@@ -1,0 +1,41 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1711776354198,
+      "tag": "0000_natural_photon",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1711795386290,
+      "tag": "0001_outgoing_stature",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1711858310997,
+      "tag": "0002_volatile_carnage",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1711866183345,
+      "tag": "0003_thankful_darkstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1711870548249,
+      "tag": "0004_hot_purple_man",
+      "breakpoints": true
+    }
+  ]
+}
