@@ -8,7 +8,8 @@ export interface Webinar extends Document {
     content: string;
     startDate: string;
     slug: string;
-    thumbnail: string;
+    thumbnail?: string;
+    coverImage?: string;
     createdBy: Types.ObjectId,
     hosts: Types.ObjectId[],
     isActive: Boolean,
@@ -26,6 +27,7 @@ const WebinarSchema = new Schema<Webinar>({
     startDate: String,
     slug: String,
     thumbnail: String,
+    coverImage: {type: String},
     isActive: {type: Boolean, default: true},
     hosts: [{ type: Schema.Types.ObjectId, ref: 'User', default: [] }],
     createdBy: {type: Schema.Types.ObjectId, ref: 'User'},

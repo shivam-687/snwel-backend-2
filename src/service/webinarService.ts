@@ -19,8 +19,11 @@ export async function createWebinar(data: CreateWebinarType): Promise<Webinar> {
 // Function to get a webinar by ID
 export async function getWebinarById(webinarId: string): Promise<Webinar | null> {
   try {
+    const query = Types.ObjectId.isValid(webinarId)
+    ?  { _id: webinarId }
+    : { slug: webinarId };
     const webinar = await WebinarModel
-                  .findById(webinarId)
+                  .findOne(query)
                   .populate('hosts', ["email", "name"])
                   .populate("createdBy", ["email", "name"]);
     return webinar ? webinar.toObject() : null;

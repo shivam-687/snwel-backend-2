@@ -26,7 +26,7 @@ interface GetUserInput {
 interface ListUsersOptions {
   limit?: number;
   page?: number;
-  filter?: { search?: string };
+  filter?: { search?: string, roles?: string[] };
 }
 
 
@@ -98,6 +98,10 @@ export async function listUsers(options: ListUsersOptions) {
   if (filter && filter.search) {
     const searchRegex = new RegExp(filter.search, 'i');
     query.$or = [{ name: searchRegex }, { email: searchRegex }];
+  }
+
+  if(filter && filter.roles){
+    query.roles = {$in: filter.roles}
   }
 
   const skip = (page - 1) * limit;
