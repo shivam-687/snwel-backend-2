@@ -63,7 +63,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
     "build": "rimraf ./build && tsc",
-    "start": "npm run build && node dist/index.js",
+    "start": "npm run build --force && node dist/index.js",
     "generate": "drizzle-kit generate:pg",
     "db:push": "node -r esbuild-register src/db/migrate.ts"
   },

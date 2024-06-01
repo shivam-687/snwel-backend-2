@@ -7,7 +7,7 @@ import { CommonConfig } from '@/config/common';
 import { errorResponse } from '@/utils/helpers/appResponse';
 import { validateSchema } from '@/middleware/validateSchema';
 import { z } from 'zod';
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken'
 
 const AuthRouter = express.Router();
 
@@ -21,7 +21,7 @@ AuthRouter.post(
   async (req, res, next) => {
     passport.authenticate(
       'login',
-      async (err: any, user: any, info: any) => {
+      async (err: any, user: any, _info: any) => {
         try {
           if (err) {
             return next(err);
