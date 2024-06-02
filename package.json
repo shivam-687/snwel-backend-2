@@ -53,6 +53,7 @@
     "drizzle-kit": "^0.20.14",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.3"
   },
@@ -62,8 +63,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
-    "build": "rimraf ./build && tsc",
-    "start": "npm run build --force && node dist/index.js",
+    "build": "rimraf ./build && tsc && tsc-alias",
+    "start": "npm run build --force && node build/index.js",
     "generate": "drizzle-kit generate:pg",
     "db:push": "node -r esbuild-register src/db/migrate.ts"
   },

@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DashboardRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const passport_1 = __importDefault(require("passport"));
+const analyticsController_1 = require("../controllers/analyticsController");
+const router = express_1.default.Router();
+exports.DashboardRoutes = router;
+router.get('/count', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getImportantEntitiesCountController);
+router.get('/popular-courses', analyticsController_1.getPopularCoursesController);
+router.get('/total-enrolled-users', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getTotalEnrolledUsersController);
+router.get('/upcoming-webinars', analyticsController_1.getUpcomingWebinarsController);
+router.get('/courses-by-category/:categoryId', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getCoursesByCategoryController);
+router.get('/total-revenue', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getTotalRevenueController);
+router.get('/top-rated-courses', analyticsController_1.getTopRatedCoursesController);
+router.get('/total-courses', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getTotalCoursesController);
+router.get('/total-users', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getTotalUsersController);
+router.get('/user-enrollments/:userId', passport_1.default.authenticate('jwt', { session: false }), analyticsController_1.getUserEnrollmentsController);
+router.get('/yearly-sales', analyticsController_1.getYearlySalesDataController);
