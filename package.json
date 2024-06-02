@@ -60,11 +60,18 @@
   "name": "snwel-backend",
   "version": "1.0.0",
   "main": "index.ts",
+  "pre-commit": [
+    "ts.check",
+    "build",
+    "add-build"
+],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
     "build": "rimraf ./build && tsc && tsc-alias",
     "start": "npm run build --force && node build/index.js",
+    "ts.check": "tsc --project tsconfig.json",
+  "add-build": "git add dist",
     "generate": "drizzle-kit generate:pg",
     "db:push": "node -r esbuild-register src/db/migrate.ts"
   },
