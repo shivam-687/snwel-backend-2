@@ -9,14 +9,17 @@ const mime_types_1 = __importDefault(require("mime-types"));
 const helpers_1 = require("../utils/helpers");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const fs_1 = __importDefault(require("fs"));
+const upload_1 = require("../middleware/upload");
 const uploadFile = async (req, res) => {
     try {
         let file;
         if (req.file) {
-            const { filename, path } = req.file;
-            console.log({ fileResponse: req.file });
-            const mimeType = mime_types_1.default.lookup(filename) || 'application/octet-stream';
-            file = new FileModal_1.FileModel({ fileName: filename, filePath: path, mimeType });
+            const b64 = Buffer.from(req.file.buffer).toString("base64");
+            let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
+            const cldRes = await (0, upload_1.handleUpload)(dataURI);
+            console.log({ fileResponse: req.file, cldRes });
+            const mimeType = mime_types_1.default.lookup(cldRes.url) || 'application/octet-stream';
+            file = new FileModal_1.FileModel({ fileName: cldRes.public_id, filePath: cldRes.url, mimeType });
             await file.save();
         }
         else if (req.body.externalUrl) {

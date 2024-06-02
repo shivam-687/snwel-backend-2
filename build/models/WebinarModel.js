@@ -25,7 +25,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebinarModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const soft_delete_plugin_mongoose_1 = require("soft-delete-plugin-mongoose");
 const WebinarSchema = new mongoose_1.Schema({
     id: String,
     title: String,
@@ -42,5 +41,4 @@ const WebinarSchema = new mongoose_1.Schema({
     currency: { type: String, default: 'INR' },
     curriculum: [{ title: String, duration: String }],
 }, { timestamps: true });
-WebinarSchema.plugin(soft_delete_plugin_mongoose_1.softDeletePlugin);
 exports.WebinarModel = mongoose_1.default.model('Webinar', WebinarSchema);

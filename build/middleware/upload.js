@@ -3,27 +3,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.handleUpload = void 0;
 // multerMiddleware.ts
 const multer_1 = __importDefault(require("multer"));
 const cloudinary_1 = __importDefault(require("cloudinary"));
-const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
-const path_1 = __importDefault(require("path"));
 // Multer storage configuration
-const storage = multer_1.default.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './uploads/');
-    },
-    filename: function (req, file, cb) {
-        const extension = path_1.default.extname(file.originalname);
-        const fileName = `${Date.now()}${extension}`;
-        cb(null, fileName);
-    }
-});
-cloudinary_1.default.v2.config();
-const cld_storage = new multer_storage_cloudinary_1.CloudinaryStorage({
-    cloudinary: cloudinary_1.default.v2,
-    params: {}
-});
+// const storage = multer.diskStorage({
+//   destination: function (req: any, file: any, cb: (arg0: null, arg1: string) => void) {
+//     cb(null, './uploads/');
+//   },
+//   filename: function (req: any, file: { originalname: string; }, cb: (arg0: null, arg1: string) => void) {
+//     const extension = path.extname(file.originalname);
+//     const fileName = `${Date.now()}${extension}`;
+//     cb(null, fileName);
+//   }
+// });
+const storage = multer_1.default.memoryStorage();
+const cld = cloudinary_1.default.v2.config();
+async function handleUpload(file) {
+    const res = await cloudinary_1.default.v2.uploader.upload(file, {
+        resource_type: "auto",
+    });
+    return res;
+}
+exports.handleUpload = handleUpload;
 // Multer file filter
 const fileFilter = (req, file, cb) => {
     // Allow only specific file types, you can customize this according to your requirements
@@ -35,5 +38,8 @@ const fileFilter = (req, file, cb) => {
     }
 };
 // Multer middleware instance
-const upload = (0, multer_1.default)({ storage: cld_storage, fileFilter: fileFilter });
+const upload = (0, multer_1.default)({
+    storage,
+    fileFilter
+});
 exports.default = upload;
