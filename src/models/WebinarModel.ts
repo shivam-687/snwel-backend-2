@@ -1,5 +1,4 @@
 import mongoose, {Document, Schema, Types} from 'mongoose';
-import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
 
 export interface Webinar extends Document {
     id: string;
@@ -36,7 +35,6 @@ const WebinarSchema = new Schema<Webinar>({
     curriculum: [{ title: String, duration: String }],
 }, {timestamps: true});
 
-WebinarSchema.plugin(softDeletePlugin);
 
 
 export const WebinarModel = mongoose.model<Webinar>('Webinar', WebinarSchema);
