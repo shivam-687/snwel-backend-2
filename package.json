@@ -25,7 +25,6 @@
     "mongodb": "^6.5.0",
     "mongoose": "^8.2.3",
     "multer": "^1.4.5-lts.1",
-    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.9.3",
     "nodemailer": "^6.9.13",
     "passport": "^0.7.0",
@@ -64,14 +63,14 @@
     "ts.check",
     "build",
     "add-build"
-],
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
     "build": "rimraf ./build && tsc && tsc-alias",
     "start": "npm run build --force && node build/index.js",
     "ts.check": "tsc --project tsconfig.json",
-  "add-build": "git add dist",
+    "add-build": "git add dist",
     "generate": "drizzle-kit generate:pg",
     "db:push": "node -r esbuild-register src/db/migrate.ts"
   },
