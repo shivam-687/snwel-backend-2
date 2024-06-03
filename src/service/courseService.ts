@@ -67,8 +67,10 @@ const getCourseById = async (courseId: string): Promise<Course | null> => {
 
 const getCourseBySlug = async (slug: string): Promise<Course | null> => {
     try {
-
-        const cs = await CourseModel.findOne({ slug }).populate(['instructors', 'categories']);
+        const query = Types.ObjectId.isValid(slug)
+        ?  { _id: slug }
+        : { slug: slug };
+        const cs = await CourseModel.findOne(query).populate(['instructors', 'categories']);
         console.log({cs, slug})
         return cs;
     } catch (error: any) {
