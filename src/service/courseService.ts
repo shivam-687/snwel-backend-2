@@ -3,6 +3,7 @@ import { convertToPagination, getPaginationParams } from '@/utils/helpers';
 import { ObjectId } from 'mongodb';
 import {ListOptions, PaginatedList} from '@/types/custom'
 import { CourseCategoryModel } from '@/models/CourseCategory';
+import { Types } from 'mongoose';
 
 // Function to create a new course
 const createCourse = async (courseData: Course): Promise<Course> => {
@@ -55,7 +56,10 @@ const getAllCourses = async (options: ListOptions): Promise<PaginatedList<Course
 // Function to retrieve a course by ID
 const getCourseById = async (courseId: string): Promise<Course | null> => {
     try {
-        return await CourseModel.findById(courseId).populate(['instructors', 'categories']);
+        const query = Types.ObjectId.isValid(courseId)
+        ?  { _id: courseId }
+        : { slug: courseId };
+        return await CourseModel.findById(query).populate(['instructors', 'categories']);
     } catch (error: any) {
         throw new Error(`Error: retrieving course: ${error.message}`);
     }
@@ -63,6 +67,7 @@ const getCourseById = async (courseId: string): Promise<Course | null> => {
 
 const getCourseBySlug = async (slug: string): Promise<Course | null> => {
     try {
+
         const cs = await CourseModel.findOne({ slug }).populate(['instructors', 'categories']);
         console.log({cs, slug})
         return cs;
