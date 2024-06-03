@@ -7,11 +7,11 @@ import { createCourseController, deleteCourseController, getAllCoursesController
 const router = express.Router();
 
 
-router.get('/', passport.authenticate('jwt', {session: false}), getAllCoursesController);
-router.post('/', createCourseController);
+router.get('/', getAllCoursesController);
+router.post('/',passport.authenticate('jwt', {session: false}), createCourseController);
 router.get('/byId/:courseId', getCourseByIdController);
-router.put('/:courseId', updateCourseController);
-router.delete('/:courseId', deleteCourseController);
+router.put('/:courseId', passport.authenticate('jwt', {session: false}), updateCourseController);
+router.delete('/:courseId', passport.authenticate('jwt', {session: false}), deleteCourseController);
 router.get('/:slug', getCourseBySlugController);
 
 
