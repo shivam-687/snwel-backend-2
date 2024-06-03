@@ -5,6 +5,7 @@ const CourseModel_1 = require("../models/CourseModel");
 const helpers_1 = require("../utils/helpers");
 const mongodb_1 = require("mongodb");
 const CourseCategory_1 = require("../models/CourseCategory");
+const mongoose_1 = require("mongoose");
 // Function to create a new course
 const createCourse = async (courseData) => {
     try {
@@ -56,7 +57,10 @@ exports.getAllCourses = getAllCourses;
 // Function to retrieve a course by ID
 const getCourseById = async (courseId) => {
     try {
-        return await CourseModel_1.CourseModel.findById(courseId).populate(['instructors', 'categories']);
+        const query = mongoose_1.Types.ObjectId.isValid(courseId)
+            ? { _id: courseId }
+            : { slug: courseId };
+        return await CourseModel_1.CourseModel.findById(query).populate(['instructors', 'categories']);
     }
     catch (error) {
         throw new Error(`Error: retrieving course: ${error.message}`);
@@ -65,7 +69,10 @@ const getCourseById = async (courseId) => {
 exports.getCourseById = getCourseById;
 const getCourseBySlug = async (slug) => {
     try {
-        const cs = await CourseModel_1.CourseModel.findOne({ slug }).populate(['instructors', 'categories']);
+        const query = mongoose_1.Types.ObjectId.isValid(slug)
+            ? { _id: slug }
+            : { slug: slug };
+        const cs = await CourseModel_1.CourseModel.findOne(query).populate(['instructors', 'categories']);
         console.log({ cs, slug });
         return cs;
     }
