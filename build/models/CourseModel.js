@@ -60,7 +60,7 @@ const CourseSchema = new mongoose_1.Schema({
         promotionalCardImage: String,
         iconImage: String,
     },
-    curriculum: [{ title: String, duration: String }],
+    curriculum: [{ title: String, duration: String, unit: String }],
 }, { timestamps: true });
 CourseSchema.pre('save', async function (next) {
     try {

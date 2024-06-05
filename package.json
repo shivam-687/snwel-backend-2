@@ -71,7 +71,7 @@
     "build": "rimraf ./build && tsc && tsc-alias",
     "start": "npm run build --force && node build/index.js",
     "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add dist",
+    "add-build": "git add build",
     "generate": "drizzle-kit generate:pg",
     "db:push": "node -r esbuild-register src/db/migrate.ts"
   },
