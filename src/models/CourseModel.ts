@@ -69,7 +69,7 @@ const CourseSchema = new Schema<Course>({
         promotionalCardImage: String,
         iconImage: String,
     },
-    curriculum: [{ title: String, duration: String }],
+    curriculum: [{ title: String, duration: String, unit: String }],
 }, {timestamps: true});
 
 

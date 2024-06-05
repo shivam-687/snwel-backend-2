@@ -49,6 +49,8 @@
     "@types/react": "^18.3.2",
     "@types/uuid": "^9.0.8",
     "drizzle-kit": "^0.20.14",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.5",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.10",
@@ -72,6 +74,14 @@
     "add-build": "git add dist",
     "generate": "drizzle-kit generate:pg",
     "db:push": "node -r esbuild-register src/db/migrate.ts"
+  },
+  "lint-staged": {
+    "*": "npm run build"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "author": "",
   "license": "ISC",
