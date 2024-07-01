@@ -38,7 +38,6 @@ const getCourseBySlugController = (0, catchAsync_1.catchAsync)(async (req, res) 
         return appResponse_1.courseErrorResponse.notFound(null, res);
     }
     const course = await (0, courseService_1.getCourseBySlug)(slug);
-    console.log({ course });
     (0, appResponse_1.successResponse)(course, res);
 });
 exports.getCourseBySlugController = getCourseBySlugController;

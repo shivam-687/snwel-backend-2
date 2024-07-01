@@ -18,7 +18,6 @@ class EmailService {
     }
     async initialize() {
         const setting = await Setting_1.SettingModel.findOne({ code: setting_schema_1.SETTINGS.EMAIL });
-        console.log("Load settings", setting);
         if (!setting || !setting.data) {
             throw new Error('Email settings not found or misconfigured');
         }
@@ -64,7 +63,6 @@ class EmailService {
             html,
         };
         const info = await this.transporter.sendMail(mailOptions);
-        console.log({ info });
         return info;
     }
     async sendOtp(email, otp) {

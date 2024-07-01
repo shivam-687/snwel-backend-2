@@ -33,7 +33,6 @@ export const getUserController = async (req: Request, res: Response) => {
 
 export const getMeController = async (req: Request, res: Response) => {
     try {
-        console.log("Get Me ")
         const user = await me(req.user?._id||'');
         return successResponse(user, res)
     } catch (error) {

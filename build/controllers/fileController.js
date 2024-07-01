@@ -17,7 +17,6 @@ const uploadFile = async (req, res) => {
             const b64 = Buffer.from(req.file.buffer).toString("base64");
             let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
             const cldRes = await (0, upload_1.handleUpload)(dataURI);
-            console.log({ fileResponse: req.file, cldRes });
             const mimeType = mime_types_1.default.lookup(cldRes.url) || 'application/octet-stream';
             file = new FileModal_1.FileModel({ fileName: cldRes.public_id, filePath: cldRes.url, mimeType });
             await file.save();
@@ -42,8 +41,7 @@ const listFiles = async (req, res) => {
         const { limit = 10, page = 1, search = '' } = { ...req.query };
         const paginationData = (0, helpers_1.getPaginationParams)(limit, page);
         const query = (0, helpers_1.getFilterQuery)({ filter: { search: String(search) } });
-        console.log({ query });
-        const files = await FileModal_1.FileModel.find().skip(paginationData.offset).limit(paginationData.limit);
+        const files = await FileModal_1.FileModel.find().sort({ uploadDate: -1 }).skip(paginationData.offset).limit(paginationData.limit);
         const count = await FileModal_1.FileModel.countDocuments(query);
         return (0, appResponse_1.successResponse)((0, helpers_1.convertToPagination)(files, count, paginationData.limit, paginationData.offset), res);
         res.json(files);

@@ -10,7 +10,6 @@ class SettingsController {
             (0, appResponse_1.successResponse)(setting, res);
         }
         catch (error) {
-            console.log(error);
             (0, appResponse_1.errorResponseFromError)(error, res);
         }
     }

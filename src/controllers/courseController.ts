@@ -41,7 +41,6 @@ const getCourseBySlugController = catchAsync(async (req: Request, res: Response)
         return courseErrorResponse.notFound(null, res)
     }
     const course = await getCourseBySlug(slug);
-    console.log({course})
     successResponse(course, res)
 });
 const updateCourseController = catchAsync(async (req: Request, res: Response): Promise<void> => {

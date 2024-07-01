@@ -42,7 +42,6 @@ CourseCategorySchema.pre('save', async function (next) {
     const category = this;
     // Generate slug from title using slugify
     try {
-        console.log("Title", category.title);
         const slug = (0, slugify_1.default)(category.title, { lower: true });
         const existingCategory = await exports.CourseCategoryModel.findOne({ slug });
         if (existingCategory) {

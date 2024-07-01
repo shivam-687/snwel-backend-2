@@ -22,7 +22,7 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use(securityMiddleware);
 app.use(loggerMiddleware);
-app.use( express.static('public'));
+app.use(express.static('public'));
 app.use('/', indexRoute)
 
 

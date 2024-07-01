@@ -398,8 +398,6 @@ export const getYearlySalesData = async (year: number): Promise<{ month: string;
                 }
             }
         ]);
-
-        console.log({salesData})
         // Mapping months to their names
         const monthNames = [
             'January', 'February', 'March', 'April', 'May', 'June',

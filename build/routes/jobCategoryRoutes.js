@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JobCategoryRouter = void 0;
+const express_1 = require("express");
+const jobCategoryController_1 = require("../controllers/jobCategoryController");
+const validateSchema_1 = require("../middleware/validateSchema");
+const job_category_1 = require("../entity-schema/job-category");
+const router = (0, express_1.Router)();
+exports.JobCategoryRouter = router;
+router.post('/', (0, validateSchema_1.validateSchema)(job_category_1.createJobCategorySchema), jobCategoryController_1.createJobCategoryController);
+router.get('/', jobCategoryController_1.getAllJobCategoriesController);
+router.get('/:id', jobCategoryController_1.getJobCategoryByIdController);
+router.put('/:id', (0, validateSchema_1.validateSchema)(job_category_1.updateJobCategorySchema), jobCategoryController_1.updateJobCategoryByIdController);
+router.delete('/:id', jobCategoryController_1.deleteJobCategoryByIdController);

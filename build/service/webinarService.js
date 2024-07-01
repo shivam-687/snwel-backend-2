@@ -35,7 +35,6 @@ exports.getWebinarById = getWebinarById;
 // Function to get a webinar by ID
 async function getWebinarBySlug(slug) {
     try {
-        console.log(slug);
         const webinar = await WebinarModel_1.WebinarModel
             .findOne({ slug })
             .populate('hosts', ["email", "name"])
@@ -96,12 +95,12 @@ async function addHosts(webinarId, hosts) {
 exports.addHosts = addHosts;
 const getAllWebinars = async (options) => {
     try {
-        const { limit = 10, page = 1, filter } = options;
+        const { limit = 10, page = 1, search, filter } = options;
         const query = {};
         const paginationData = (0, helpers_1.getPaginationParams)(limit, page);
-        if (filter && filter.search) {
-            const searchRegex = new RegExp(filter.search, 'i');
-            query.$or = [{ name: searchRegex }, { email: searchRegex }];
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query.$and = [{ title: searchRegex }];
         }
         const skip = (page - 1) * limit;
         const users = await WebinarModel_1.WebinarModel

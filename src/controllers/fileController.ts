@@ -16,7 +16,6 @@ export const uploadFile = async (req: Request, res: Response) => {
       let dataURI = "data:" + req.file.mimetype + ";base64," + b64;
       const cldRes = await handleUpload(dataURI);
     
-      console.log({ fileResponse: req.file, cldRes })
       const mimeType = mime.lookup(cldRes.url) || 'application/octet-stream';
       file = new FileModel({ fileName: cldRes.public_id, filePath: cldRes.url, mimeType });
       await file.save();
@@ -39,8 +38,7 @@ export const listFiles = async (req: Request, res: Response) => {
     const { limit = 10, page = 1, search = '' } = { ...req.query };
     const paginationData = getPaginationParams(limit, page)
     const query: any = getFilterQuery({ filter: { search: String(search) } })
-    console.log({ query })
-    const files = await FileModel.find().skip(paginationData.offset).limit(paginationData.limit);
+    const files = await FileModel.find().sort({uploadDate: -1}).skip(paginationData.offset).limit(paginationData.limit);
     const count = await FileModel.countDocuments(query);
     return successResponse(convertToPagination(files, count, paginationData.limit, paginationData.offset), res)
     res.json(files);

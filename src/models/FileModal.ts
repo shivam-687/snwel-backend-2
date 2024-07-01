@@ -15,7 +15,7 @@ const FileSchema: Schema = new Schema({
   mimeType: { type: String, required: true },
   externalUrl: { type: String },
   uploadDate: { type: Date, default: Date.now }
-});
+}, {timestamps: true});
 
 export const FileModel =  mongoose.model<IFile>('File', FileSchema);
 

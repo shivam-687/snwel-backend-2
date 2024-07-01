@@ -5,6 +5,7 @@ exports.getAllWebinarController = exports.addHostsToWebinarController = exports.
 const webinarService_1 = require("../service/webinarService");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const catchAsync_1 = require("../utils/helpers/catchAsync");
+const helpers_1 = require("../utils/helpers");
 // Controller function to create a new webinar
 async function createWebinarController(req, res) {
     try {
@@ -91,6 +92,6 @@ async function addHostsToWebinarController(req, res) {
 }
 exports.addHostsToWebinarController = addHostsToWebinarController;
 exports.getAllWebinarController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const courses = await (0, webinarService_1.getAllWebinars)({ ...req.query });
+    const courses = await (0, webinarService_1.getAllWebinars)((0, helpers_1.extractListOptions)(req));
     return (0, appResponse_1.successResponse)(courses, res, { message: "Webinars Fetched successfully!" });
 });

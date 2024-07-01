@@ -37,7 +37,6 @@ const getUserController = async (req, res) => {
 exports.getUserController = getUserController;
 const getMeController = async (req, res) => {
     try {
-        console.log("Get Me ");
         const user = await (0, userService_1.me)(req.user?._id || '');
         return (0, appResponse_1.successResponse)(user, res);
     }

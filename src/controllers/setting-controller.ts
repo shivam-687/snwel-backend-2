@@ -11,7 +11,6 @@ class SettingsController {
       const setting = await settingsService.createSetting(req.body);
       successResponse(setting, res);
     } catch (error: any) {
-        console.log(error)
         errorResponseFromError(error, res);
     }
   }

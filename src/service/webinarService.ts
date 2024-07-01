@@ -34,7 +34,6 @@ export async function getWebinarById(webinarId: string): Promise<Webinar | null>
 // Function to get a webinar by ID
 export async function getWebinarBySlug(slug: string): Promise<Webinar | null> {
   try {
-    console.log(slug)
     const webinar = await WebinarModel
     .findOne({slug})
     .populate('hosts', ["email", "name"])
@@ -98,12 +97,12 @@ export async function addHosts(webinarId: string, hosts: string[]): Promise<Webi
 
 export const getAllWebinars = async (options: ListOptions): Promise<PaginatedList<Webinar>> => {
   try {
-      const { limit = 10, page = 1, filter } = options;
+      const { limit = 10, page = 1, search, filter } = options;
       const query: any = {}; 
       const paginationData = getPaginationParams(limit, page)
-      if (filter && filter.search) {
-        const searchRegex = new RegExp(filter.search, 'i');
-        query.$or = [{ name: searchRegex }, { email: searchRegex }];
+      if (search) {
+        const searchRegex = new RegExp(search, 'i');
+        query.$and = [{ title: searchRegex }];
       }
     
       const skip = (page - 1) * limit;

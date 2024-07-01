@@ -60,11 +60,10 @@ const CourseSchema = new mongoose_1.Schema({
         promotionalCardImage: String,
         iconImage: String,
     },
-    curriculum: [{ title: String, duration: String, unit: String }],
+    curriculum: [{ title: String, duration: String, unit: String, classCount: Number, curriculumType: String }],
 }, { timestamps: true });
 CourseSchema.pre('save', async function (next) {
     try {
-        console.log("Title", this.title);
         const slug = (0, slugify_1.default)(this.title, { lower: true });
         const existingCourse = await exports.CourseModel.findOne({ slug });
         if (existingCourse) {

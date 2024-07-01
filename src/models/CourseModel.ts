@@ -69,13 +69,14 @@ const CourseSchema = new Schema<Course>({
         promotionalCardImage: String,
         iconImage: String,
     },
-    curriculum: [{ title: String, duration: String, unit: String }],
+    curriculum: [{ title: String, duration: String, unit: String, classCount: Number,  curriculumType: String }],
+
+
 }, {timestamps: true});
 
 
 CourseSchema.pre<Course>('save', async function (next) {
     try {
-        console.log("Title",this.title)
         const slug = slugify(this.title, { lower: true });
         const existingCourse = await CourseModel.findOne({slug});
 

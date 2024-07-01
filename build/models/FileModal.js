@@ -32,5 +32,5 @@ const FileSchema = new mongoose_1.Schema({
     mimeType: { type: String, required: true },
     externalUrl: { type: String },
     uploadDate: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 exports.FileModel = mongoose_1.default.model('File', FileSchema);

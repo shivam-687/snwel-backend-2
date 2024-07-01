@@ -4,6 +4,7 @@ import {Webinar} from '@/models/WebinarModel'
 import { createWebinar, getWebinarById, updateWebinarById, deleteWebinarById, addHosts, getAllWebinars, getWebinarBySlug } from '@/service/webinarService';
 import { errorResponseFromError, successResponse } from '@/utils/helpers/appResponse';
 import { catchAsync } from '@/utils/helpers/catchAsync';
+import { extractListOptions } from '@/utils/helpers';
 
 // Controller function to create a new webinar
 export async function createWebinarController(req: Request, res: Response): Promise<void> {
@@ -84,6 +85,6 @@ export async function addHostsToWebinarController(req: Request, res: Response): 
 }
 
 export const getAllWebinarController = catchAsync(async (req: Request, res: Response): Promise<void> => {
-  const courses = await getAllWebinars({...req.query});
+  const courses = await getAllWebinars(extractListOptions(req));
   return successResponse(courses, res, { message: "Webinars Fetched successfully!" })
 });

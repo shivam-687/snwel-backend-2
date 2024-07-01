@@ -71,7 +71,6 @@ const getCourseBySlug = async (slug: string): Promise<Course | null> => {
         ?  { _id: slug }
         : { slug: slug };
         const cs = await CourseModel.findOne(query).populate(['instructors', 'categories']);
-        console.log({cs, slug})
         return cs;
     } catch (error: any) {
         throw new Error(`Error: retrieving course: ${error.message}`);

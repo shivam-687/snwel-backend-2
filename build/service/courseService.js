@@ -73,7 +73,6 @@ const getCourseBySlug = async (slug) => {
             ? { _id: slug }
             : { slug: slug };
         const cs = await CourseModel_1.CourseModel.findOne(query).populate(['instructors', 'categories']);
-        console.log({ cs, slug });
         return cs;
     }
     catch (error) {

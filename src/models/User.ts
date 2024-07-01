@@ -39,7 +39,6 @@ UserSchema.pre(
   async function (next) {
     const user = this;
     const hash = await bcrypt.hash(this.password, 10);
-    console.log("Hash password called")
     this.password = hash;
     next();
   }
