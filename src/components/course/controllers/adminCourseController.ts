@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { createCourse, deleteCourseById, getAllCourses, getCourseById, getCourseBySlug, partialUpdateCourse, updateCourseById } from '@/service/courseService'
-import { courseErrorResponse, errorResponse, errorResponseFromError, successResponse } from '@/utils/helpers/appResponse';
+import { createCourse, deleteCourseById, getAllCourses, getCourseById, getCourseBySlug, partialUpdateCourse, updateCourseById } from '@/components/course/service/courseService'
+import { courseErrorResponse, errorResponse, successResponse } from '@/utils/helpers/appResponse';
 import { Course } from '@/models/CourseModel';
 import { catchAsync } from '@/utils/helpers/catchAsync';
 import { extractListOptions } from '@/utils/helpers';
@@ -9,7 +9,7 @@ import { extractListOptions } from '@/utils/helpers';
 
 // Function to get all courses
 const getAllCoursesController = catchAsync(async (req: Request, res: Response): Promise<void> => {
-    const courses = await getAllCourses(extractListOptions(req));
+    const courses = await getAllCourses(extractListOptions(req), true);
     return successResponse(courses, res, { message: "Course Fetched successfully!" })
 });
 
@@ -40,7 +40,7 @@ const getCourseBySlugController = catchAsync(async (req: Request, res: Response)
     if (!slug) {
         return courseErrorResponse.notFound(null, res)
     }
-    const course = await getCourseBySlug(slug);
+    const course = await getCourseBySlug(slug, true);
     successResponse(course, res)
 });
 const updateCourseController = catchAsync(async (req: Request, res: Response): Promise<void> => {

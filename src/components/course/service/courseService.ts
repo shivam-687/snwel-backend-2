@@ -1,10 +1,9 @@
-import { CourseModel, Course, COURSE_STATUS } from '@/models/CourseModel';
+import { CourseModel, Course, COURSE_STATUS } from '@/components/course/model/courseModel';
 import { convertToPagination, getPaginationParams } from '@/utils/helpers';
 import { ObjectId } from 'mongodb';
 import {ListOptions, PaginatedList} from '@/types/custom'
 import { CourseCategoryModel } from '@/models/CourseCategory';
 import { Types } from 'mongoose';
-import Master from '@/models/MasterModel';
 
 // Function to create a new course
 const createCourse = async (courseData: Course): Promise<Course> => {

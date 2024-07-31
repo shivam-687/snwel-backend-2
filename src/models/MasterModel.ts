@@ -6,7 +6,8 @@ export interface IMaster extends Document {
     isActive: boolean;
     name: string;
     meta?: Record<string, any>;
-    sequence: number
+    sequence: number,
+    type: string
 }
 
 const masterSchema = new Schema<IMaster>({
@@ -15,7 +16,8 @@ const masterSchema = new Schema<IMaster>({
     isActive: { type: Boolean, default: true },
     name: { type: String, required: true },
     meta: { type: Schema.Types.Mixed, required: false },
-    sequence: { type: Number }
+    sequence: { type: Number },
+    type: {type: String, default: 'MASTER'}
 }, {
     timestamps: true,
 });

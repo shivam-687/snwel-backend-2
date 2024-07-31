@@ -9,7 +9,7 @@ import { extractListOptions } from '@/utils/helpers';
 
 // Function to get all courses
 const getAllCoursesController = catchAsync(async (req: Request, res: Response): Promise<void> => {
-    const courses = await getAllCourses(extractListOptions(req));
+    const courses = await getAllCourses(extractListOptions(req), true);
     return successResponse(courses, res, { message: "Course Fetched successfully!" })
 });
 

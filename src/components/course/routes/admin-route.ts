@@ -1,6 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import { createCourseController, deleteCourseController, getAllCoursesController, getCourseByIdController, getCourseBySlugController, partialUpdateCourseController, updateCourseController } from '@/controllers/courseController';
+import { createCourseController, deleteCourseController, getAllCoursesController, getCourseByIdController, getCourseBySlugController, partialUpdateCourseController, updateCourseController } from '@/components/course/controllers/adminCourseController';
 
 const router = express.Router();
 
@@ -14,4 +14,4 @@ router.delete('/:courseId', passport.authenticate('jwt', {session: false}), dele
 router.get('/:slug', getCourseBySlugController);
 
 
-export { router as CourseRouter };
+export { router as AdminCourseRouter };
