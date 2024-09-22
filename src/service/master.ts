@@ -1,6 +1,7 @@
 import MasterModel, { IMaster } from '@/models/MasterModel';
 import { PaginatedList, ListOptions } from '@/types/custom';
 import { convertToPagination, getPaginationParams } from '@/utils/helpers';
+import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
 
 const createMasterItem = async (data: Partial<IMaster>): Promise<IMaster> => {
@@ -22,7 +23,11 @@ const getAllMasterItems = async (options: ListOptions): Promise<PaginatedList<IM
       query.$or = [{ name: searchRegex }, { code: searchRegex }];
     }
     if(filter){
-        query = {...query, ...filter}
+      const {ids, ...rest} = filter;
+      if(Array.isArray(ids)&& ids.length > 0){
+        query['_id'] = {$in: ids.map((id: string) => new ObjectId(id))}
+      }
+        query = {...query, ...rest}
     }
 
     const skip = (page - 1) * limit;
@@ -31,7 +36,6 @@ const getAllMasterItems = async (options: ListOptions): Promise<PaginatedList<IM
       .skip(skip)
       .limit(limit)
       .sort({createdAt: -1, sequence: -1})
-      .exec();
 
     const count = await MasterModel.countDocuments(query);
 
@@ -52,7 +56,7 @@ const getMasterItemByCode = async (code: string): Promise<IMaster | null> => {
 
 const updateMasterItemByCode = async (code: string, updateData: Partial<IMaster>): Promise<IMaster | null> => {
   try {
-    return await MasterModel.findOneAndUpdate({ code }, updateData, { new: true });
+    return await MasterModel.findOneAndUpdate({ _id: new ObjectId(code) }, updateData, { new: true });
   } catch (error: any) {
     throw new Error(`Error: updating master item: ${error.message}`);
   }
@@ -72,9 +76,16 @@ const getMasterItem = async (identifier: string): Promise<IMaster | null> => {
   }
 };
 
-const deleteMasterItemByCode = async (code: string): Promise<void> => {
+const deleteMasterItemByCode = async (identifier: string): Promise<void> => {
   try {
-    await MasterModel.findOneAndDelete({ code });
+    let query: any = {};
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+      query["_id"] = new ObjectId(identifier);
+    } else {
+     query["code"] = identifier;
+    }
+    console.log(query)
+    await MasterModel.findOneAndDelete(query);
   } catch (error: any) {
     throw new Error(`Error: deleting master item: ${error.message}`);
   }

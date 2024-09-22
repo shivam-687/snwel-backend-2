@@ -1,7 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 interface OTP extends Document {
-  userId: string;
   otp: string;
   expirationTime: Date;
   verified: boolean;
@@ -11,7 +10,6 @@ interface OTP extends Document {
 }
 
 const OTPSchema = new Schema<OTP>({
-  userId: { type: String, unique: true },
   otp: String,
   expirationTime: Date,
   verified: { type: Boolean, default: false },

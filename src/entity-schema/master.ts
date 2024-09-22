@@ -1,3 +1,4 @@
+import { Constants } from '@/config/constants';
 import { z } from 'zod';
 
 const masterSchema = z.object({
@@ -6,6 +7,7 @@ const masterSchema = z.object({
   isActive: z.boolean().default(true),
   name: z.string().min(1, "Name is required"),
   meta: z.record(z.string(), z.any()).optional(),
+  type: z.enum([Constants.MASTER_TYPES.MASTER, Constants.MASTER_TYPES.SUB_MASTER])
 });
 
 // Schema for creating a new master item

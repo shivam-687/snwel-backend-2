@@ -26,3 +26,18 @@ try {
     console.error("Config validation error", error);
     process.exit(1)
 }
+
+
+export const paginateOptions = {
+    customLabels: {
+      totalDocs: 'total',       // Rename totalDocs to totalItems
+      docs: 'docs',          // Rename docs to applications
+      limit: 'pageSize',             // Rename limit to pageSize
+      totalPages: 'totalPages',      // Keep the same or rename as needed
+      page: 'currentPage',           // Rename page to currentPage
+      nextPage: 'nextPage',              // Rename nextPage to next
+      prevPage: 'prevPage',          // Rename prevPage to previous
+      hasPrevPage: 'hasPrevious',    // Rename hasPrevPage to hasPrevious
+      hasNextPage: 'hasNext',        // Rename hasNextPage to hasNext
+    }
+  };

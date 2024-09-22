@@ -13,8 +13,8 @@ const router = Router();
 
 router.post('/', validateSchema(createMasterItemSchema), createMasterItemController);
 router.get('/', getAllMasterItemsController);
-router.get('/:id', getMasterItemController);
-router.put('/:id', validateSchema(updateMasterItemSchema), updateMasterItemByCodeController);
+router.get('/:idOrCode', getMasterItemController);
+router.put('/:idOrCode', validateSchema(updateMasterItemSchema), updateMasterItemByCodeController);
 router.delete('/:id', deleteMasterItemByCodeController);
 
 export { router as MasterRouter };

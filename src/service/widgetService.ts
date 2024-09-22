@@ -2,6 +2,7 @@
 import WidgetModel, { IWidget } from '@/models/Widgets';
 import { PaginatedList, ListOptions } from '@/types/custom';
 import { convertToPagination, getPaginationParams } from '@/utils/helpers';
+import mongoose from 'mongoose';
 
 const createWidget = async (widgetData: Partial<IWidget>): Promise<IWidget> => {
   try {
@@ -34,7 +35,11 @@ const getAllWidgets = async (options: ListOptions): Promise<PaginatedList<IWidge
 
 const getWidgetById = async (widgetId: string): Promise<IWidget | null> => {
   try {
-    return await WidgetModel.findById(widgetId);
+     if (mongoose.Types.ObjectId.isValid(widgetId)) {
+      return await WidgetModel.findById(widgetId);
+    } else {
+      return await WidgetModel.findOne({ code: widgetId });
+    }
   } catch (error: any) {
     throw new Error(`Error: retrieving widget: ${error.message}`);
   }

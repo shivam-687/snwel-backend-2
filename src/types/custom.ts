@@ -1,3 +1,5 @@
+import { SortOrder } from "mongoose"
+
 export type User = {
     id: number,
     name: string,
@@ -18,7 +20,10 @@ export type ListOptions<F = any> = {
     limit?: number;
     page?: number;
     filter?: F,
-    search?: string
+    search?: string,
+    sort?: Record<string, SortOrder>,
+    startDate?: string | Date,
+    endDate?: string | Date
 }
 
 export type PaginatedList<T=any> = {

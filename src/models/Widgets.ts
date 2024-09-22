@@ -1,5 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+
+
 // Define common widget schema
 const WidgetSchema: Schema = new Schema({
     title: {type: String},
@@ -57,7 +59,7 @@ export interface CDTWidget extends IWidget {
                 buttonText: string
             },
             hideTimer: {
-                isActive: true
+                isActive: boolean
             },
         },
         appearence: {
@@ -71,6 +73,8 @@ export interface CDTWidget extends IWidget {
         }
     };
 }
+
+
 
 export interface MarketingPopupWidget extends IWidget {
     type: 'Popup';

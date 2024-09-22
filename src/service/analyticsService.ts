@@ -38,18 +38,20 @@ export const getImportantEntitiesCount = async (options?: FilterOptions) => {
         }
 
         // Fetch counts in parallel
-        const [totalCourses, totalUsers, totalEnrollments, totalWebinars] = await Promise.all([
+        const [totalCourses, totalUsers, paidEnrollments, totalWebinars, allEnrollments] = await Promise.all([
             CourseModel.countDocuments(courseQuery).exec(),
             UserModel.countDocuments(userQuery).exec(),
             CourseEnrollmentModel.countDocuments(enrollmentQuery).exec(),
-            WebinarModel.countDocuments(webinarQuery).exec()
+            WebinarModel.countDocuments(webinarQuery).exec(),
+            CourseEnrollmentModel.countDocuments({$nor: [{status: 'DECLINED'}]}).exec(),
         ]);
 
         return {
             totalCourses,
             totalUsers,
-            totalEnrollments,
-            totalWebinars
+            paidEnrollments,
+            totalWebinars,
+            allEnrollments
         };
     } catch (error: any) {
         throw new Error(`Error fetching important entities count: ${error.message}`);

@@ -15,6 +15,10 @@ import { EnquiryRouter } from './enquiryRoute';
 import { JobVacancyRouter } from './jobVacancyRoute';
 import { JobCategoryRouter } from './jobCategoryRoutes';
 import { MasterRouter } from './masterRoute';
+import PaymentRouter from '@/components/payment/paymentRoutes';
+import { JobApplicationRouter } from './jobApplicationRoutes';
+import { OtpRouter } from './otpRoutes';
+import { GalleryRouter } from './gallerRoutes';
 
 const router = express.Router();
 
@@ -33,6 +37,10 @@ router.use("/enquiries", EnquiryRouter);
 router.use("/jobvacancies", JobVacancyRouter);
 router.use("/jobcategories", JobCategoryRouter);
 router.use("/master", MasterRouter);
+router.use("/payments", PaymentRouter)
+router.use("/job-application", JobApplicationRouter)
+router.use("/otp", OtpRouter)
+router.use("/gallery", GalleryRouter)
 
 
 export { router as indexRoute };

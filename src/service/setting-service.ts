@@ -1,5 +1,5 @@
 import { convertToPagination } from './../utils/helpers/index';
-import { CreateSettingInput, EmailSettingTypeSchema, GeneralSettingSchema, IntegrationSettingTypeSchema, SETTINGS, Setting, UpdateSettingInput } from '@/entity-schema/setting-schema';
+import { CreateSettingInput, EmailSettingTypeSchema, GeneralSettingSchema, IntegrationSettingTypeSchema, MenuSettingSchema, SETTINGS, Setting, UpdateSettingInput } from '@/entity-schema/setting-schema';
 import { SettingModel } from '@/models/Setting';
 import { ListOptions, PaginatedList } from '@/types/custom';
 import { getPaginationParams } from '@/utils/helpers';
@@ -20,6 +20,9 @@ class SettingsService {
         break;
       case SETTINGS.GENERAL:
         validatedInput = GeneralSettingSchema.parse(input);
+        break;
+      case SETTINGS.MENUBUILDER:
+        validatedInput = MenuSettingSchema.parse(input);
         break;
       default:
         throw new Error('Invalid setting code');
@@ -52,12 +55,16 @@ class SettingsService {
       case SETTINGS.GENERAL:
         validatedInput = GeneralSettingSchema.pick({ data: true, isChangable: true }).parse(input);
         break;
+        case SETTINGS.MENUBUILDER:
+          validatedInput = MenuSettingSchema.parse(input);
+          break;
       default:
         throw new Error('Invalid setting code');
     }
 
     // Update in database
-    const updatedSetting = await SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true });
+  
+    const updatedSetting = await SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true, upsert: true});
     if (!updatedSetting) {
       throw new Error(`Setting with code ${code} not found`);
     }

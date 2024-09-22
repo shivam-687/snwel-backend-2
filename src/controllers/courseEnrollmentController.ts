@@ -11,7 +11,7 @@ import { Constants } from '@/config/constants';
 
 // Function to get all courses
 const getAllController = catchAsync(async (req: Request, res: Response): Promise<void> => {
-    const courses = await getAll({...req.query});
+    const courses = await getAll({ ...req.query });
     return successResponse(courses, res, { message: "Course Enrollments Fetched successfully!" })
 });
 
@@ -25,10 +25,15 @@ const createController = catchAsync(async (req: Request, res: Response): Promise
 const createByAnonymous = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const courseData: CreateEnrollmentAnonymously = req.body;
     const userExists = await getUserByEmail(courseData.email);
-    if(userExists){
+    if (userExists) {
         const createdCourse = await create({
             userId: userExists._id,
             courseId: courseData.courseId,
+            extra: courseData.extra,
+            qualification: courseData.qualification,
+            mode: courseData.mode,
+            occupation: courseData.occupation,
+            widget: courseData.widget
         });
         return successResponse(createdCourse, res);
     }
@@ -43,19 +48,24 @@ const createByAnonymous = catchAsync(async (req: Request, res: Response): Promis
 
     const newEnroll = await create({
         courseId: courseData.courseId,
-        userId: newUser._id
+        userId: newUser._id,
+        extra: courseData.extra,
+        qualification: courseData.qualification,
+        mode: courseData.mode,
+        occupation: courseData.occupation,
+        widget: courseData.widget
     });
     successResponse(newEnroll, res);
 })
 
 // Function to get course by id
 const getByIdController = catchAsync(async (req: Request, res: Response): Promise<void> => {
-        const { id } = req.params;
-        if (!id) {
-            return courseEnrollmentResponse.notFound(null, res)
-        }
-        const course = await getById(id)
-        successResponse(course, res)
+    const { id } = req.params;
+    if (!id) {
+        return courseEnrollmentResponse.notFound(null, res)
+    }
+    const course = await getById(id)
+    successResponse(course, res)
 });
 
 const updateController = catchAsync(async (req: Request, res: Response): Promise<void> => {
@@ -64,7 +74,7 @@ const updateController = catchAsync(async (req: Request, res: Response): Promise
         return courseEnrollmentResponse.notFound(null, res)
     }
     const course = await updateById(id, req.body);
-    successResponse(course, res, {message: "Course Enrollment Updated successfully!"})
+    successResponse(course, res, { message: "Course Enrollment Updated successfully!" })
 });
 
 const deleteController = catchAsync(async (req: Request, res: Response): Promise<void> => {
@@ -72,19 +82,19 @@ const deleteController = catchAsync(async (req: Request, res: Response): Promise
     if (!id) {
         return courseErrorResponse.notFound(null, res)
     }
-     await deleteById(id);
-    successResponse(null, res, {message: "Course Enrollment deleted successfully!"})
+    await deleteById(id);
+    successResponse(null, res, { message: "Course Enrollment deleted successfully!" })
 });
 
 const verifyOtpController = catchAsync(async (req, res): Promise<any> => {
     const { token, otp } = req.body;
-    
+
     if (!token || !otp) {
         throw new Error("Error: 400: Token and OTP are required")
     }
     const result = await verifyOtpAndUpdate(token, otp);
     successResponse(result, res);
-    
+
 });
 
 
@@ -97,7 +107,7 @@ const resendOtpController = catchAsync(async (req, res): Promise<any> => {
 
     const result = await resendOtp(token);
     if (result.success) {
-        successResponse({token: result.token}, res, { message: 'OTP resent successfully' });
+        successResponse({ token: result.token }, res, { message: 'OTP resent successfully' });
     } else {
         res.status(400).json({ message: result.message });
     }

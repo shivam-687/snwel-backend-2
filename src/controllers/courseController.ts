@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createCourse, deleteCourseById, getAllCourses, getCourseById, getCourseBySlug, updateCourseById } from '@/service/courseService'
+import { createCourse, deleteCourseById, getAllCourses, getCourseById, getCourseBySlug, partialUpdateCourse, updateCourseById } from '@/service/courseService'
 import { courseErrorResponse, errorResponse, errorResponseFromError, successResponse } from '@/utils/helpers/appResponse';
 import { Course } from '@/models/CourseModel';
 import { catchAsync } from '@/utils/helpers/catchAsync';
@@ -30,7 +30,7 @@ const getCourseByIdController = catchAsync(async (req: Request, res: Response): 
         if (!courseId) {
             return courseErrorResponse.notFound(null, res)
         }
-        const course = await getCourseById(courseId)
+        const course = await getCourseById(courseId);
         successResponse(course, res)
 });
 
@@ -51,6 +51,14 @@ const updateCourseController = catchAsync(async (req: Request, res: Response): P
     const course = await updateCourseById(courseId, req.body);
     successResponse(course, res, {message: "Course Updated successfully!"})
 });
+const partialUpdateCourseController = catchAsync(async (req: Request, res: Response): Promise<void> => {
+    const { courseId } = req.params;
+    if (!courseId) {
+        return courseErrorResponse.notFound(null, res)
+    }
+    const course = await partialUpdateCourse(courseId, req.body);
+    successResponse(course, res, {message: "Course Updated successfully!"})
+});
 
 const deleteCourseController = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const { courseId } = req.params;
@@ -69,5 +77,6 @@ export {
     getCourseByIdController,
     getCourseBySlugController,
     updateCourseController,
-    deleteCourseController
+    deleteCourseController,
+    partialUpdateCourseController
 };

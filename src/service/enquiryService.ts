@@ -40,7 +40,6 @@ async function getAllEnquiries(options: ListOptions): Promise<PaginatedList<IEnq
           { $skip: skip },
           { $limit: limit }
       ];
-      console.log({options})
       // Check if there are any webinar enquiries in the query
       if (options?.filter?.type === 'webinar' || search?.toLowerCase().includes('webinar')) {
           pipeline.push(

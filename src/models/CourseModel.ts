@@ -1,6 +1,11 @@
-import mongoose, {Document, Schema, Types} from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 import slugify from 'slugify';
 
+
+export enum COURSE_STATUS {
+    SAVED = 'SAVED',
+    PUBLISHED = 'PUBLISHED'
+}
 
 export interface Course extends Document {
     id: string;
@@ -16,6 +21,7 @@ export interface Course extends Document {
     language: string[];
     assessment: string;
     certificate: boolean;
+    content: any;
     lessons: number;
     rating: number;
     enrolled: number;
@@ -33,7 +39,11 @@ export interface Course extends Document {
         promotionalCardImage?: string;
         iconImage?: string;
     };
-    curriculum: { title: string; duration: string }[];
+    curriculum: { title: string; duration: string, unit: string, classCount: string, curriculumType: Types.ObjectId }[];
+    status: COURSE_STATUS;
+    qualifications: Types.ObjectId[],
+    trainingModes: Types.ObjectId[],
+    widget: string
 }
 
 
@@ -42,24 +52,25 @@ const CourseSchema = new Schema<Course>({
     id: String,
     image: String,
     title: String,
-    slug: {type: String, unique: true},
+    slug: { type: String, unique: true },
     shortDescription: String,
     text: String,
     courseDuration: String,
     categories: [{ type: Types.ObjectId, ref: 'CourseCategory' }],
     instructors: [{ type: Types.ObjectId, ref: 'User' }],
+    content: { type: Schema.Types.Mixed },
     difficulty: String,
     language: [String],
     assessment: String,
     certificate: Boolean,
     lessons: Number,
-    rating: {type: Number, default: 0},
-    enrolled: {type: Number, default: 0},
-    isPopular: {type: Boolean, default: false},
-    price: {type: Number, default: 0},
-    currency: {type: String, default: 'INR'},
+    rating: { type: Number, default: 0 },
+    enrolled: { type: Number, default: 0 },
+    isPopular: { type: Boolean, default: false },
+    price: { type: Number, default: 0 },
+    currency: { type: String, default: 'INR' },
     discount: Number,
-    isPremium: {type: Boolean, default: false},
+    isPremium: { type: Boolean, default: false },
     masterCategory: String,
     appearence: {
         themeColor: String,
@@ -69,16 +80,28 @@ const CourseSchema = new Schema<Course>({
         promotionalCardImage: String,
         iconImage: String,
     },
-    curriculum: [{ title: String, duration: String, unit: String, classCount: Number,  curriculumType: String }],
+    curriculum: [{
+        title: String,
+        duration: String,
+        unit: String,
+        classCount: String,
+        curriculumType: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Master'
+        }
+    }],
+    status: { type: String, default: COURSE_STATUS.SAVED },
+    qualifications: [{type: mongoose.Schema.Types.ObjectId, ref: 'Master', default: []}],
+    trainingModes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Master', default: []}],
+    widget: {type: mongoose.Schema.Types.String}
 
-
-}, {timestamps: true});
+}, { timestamps: true });
 
 
 CourseSchema.pre<Course>('save', async function (next) {
     try {
         const slug = slugify(this.title, { lower: true });
-        const existingCourse = await CourseModel.findOne({slug});
+        const existingCourse = await CourseModel.findOne({ slug });
 
         if (existingCourse) {
             let counter = 1;
