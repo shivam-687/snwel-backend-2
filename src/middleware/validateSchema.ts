@@ -1,4 +1,4 @@
-import { EmailSettingTypeSchema, GeneralSettingSchema, IntegrationSettingTypeSchema, SETTINGS, SettingSchema } from "@/entity-schema/setting-schema";
+import { EmailSettingTypeSchema, GeneralSettingSchema, IntegrationSettingTypeSchema, MenuSettingSchema, SETTINGS, SettingSchema } from "@/entity-schema/setting-schema";
 import { NextFunction, Response, Request } from "express";
 import { ZodError, ZodSchema } from "zod";
 
@@ -26,7 +26,8 @@ export function validateSettingSchema (type: SETTINGS) {
     const schema = {
         [SETTINGS.EMAIL]: EmailSettingTypeSchema,
         [SETTINGS.GENERAL]: GeneralSettingSchema,
-        [SETTINGS.INTEGRATION]: IntegrationSettingTypeSchema
+        [SETTINGS.INTEGRATION]: IntegrationSettingTypeSchema,
+        [SETTINGS.MENUBUILDER]: MenuSettingSchema
     };
     return validateSchema(schema[type]);
 }

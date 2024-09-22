@@ -5,7 +5,7 @@ export interface Webinar extends Document {
     title: string;
     shortDescription: string;
     content: string;
-    startDate: string;
+    startDate: any;
     slug: string;
     thumbnail?: string;
     coverImage?: string;
@@ -15,6 +15,7 @@ export interface Webinar extends Document {
     price: number,
     currency: string,
     curriculum: { title: string; duration: string }[];
+    videoUrl?: string
 }
 
 
@@ -23,7 +24,7 @@ const WebinarSchema = new Schema<Webinar>({
     title: String,
     shortDescription: String,
     content: String,
-    startDate: String,
+    startDate: {type: Schema.Types.Date, default: new Date()},
     slug: String,
     thumbnail: String,
     coverImage: {type: String},
@@ -33,6 +34,7 @@ const WebinarSchema = new Schema<Webinar>({
     price: {type: Number, default: 0},
     currency: {type: String, default: 'INR'},
     curriculum: [{ title: String, duration: String }],
+    videoUrl: {type: String, default: null}
 }, {timestamps: true});
 
 

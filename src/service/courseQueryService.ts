@@ -1,19 +1,17 @@
 import jwt from 'jsonwebtoken';
 
-import { convertToPagination, generateJwtToken, generateOTP, generateOTPObject, getPaginationParams } from '@/utils/helpers';
+import { convertToPagination, generateJwtToken, generateOTPObject, getPaginationParams, queryHandler } from '@/utils/helpers';
 import { ObjectId } from 'mongodb';
 import { ListOptions, PaginatedList } from '@/types/custom'
 import { CreateCourseQuery } from '@/entity-schema/course-enrollment';
 import CourseEnrollmentModel, { CourseEnrollment } from '@/models/CourseEnrollment';
-import { RegistrationInput } from './userService';
-import dayjs from 'dayjs';
 import { Constants } from '@/config/constants';
 import { logger } from '@/utils/logger';
 import emailService from './emailService';
 import { UserModel } from '@/models/User';
 
 // Function to create a new course
-const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, isVerified: boolean, enrollmentId?:string }> => {
+const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, isVerified: boolean, enrollmentId?: string }> => {
     try {
         const exists = await CourseEnrollmentModel.findOne({ userId: queryData.userId, courseId: queryData.courseId });
         if (exists && exists.otp?.verified) {
@@ -88,24 +86,18 @@ const getAllByCourseId = async (userId: string) => {
 // Function to retrieve all courses
 const getAll = async (options: ListOptions): Promise<PaginatedList<CourseEnrollment>> => {
     try {
-        const { limit = 10, page = 1, filter } = options;
-        const query: any = {};
-        const paginationData = getPaginationParams(limit, page)
-        if (filter && filter.search) {
-            const searchRegex = new RegExp(filter.search, 'i');
-            query.$or = [{ name: searchRegex }, { email: searchRegex }];
-        }
-
-        const skip = (page - 1) * limit;
-        const users = await CourseEnrollmentModel
-                    .find(query)
-                    .skip(skip)
-                    .limit(limit)
-                    .populate("userId", ["email", "name", "profilePic"])
-                    .populate("courseId", "title slug")
-                    .select(['_id', "status", "paymentStatus", "otp.verified", "createdAt", "updatedAt", "paymentMethod"]);
-        const count = await CourseEnrollmentModel.countDocuments(query);
-        return convertToPagination(users, count, paginationData.limit, paginationData.offset);
+        // console.log(options)
+        const {documents, limit, page} = await queryHandler(CourseEnrollmentModel, {
+            ...options,
+        })
+        const searcQ = options?.search ? new RegExp(options.search, 'i') : '' 
+        const users = await documents
+            .populate({path: "userId", select:["email", "name", "profilePic"]})
+            .populate("courseId", "title slug")
+            .populate(['qualification', 'mode', 'occupation', 'widget'])
+            .sort({createdAt: -1})
+        const count = await CourseEnrollmentModel.countDocuments(documents.getQuery());
+        return convertToPagination(users, count, limit, page);
     } catch (error: any) {
         throw new Error(`Error: retrieving courseQuery: ${error.message}`);
     }
@@ -116,7 +108,7 @@ const getById = async (id: string): Promise<CourseEnrollment | null> => {
     try {
         return await CourseEnrollmentModel.findById(id)
             .populate("userId", "email name profilePic")
-            .populate("courseId");
+            .populate(["courseId", 'qualification', 'mode', 'occupation', 'widget']);
     } catch (error: any) {
         throw new Error(`Error: retrieving course query: ${error.message}`);
     }
@@ -161,7 +153,7 @@ async function verifyOtpAndUpdate(token: string, otp: string) {
         }
 
         const now = new Date();
-       
+
         if ((enrollment.otp.otp !== otp && Number(otp) !== Constants.OTP.MASTER_OTP) || now > enrollment.otp.expirationTime) {
             return {
                 isVerified: false,

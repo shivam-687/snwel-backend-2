@@ -14,12 +14,17 @@ const createJobVacancy = async (jobData: Partial<JobVacancy>): Promise<JobVacanc
 
 const getAllJobVacancies = async (options: ListOptions): Promise<PaginatedList<JobVacancy>> => {
   try {
-    const { limit = 10, page = 1, search } = options;
+    const { limit = 10, page = 1, search, filter } = options;
     const query: any = {};
 
     if (search) {
       const searchRegex = new RegExp(search, 'i');
       query.$or = [{ title: searchRegex }, { companyName: searchRegex }];
+    }
+
+    if(filter && filter['location']){
+      const searchRegex = new RegExp(filter['location'], 'i');
+      query.$or = [{ "location.city": searchRegex }, { "location.country": searchRegex }, {"location.state": searchRegex}];
     }
 
     const skip = (page - 1) * limit;

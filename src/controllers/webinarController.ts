@@ -85,6 +85,10 @@ export async function addHostsToWebinarController(req: Request, res: Response): 
 }
 
 export const getAllWebinarController = catchAsync(async (req: Request, res: Response): Promise<void> => {
-  const courses = await getAllWebinars(extractListOptions(req));
+  const courses = await getAllWebinars(req.query);
+  return successResponse(courses, res, { message: "Webinars Fetched successfully!" })
+});
+export const getAllPublicWebinarController = catchAsync(async (req: Request, res: Response): Promise<void> => {
+  const courses = await getAllWebinars(req.query, true);
   return successResponse(courses, res, { message: "Webinars Fetched successfully!" })
 });

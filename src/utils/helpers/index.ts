@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { Constants } from '@/config/constants';
 import {Request} from 'express'
+import { Model, Models } from 'mongoose';
 
 
 
@@ -53,17 +54,20 @@ export function withPagination<T extends PgSelect>(
 
 export const getPaginationParams = (limit: number = 20, page: number = 1) => {
     // Calculate offset based on page number and limit
+    limit = Number(limit);
+    page = Number(page)
     const offset = (page - 1) * limit;
-    return { limit, offset };
+    return { limit, offset, page};
 }
 
 export const convertToPagination = (data: any[], total: number, limit: number = 20, page: number = 1) => {
-    const offset = Math.max((page - 1) * limit, 0);
+  const offset = Math.max((page - 1) * limit, 0);
     const nextPage = page < Math.ceil(total / limit) ? page + 1 : null;
     const prevPage = page > 1 ? page - 1 : null;
     const hasNext = nextPage !== null;
     const currentPage = page;
 
+    console.log(total)
     return {
         docs: data,
         limit: limit,
@@ -162,6 +166,76 @@ export const extractListOptions = (req: Request): ListOptions => {
         filter
     };
 };
+
+
+interface QueryOptions {
+    limit?: number;
+    page?: number;
+    filter?: Record<string, any>;
+    sort?: Record<string, any>;
+    searchFields?: string[]; // Array of fields to search
+    search?: string
+  }
+  
+  function buildQuery(filter?: Record<string, any>, searchFields?: string[]): any {
+    const query: any = {};
+  
+    // Handle dynamic search across multiple fields
+    if (filter?.search && searchFields?.length) {
+      const searchRegex = new RegExp(filter.search, 'i');
+      query.$or = searchFields.map(field => ({ [field]: searchRegex }));
+    }
+  
+    // Handle dynamic filters
+    if (filter) {
+      for (const [key, value] of Object.entries(filter)) {
+        if (key !== 'search') { // Exclude search from normal filter processing
+          query[key] = value;
+        }
+      }
+    }
+  console.log(query)
+    return query;
+  }
+  
+  export async function queryHandler<T = any>(model: Model<T>, options: QueryOptions) {
+    const { limit = 10, page = 1, filter, sort, searchFields, search } = options;
+    const { limit: parsedLimit, offset } = getPaginationParams(limit, page);
+    const query = buildQuery({...filter, search}, searchFields);
+    const documents = model
+      .find(query)
+      .sort(sort)
+      .skip(offset)
+      .limit(parsedLimit)
+  
+    return {
+      documents,
+      limit: parsedLimit,
+      offset,
+      page: Number(page)
+    };
+  }
+
+  export function convertSortOrder(obj: Record<string, any>): Record<string, any> {
+    const newObj: Record<string, any> = {};
+  
+    for (const key in obj) {
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        // Recursively handle nested objects
+        newObj[key] = convertSortOrder(obj[key]);
+      } else if (obj[key] === 'asc') {
+        newObj[key] = 1;
+      } else if (obj[key] === 'desc') {
+        newObj[key] = -1;
+      } else {
+        newObj[key] = obj[key]; // Keep other values unchanged
+      }
+    }
+  
+    return newObj;
+  }
+  
+  
 
 
 

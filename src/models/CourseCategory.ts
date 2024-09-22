@@ -10,7 +10,8 @@ export interface CourseCategory extends Document {
     isPremium?: boolean;
     parentCategory?: ObjectId;
     slug: string;
-    isActive: boolean
+    isActive: boolean,
+    image?: string
 }
 
 const CourseCategorySchema = new Schema<CourseCategory>({
@@ -20,7 +21,8 @@ const CourseCategorySchema = new Schema<CourseCategory>({
     isPremium: Boolean,
     parentCategory: { type: Schema.Types.ObjectId, ref: 'CourseCategory' }, // Assuming CourseCategory has a self-referencing relationship
     slug: { type: String, unique: true },
-    isActive: {type: Boolean, default: true}
+    isActive: {type: Boolean, default: true},
+    image: {type: String}
 });
 
 

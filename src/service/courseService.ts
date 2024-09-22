@@ -49,6 +49,14 @@ const getAllCourses = async (options: ListOptions, adminMode=false): Promise<Pag
         if(filter && filter?.isPopular){
             query["isPopular"] = true 
         }
+
+        if(filter && Object.keys(filter).some((value) => ['qualifications', 'trainingModes'].includes(value))){
+            Object.entries(filter).forEach(([key, value]) => {
+                query[key] = {
+                    $in: [value]
+                }
+            })
+        }
       
         const skip = (page - 1) * limit;
         const users = await CourseModel
@@ -57,6 +65,8 @@ const getAllCourses = async (options: ListOptions, adminMode=false): Promise<Pag
         .limit(limit)
         .populate('instructors')
         .populate('categories')
+        .populate('qualifications', '_id name code')
+        .populate('trainingModes', '_id name code')
         .populate('curriculum.curriculumType', 'name');
         const count = await CourseModel.countDocuments(query);
         return convertToPagination(users, count, paginationData.limit, paginationData.offset);
@@ -71,7 +81,7 @@ const getCourseById = async (courseId: string): Promise<Course | null> => {
         const query = Types.ObjectId.isValid(courseId)
         ?  { _id: courseId }
         : { slug: courseId };
-        return await CourseModel.findById(query).populate(['instructors', 'categories']);
+        return await CourseModel.findById(query).populate(['instructors', 'categories', 'curriculum.curriculumType']);
     } catch (error: any) {
         throw new Error(`Error: retrieving course: ${error.message}`);
     }
@@ -86,7 +96,10 @@ const getCourseBySlug = async (slug: string, admin=false): Promise<Course | null
         if(admin){
             query.status = COURSE_STATUS.PUBLISHED;
         }
-        const cs = await CourseModel.findOne(query).populate(['instructors', 'categories']);
+        const cs = await CourseModel
+        .findOne(query)
+        .populate(['instructors', 'categories', 'curriculum.curriculumType', 'qualifications', 'trainingModes'])
+        ;
         return cs;
     } catch (error: any) {
         throw new Error(`Error: retrieving course: ${error.message}`);

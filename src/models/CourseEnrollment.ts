@@ -14,7 +14,12 @@ export interface CourseEnrollment extends Document {
         otp: string;
         expirationTime: Date;
         verified: boolean;
-    }
+    },
+    extra: any,
+    qualification: Types.ObjectId;
+    mode: Types.ObjectId,
+    occupation: Types.ObjectId,
+    widget?: Types.ObjectId
 }
 
 const CourseEnrollmentSchema = new Schema<CourseEnrollment>({
@@ -28,7 +33,12 @@ const CourseEnrollmentSchema = new Schema<CourseEnrollment>({
         otp: String,
         expirationTime: Date,
         verified: { type: Boolean, default: false },
-    }
+    },
+    extra: {type: Schema.Types.Mixed, default: {}},
+    qualification: {type: Schema.Types.ObjectId,  ref: 'Master', required: true},
+    mode: {type: Schema.Types.ObjectId,  ref: 'Master', required: true},
+    occupation:{type:  Schema.Types.ObjectId,  ref: 'Master', required: true},
+    widget: {type: Schema.Types.ObjectId, ref: 'Widget', default: null}
 }, { timestamps: true }); // This option enables Mongoose to add createdAt and updatedAt timestamps automatically
 
 const CourseEnrollmentModel = mongoose.model<CourseEnrollment>('CourseEnrollment', CourseEnrollmentSchema);

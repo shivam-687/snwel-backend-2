@@ -95,26 +95,40 @@ export async function addHosts(webinarId: string, hosts: string[]): Promise<Webi
 }
 
 
-export const getAllWebinars = async (options: ListOptions): Promise<PaginatedList<Webinar>> => {
+export const getAllWebinars = async (options: ListOptions, adminMode= false): Promise<PaginatedList<Webinar>> => {
   try {
-      const { limit = 10, page = 1, search, filter } = options;
+      const { limit = 10, page = 1, search, filter, sort } = options;
       const query: any = {}; 
-      const paginationData = getPaginationParams(limit, page)
+      const paginationData = getPaginationParams(limit, page);
+      if(adminMode){
+        const currentDate = new Date();
+        // query.isActive = true,
+        query.startDate = {$gte: currentDate};
+      }
+
       if (search) {
         const searchRegex = new RegExp(search, 'i');
         query.$and = [{ title: searchRegex }];
       }
-    
+      if (filter && filter?.startDate) {
+        const startDate = new Date(filter.startDate);
+        console.log(startDate)
+        query.startDate = { $gte: startDate };
+      }
+
       const skip = (page - 1) * limit;
-      const users = await WebinarModel
+      const webinars = await WebinarModel
                     .find(query)
                     .populate('hosts', ["email", "name"])
                     .populate("createdBy", ["email", "name"])
                     .skip(skip)
-                    .limit(limit);
+                    .limit(limit)
+                    .sort(sort || { startDate: -1 });
+      
       const count = await WebinarModel.countDocuments(query);
-      return convertToPagination(users, count, paginationData.limit, paginationData.offset);
+      return convertToPagination(webinars, count, paginationData.limit, paginationData.offset);
   } catch (error: any) {
       throw new Error(`Error: retrieving webinar: ${error.message}`);
   }
 };
+

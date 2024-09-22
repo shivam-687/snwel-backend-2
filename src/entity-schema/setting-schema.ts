@@ -3,13 +3,15 @@ import { z } from "zod";
 export enum SETTINGS {
     INTEGRATION = 'INTEGRATION',
     GENERAL = 'GENERAL',
-    EMAIL = 'EMAIL'
+    EMAIL = 'EMAIL',
+    MENUBUILDER = 'MENUBUILDER'
 }
 
 const settings_array = [
     'INTEGRATION',
     'GENERAL',
-    'EMAIL'
+    'EMAIL',
+    'MENUBUILDER'
 ] as const;
 
 export const SettingSchema = z.object({
@@ -102,8 +104,37 @@ export const GeneralSettingSchema = SettingSchema.merge(z.object({
             phone: z.string().optional(),
             email: z.string().optional(),
         }).optional(),
+        socialLinks: z.object({
+            facebook: z.string().optional(),
+            insta: z.string().optional(),
+            x: z.string().optional(),
+            youtube: z.string().optional(),
+            linkedin: z.string().optional()
+        }).optional(),
         emailTransport: z.enum([EMAIL_TRANSPORTER.NODEMAILER, EMAIL_TRANSPORTER.RESEND, EMAIL_TRANSPORTER.SENDGRID]).default(EMAIL_TRANSPORTER.NODEMAILER).optional(),
         senderEmail: z.string()
+    })
+}))
+
+export const MenuItemSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    href: z.string().optional(),
+    icon: z.string().optional(),
+    img: z.string().optional(),
+    index: z.number().nullable().optional(),
+    parentId: z.string().nullable().optional(),
+    depth: z.number().optional(),
+    desc: z.string().optional()
+    
+})
+export const MenuSchemaWithChildren = MenuItemSchema.merge(z.object({children: z.array(MenuItemSchema).optional().default([])}))
+
+export const MenuSettingSchema = SettingSchema.merge(z.object({
+    code: z.enum([SETTINGS.MENUBUILDER]),
+    data: z.object({
+        menus: z.array(MenuSchemaWithChildren).default([]),
+        footerMenu: z.array(MenuSchemaWithChildren).default([])
     })
 }))
 

@@ -6,6 +6,7 @@ import { convertToPagination, getFilterQuery, getPaginationParams } from '@/util
 import { successResponse } from '@/utils/helpers/appResponse';
 import fs from 'fs';
 import { handleUpload } from '@/middleware/upload';
+import { handleUploadV2 } from '@/middleware/uploadV2';
 
 export const uploadFile = async (req: Request, res: Response) => {
   try {
@@ -30,6 +31,52 @@ export const uploadFile = async (req: Request, res: Response) => {
     successResponse(file, res, { message: 'File uploaded successfully' })
   } catch (error: any) {
     res.status(500).send(error.message);
+  }
+};
+
+export const uploadFileV2Controller = async (req: Request, res: Response) => {
+  try {
+    const files = req.files as Express.Multer.File[];
+    const { externalUrl } = req.body;
+
+    // Array to store file upload results
+    let uploadedFiles: IFile[] = [];
+
+    // Handle file uploads if they exist
+    if (files && files.length > 0) {
+      for (const file of files) {
+        // Convert buffer to base64 and upload to Cloudinary
+        const cldRes = await handleUploadV2(file.buffer, file.mimetype);
+        if(!cldRes) return;
+        const mimeType = cldRes ? mime.lookup(cldRes?.url) : 'application/octet-stream';
+        const uploadedFile = new FileModel({
+          fileName: cldRes.public_id,
+          filePath: cldRes.url,
+          mimeType
+        });
+        await uploadedFile.save();
+        uploadedFiles.push(uploadedFile);
+      }
+    }
+
+    // Handle external URL uploads
+    if (externalUrl) {
+      const file = new FileModel({ fileName: externalUrl, filePath: externalUrl });
+      await file.save();
+      uploadedFiles.push(file);
+    }
+
+    if (uploadedFiles.length === 0) {
+      throw new Error('No file uploaded or external URL provided.');
+    }
+
+    return res.status(200).json({
+      message: 'Files uploaded successfully',
+      data: uploadedFiles,
+    });
+  } catch (error: any) {
+    console.error('Error uploading file:', error);
+    res.status(500).json({ error: error.message });
   }
 };
 

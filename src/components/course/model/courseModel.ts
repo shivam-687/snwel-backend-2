@@ -41,6 +41,8 @@ export interface Course extends Document {
     };
     curriculum: { title: string; duration: string, unit: string, classCount: string, curriculumType: Types.ObjectId }[];
     status: COURSE_STATUS;
+    qualifications: Types.ObjectId[],
+    trainingModes: Types.ObjectId[]
 }
 
 
@@ -87,7 +89,9 @@ const CourseSchema = new Schema<Course>({
             ref: 'Master'
         }
     }],
-    status: { type: String, default: COURSE_STATUS.SAVED }
+    status: { type: String, default: COURSE_STATUS.SAVED },
+    qualifications: [{type: mongoose.Schema.Types.ObjectId, ref: 'Master', default: []}],
+    trainingModes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Master', default: []}],
 
 }, { timestamps: true });
 

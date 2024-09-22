@@ -6,7 +6,14 @@ export const createCourseEnrollment = z.object({
     status: z.enum(['ACTIVE', 'PENDING', 'DECLINED']).default('PENDING').optional(),
     paymentStatus: z.enum(['PAID', 'PENDING', 'FAILED']).default('PENDING').optional(),
     paymentMethod: z.enum(['CASH', 'EXTERNAL', 'INAPP']).optional(),
-    expiredAt: z.string().optional()
+    expiredAt: z.string().optional(),
+    extra: z.object({
+        agree: z.boolean(),
+    }),
+    qualification: z.string(),
+    mode: z.string(),
+    occupation: z.string(),
+    widget: z.string().optional()
 })
 export const updateCourseEnrollment = z.object({
     _id: z.string()
@@ -14,16 +21,23 @@ export const updateCourseEnrollment = z.object({
 
 
 export const createEnrollmentAnonymously = z.object({
+    name: z.string().min(2, { message: "Username must be at least 2 characters." }),
     email: z.string().email(),
-    name: z.string(),
+    courseId: z.string(),
+    phone: z.string(),
     location: z.object({
         addr: z.string().optional(),
         city: z.string(),
         state: z.string(),
         country: z.string()
-    }).optional(),
-    phone: z.string().optional(),
-    courseId: z.string()
+    }),
+    extra: z.object({
+        agree: z.boolean(),
+    }),
+    qualification: z.string(),
+    mode: z.string(),
+    occupation: z.string(),
+    widget: z.string().optional()
 })
 
 export type CreateEnrollmentAnonymously = z.infer<typeof createEnrollmentAnonymously>;

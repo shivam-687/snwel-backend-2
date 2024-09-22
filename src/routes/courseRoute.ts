@@ -1,6 +1,14 @@
 import express from 'express';
 import passport from 'passport';
-import { createCourseController, deleteCourseController, getAllCoursesController, getCourseByIdController, getCourseBySlugController, partialUpdateCourseController, updateCourseController } from '@/controllers/courseController';
+import { 
+    createCourseController, 
+    deleteCourseController, 
+    getAllCoursesController, 
+    getCourseByIdController, 
+    getCourseBySlugController, 
+    partialUpdateCourseController, 
+    updateCourseController 
+} from '@/controllers/courseController';
 
 const router = express.Router();
 

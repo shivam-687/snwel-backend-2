@@ -23,9 +23,12 @@ const getAllMasterItems = async (options: ListOptions): Promise<PaginatedList<IM
       query.$or = [{ name: searchRegex }, { code: searchRegex }];
     }
     if(filter){
-        query = {...query, ...filter}
+      const {ids, ...rest} = filter;
+      if(Array.isArray(ids)&& ids.length > 0){
+        query['_id'] = {$in: ids.map((id: string) => new ObjectId(id))}
+      }
+        query = {...query, ...rest}
     }
-    console.log({query})
 
     const skip = (page - 1) * limit;
 
