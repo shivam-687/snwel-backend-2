@@ -13,6 +13,7 @@ const createMasterItemController = (0, catchAsync_1.catchAsync)(async (req, res)
 exports.createMasterItemController = createMasterItemController;
 const getAllMasterItemsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const options = { ...req.query };
+    // console.log(options)
     const masterItems = await (0, master_1.getAllMasterItems)((0, helpers_1.extractListOptions)(req));
     (0, appResponse_1.successResponse)(masterItems, res, { message: 'Master items fetched successfully!' });
 });
@@ -27,9 +28,9 @@ const getMasterItemController = (0, catchAsync_1.catchAsync)(async (req, res) =>
 });
 exports.getMasterItemController = getMasterItemController;
 const updateMasterItemByCodeController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const { code } = req.params;
+    const { idOrCode } = req.params;
     const updateData = req.body;
-    const updatedMasterItem = await (0, master_1.updateMasterItemByCode)(code, updateData);
+    const updatedMasterItem = await (0, master_1.updateMasterItemByCode)(idOrCode, updateData);
     if (!updatedMasterItem) {
         return (0, appResponse_1.errorResponse)('Master item not found', res);
     }
@@ -37,8 +38,8 @@ const updateMasterItemByCodeController = (0, catchAsync_1.catchAsync)(async (req
 });
 exports.updateMasterItemByCodeController = updateMasterItemByCodeController;
 const deleteMasterItemByCodeController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const { code } = req.params;
-    await (0, master_1.deleteMasterItemByCode)(code);
+    const { id } = req.params;
+    await (0, master_1.deleteMasterItemByCode)(id);
     (0, appResponse_1.successResponse)(null, res, { message: 'Master item deleted successfully!' });
 });
 exports.deleteMasterItemByCodeController = deleteMasterItemByCodeController;

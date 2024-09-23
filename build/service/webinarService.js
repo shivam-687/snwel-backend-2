@@ -93,24 +93,35 @@ async function addHosts(webinarId, hosts) {
     }
 }
 exports.addHosts = addHosts;
-const getAllWebinars = async (options) => {
+const getAllWebinars = async (options, adminMode = false) => {
     try {
-        const { limit = 10, page = 1, search, filter } = options;
+        const { limit = 10, page = 1, search, filter, sort } = options;
         const query = {};
         const paginationData = (0, helpers_1.getPaginationParams)(limit, page);
+        if (adminMode) {
+            const currentDate = new Date();
+            // query.isActive = true,
+            query.startDate = { $gte: currentDate };
+        }
         if (search) {
             const searchRegex = new RegExp(search, 'i');
             query.$and = [{ title: searchRegex }];
         }
+        if (filter && filter?.startDate) {
+            const startDate = new Date(filter.startDate);
+            console.log(startDate);
+            query.startDate = { $gte: startDate };
+        }
         const skip = (page - 1) * limit;
-        const users = await WebinarModel_1.WebinarModel
+        const webinars = await WebinarModel_1.WebinarModel
             .find(query)
             .populate('hosts', ["email", "name"])
             .populate("createdBy", ["email", "name"])
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .sort(sort || { startDate: -1 });
         const count = await WebinarModel_1.WebinarModel.countDocuments(query);
-        return (0, helpers_1.convertToPagination)(users, count, paginationData.limit, paginationData.offset);
+        return (0, helpers_1.convertToPagination)(webinars, count, paginationData.limit, paginationData.offset);
     }
     catch (error) {
         throw new Error(`Error: retrieving webinar: ${error.message}`);

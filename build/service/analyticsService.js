@@ -36,17 +36,19 @@ const getImportantEntitiesCount = async (options) => {
             }
         }
         // Fetch counts in parallel
-        const [totalCourses, totalUsers, totalEnrollments, totalWebinars] = await Promise.all([
+        const [totalCourses, totalUsers, paidEnrollments, totalWebinars, allEnrollments] = await Promise.all([
             CourseModel_1.CourseModel.countDocuments(courseQuery).exec(),
             User_1.UserModel.countDocuments(userQuery).exec(),
             CourseEnrollment_1.default.countDocuments(enrollmentQuery).exec(),
-            WebinarModel_1.WebinarModel.countDocuments(webinarQuery).exec()
+            WebinarModel_1.WebinarModel.countDocuments(webinarQuery).exec(),
+            CourseEnrollment_1.default.countDocuments({ $nor: [{ status: 'DECLINED' }] }).exec(),
         ]);
         return {
             totalCourses,
             totalUsers,
-            totalEnrollments,
-            totalWebinars
+            paidEnrollments,
+            totalWebinars,
+            allEnrollments
         };
     }
     catch (error) {

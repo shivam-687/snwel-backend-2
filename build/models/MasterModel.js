@@ -7,7 +7,8 @@ const masterSchema = new mongoose_1.Schema({
     isActive: { type: Boolean, default: true },
     name: { type: String, required: true },
     meta: { type: mongoose_1.Schema.Types.Mixed, required: false },
-    sequence: { type: Number }
+    sequence: { type: Number },
+    type: { type: String, default: 'MASTER' }
 }, {
     timestamps: true,
 });

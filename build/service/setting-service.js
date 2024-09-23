@@ -21,6 +21,9 @@ class SettingsService {
             case setting_schema_1.SETTINGS.GENERAL:
                 validatedInput = setting_schema_1.GeneralSettingSchema.parse(input);
                 break;
+            case setting_schema_1.SETTINGS.MENUBUILDER:
+                validatedInput = setting_schema_1.MenuSettingSchema.parse(input);
+                break;
             default:
                 throw new Error('Invalid setting code');
         }
@@ -49,11 +52,14 @@ class SettingsService {
             case setting_schema_1.SETTINGS.GENERAL:
                 validatedInput = setting_schema_1.GeneralSettingSchema.pick({ data: true, isChangable: true }).parse(input);
                 break;
+            case setting_schema_1.SETTINGS.MENUBUILDER:
+                validatedInput = setting_schema_1.MenuSettingSchema.parse(input);
+                break;
             default:
                 throw new Error('Invalid setting code');
         }
         // Update in database
-        const updatedSetting = await Setting_1.SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true });
+        const updatedSetting = await Setting_1.SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true, upsert: true });
         if (!updatedSetting) {
             throw new Error(`Setting with code ${code} not found`);
         }

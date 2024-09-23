@@ -27,6 +27,11 @@ const createByAnonymous = (0, catchAsync_1.catchAsync)(async (req, res) => {
         const createdCourse = await (0, courseQueryService_1.create)({
             userId: userExists._id,
             courseId: courseData.courseId,
+            extra: courseData.extra,
+            qualification: courseData.qualification,
+            mode: courseData.mode,
+            occupation: courseData.occupation,
+            widget: courseData.widget
         });
         return (0, appResponse_1.successResponse)(createdCourse, res);
     }
@@ -40,7 +45,12 @@ const createByAnonymous = (0, catchAsync_1.catchAsync)(async (req, res) => {
     });
     const newEnroll = await (0, courseQueryService_1.create)({
         courseId: courseData.courseId,
-        userId: newUser._id
+        userId: newUser._id,
+        extra: courseData.extra,
+        qualification: courseData.qualification,
+        mode: courseData.mode,
+        occupation: courseData.occupation,
+        widget: courseData.widget
     });
     (0, appResponse_1.successResponse)(newEnroll, res);
 });

@@ -26,9 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourseModel = void 0;
+exports.CourseModel = exports.COURSE_STATUS = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const slugify_1 = __importDefault(require("slugify"));
+var COURSE_STATUS;
+(function (COURSE_STATUS) {
+    COURSE_STATUS["SAVED"] = "SAVED";
+    COURSE_STATUS["PUBLISHED"] = "PUBLISHED";
+})(COURSE_STATUS || (exports.COURSE_STATUS = COURSE_STATUS = {}));
 const CourseSchema = new mongoose_1.Schema({
     id: String,
     image: String,
@@ -39,6 +44,7 @@ const CourseSchema = new mongoose_1.Schema({
     courseDuration: String,
     categories: [{ type: mongoose_1.Types.ObjectId, ref: 'CourseCategory' }],
     instructors: [{ type: mongoose_1.Types.ObjectId, ref: 'User' }],
+    content: { type: mongoose_1.Schema.Types.Mixed },
     difficulty: String,
     language: [String],
     assessment: String,
@@ -60,7 +66,20 @@ const CourseSchema = new mongoose_1.Schema({
         promotionalCardImage: String,
         iconImage: String,
     },
-    curriculum: [{ title: String, duration: String, unit: String, classCount: Number, curriculumType: String }],
+    curriculum: [{
+            title: String,
+            duration: String,
+            unit: String,
+            classCount: String,
+            curriculumType: {
+                type: mongoose_1.default.Schema.Types.ObjectId,
+                ref: 'Master'
+            }
+        }],
+    status: { type: String, default: COURSE_STATUS.SAVED },
+    qualifications: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Master', default: [] }],
+    trainingModes: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Master', default: [] }],
+    widget: { type: mongoose_1.default.Schema.Types.String }
 }, { timestamps: true });
 CourseSchema.pre('save', async function (next) {
     try {

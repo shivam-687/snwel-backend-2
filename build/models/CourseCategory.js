@@ -36,7 +36,8 @@ const CourseCategorySchema = new mongoose_1.Schema({
     isPremium: Boolean,
     parentCategory: { type: mongoose_1.Schema.Types.ObjectId, ref: 'CourseCategory' }, // Assuming CourseCategory has a self-referencing relationship
     slug: { type: String, unique: true },
-    isActive: { type: Boolean, default: true }
+    isActive: { type: Boolean, default: true },
+    image: { type: String }
 });
 CourseCategorySchema.pre('save', async function (next) {
     const category = this;

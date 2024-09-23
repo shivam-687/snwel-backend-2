@@ -30,7 +30,7 @@ const WebinarSchema = new mongoose_1.Schema({
     title: String,
     shortDescription: String,
     content: String,
-    startDate: String,
+    startDate: { type: mongoose_1.Schema.Types.Date, default: new Date() },
     slug: String,
     thumbnail: String,
     coverImage: { type: String },
@@ -40,5 +40,6 @@ const WebinarSchema = new mongoose_1.Schema({
     price: { type: Number, default: 0 },
     currency: { type: String, default: 'INR' },
     curriculum: [{ title: String, duration: String }],
+    videoUrl: { type: String, default: null }
 }, { timestamps: true });
 exports.WebinarModel = mongoose_1.default.model('Webinar', WebinarSchema);

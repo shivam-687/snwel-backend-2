@@ -27,7 +27,8 @@ AuthRouter.post('/login', (0, validateSchema_1.validateSchema)(zod_1.z.object({ 
                 if (error)
                     return next(error);
                 const token = jsonwebtoken_1.default.sign({ user }, common_1.CommonConfig.JWT_SECRET);
-                return res.json({ token });
+                console.log({ user });
+                return res.json({ token, email: user.email, name: user.name, roles: user.roles, picture: user.profilePic, id: user?._id });
             });
         }
         catch (error) {

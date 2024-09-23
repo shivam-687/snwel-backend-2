@@ -15,5 +15,9 @@ exports.Constants = {
         MASTER_OTP: 796239
     },
     TOKEN_SECRET: 'snwellacademy',
-    FROM_EMAIL: "snwellacademy@gmail.com"
+    FROM_EMAIL: "snwellacademy@gmail.com",
+    MASTER_TYPES: {
+        MASTER: 'MASTER',
+        SUB_MASTER: 'SUB_MASTER'
+    }
 };

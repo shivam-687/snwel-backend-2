@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommonConfig = void 0;
+exports.paginateOptions = exports.CommonConfig = void 0;
 const zod_1 = __importDefault(require("zod"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
@@ -27,3 +27,16 @@ catch (error) {
     console.error("Config validation error", error);
     process.exit(1);
 }
+exports.paginateOptions = {
+    customLabels: {
+        totalDocs: 'total', // Rename totalDocs to totalItems
+        docs: 'docs', // Rename docs to applications
+        limit: 'pageSize', // Rename limit to pageSize
+        totalPages: 'totalPages', // Keep the same or rename as needed
+        page: 'currentPage', // Rename page to currentPage
+        nextPage: 'nextPage', // Rename nextPage to next
+        prevPage: 'prevPage', // Rename prevPage to previous
+        hasPrevPage: 'hasPrevious', // Rename hasPrevPage to hasPrevious
+        hasNextPage: 'hasNext', // Rename hasNextPage to hasNext
+    }
+};
