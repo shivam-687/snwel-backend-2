@@ -28,7 +28,8 @@ function validateSettingSchema(type) {
     const schema = {
         [setting_schema_1.SETTINGS.EMAIL]: setting_schema_1.EmailSettingTypeSchema,
         [setting_schema_1.SETTINGS.GENERAL]: setting_schema_1.GeneralSettingSchema,
-        [setting_schema_1.SETTINGS.INTEGRATION]: setting_schema_1.IntegrationSettingTypeSchema
+        [setting_schema_1.SETTINGS.INTEGRATION]: setting_schema_1.IntegrationSettingTypeSchema,
+        [setting_schema_1.SETTINGS.MENUBUILDER]: setting_schema_1.MenuSettingSchema
     };
     return validateSchema(schema[type]);
 }

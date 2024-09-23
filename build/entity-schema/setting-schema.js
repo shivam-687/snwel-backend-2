@@ -1,17 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GeneralSettingSchema = exports.EmailSettingTypeSchema = exports.IntegrationSettingTypeSchema = exports.EMAIL_TRANSPORTER = exports.SettingSchema = exports.SETTINGS = void 0;
+exports.MenuSettingSchema = exports.MenuSchemaWithChildren = exports.MenuItemSchema = exports.GeneralSettingSchema = exports.EmailSettingTypeSchema = exports.IntegrationSettingTypeSchema = exports.EMAIL_TRANSPORTER = exports.SettingSchema = exports.SETTINGS = void 0;
 const zod_1 = require("zod");
 var SETTINGS;
 (function (SETTINGS) {
     SETTINGS["INTEGRATION"] = "INTEGRATION";
     SETTINGS["GENERAL"] = "GENERAL";
     SETTINGS["EMAIL"] = "EMAIL";
+    SETTINGS["MENUBUILDER"] = "MENUBUILDER";
 })(SETTINGS || (exports.SETTINGS = SETTINGS = {}));
 const settings_array = [
     'INTEGRATION',
     'GENERAL',
-    'EMAIL'
+    'EMAIL',
+    'MENUBUILDER'
 ];
 exports.SettingSchema = zod_1.z.object({
     code: zod_1.z.enum(settings_array),
@@ -67,7 +69,33 @@ exports.GeneralSettingSchema = exports.SettingSchema.merge(zod_1.z.object({
             phone: zod_1.z.string().optional(),
             email: zod_1.z.string().optional(),
         }).optional(),
+        socialLinks: zod_1.z.object({
+            facebook: zod_1.z.string().optional(),
+            insta: zod_1.z.string().optional(),
+            x: zod_1.z.string().optional(),
+            youtube: zod_1.z.string().optional(),
+            linkedin: zod_1.z.string().optional()
+        }).optional(),
         emailTransport: zod_1.z.enum([EMAIL_TRANSPORTER.NODEMAILER, EMAIL_TRANSPORTER.RESEND, EMAIL_TRANSPORTER.SENDGRID]).default(EMAIL_TRANSPORTER.NODEMAILER).optional(),
         senderEmail: zod_1.z.string()
+    })
+}));
+exports.MenuItemSchema = zod_1.z.object({
+    id: zod_1.z.string(),
+    name: zod_1.z.string(),
+    href: zod_1.z.string().optional(),
+    icon: zod_1.z.string().optional(),
+    img: zod_1.z.string().optional(),
+    index: zod_1.z.number().nullable().optional(),
+    parentId: zod_1.z.string().nullable().optional(),
+    depth: zod_1.z.number().optional(),
+    desc: zod_1.z.string().optional()
+});
+exports.MenuSchemaWithChildren = exports.MenuItemSchema.merge(zod_1.z.object({ children: zod_1.z.array(exports.MenuItemSchema).optional().default([]) }));
+exports.MenuSettingSchema = exports.SettingSchema.merge(zod_1.z.object({
+    code: zod_1.z.enum([SETTINGS.MENUBUILDER]),
+    data: zod_1.z.object({
+        menus: zod_1.z.array(exports.MenuSchemaWithChildren).default([]),
+        footerMenu: zod_1.z.array(exports.MenuSchemaWithChildren).default([])
     })
 }));

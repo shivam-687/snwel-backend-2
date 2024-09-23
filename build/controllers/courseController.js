@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCourseController = exports.updateCourseController = exports.getCourseBySlugController = exports.getCourseByIdController = exports.createCourseController = exports.getAllCoursesController = void 0;
+exports.partialUpdateCourseController = exports.deleteCourseController = exports.updateCourseController = exports.getCourseBySlugController = exports.getCourseByIdController = exports.createCourseController = exports.getAllCoursesController = void 0;
 const courseService_1 = require("../service/courseService");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const catchAsync_1 = require("../utils/helpers/catchAsync");
@@ -50,6 +50,15 @@ const updateCourseController = (0, catchAsync_1.catchAsync)(async (req, res) => 
     (0, appResponse_1.successResponse)(course, res, { message: "Course Updated successfully!" });
 });
 exports.updateCourseController = updateCourseController;
+const partialUpdateCourseController = (0, catchAsync_1.catchAsync)(async (req, res) => {
+    const { courseId } = req.params;
+    if (!courseId) {
+        return appResponse_1.courseErrorResponse.notFound(null, res);
+    }
+    const course = await (0, courseService_1.partialUpdateCourse)(courseId, req.body);
+    (0, appResponse_1.successResponse)(course, res, { message: "Course Updated successfully!" });
+});
+exports.partialUpdateCourseController = partialUpdateCourseController;
 const deleteCourseController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const { courseId } = req.params;
     if (!courseId) {

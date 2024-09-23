@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractListOptions = exports.generateRandomPassword = exports.getFilterQuery = exports.generateJwtToken = exports.generateOTPObject = exports.generateOTP = exports.decryptToken = exports.generateToken = exports.convertToPagination = exports.getPaginationParams = exports.withPagination = exports.parseErrorMessage = exports.validatedPassword = exports.hashPassword = void 0;
+exports.convertSortOrder = exports.queryHandler = exports.extractListOptions = exports.generateRandomPassword = exports.getFilterQuery = exports.generateJwtToken = exports.generateOTPObject = exports.generateOTP = exports.decryptToken = exports.generateToken = exports.convertToPagination = exports.getPaginationParams = exports.withPagination = exports.parseErrorMessage = exports.validatedPassword = exports.hashPassword = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dayjs_1 = __importDefault(require("dayjs"));
 const uuid_1 = require("uuid");
@@ -43,8 +43,10 @@ function withPagination(qb, orderByColumn, page = 1, pageSize = 10) {
 exports.withPagination = withPagination;
 const getPaginationParams = (limit = 20, page = 1) => {
     // Calculate offset based on page number and limit
+    limit = Number(limit);
+    page = Number(page);
     const offset = (page - 1) * limit;
-    return { limit, offset };
+    return { limit, offset, page };
 };
 exports.getPaginationParams = getPaginationParams;
 const convertToPagination = (data, total, limit = 20, page = 1) => {
@@ -53,6 +55,7 @@ const convertToPagination = (data, total, limit = 20, page = 1) => {
     const prevPage = page > 1 ? page - 1 : null;
     const hasNext = nextPage !== null;
     const currentPage = page;
+    console.log(total);
     return {
         docs: data,
         limit: limit,
@@ -140,3 +143,58 @@ const extractListOptions = (req) => {
     };
 };
 exports.extractListOptions = extractListOptions;
+function buildQuery(filter, searchFields) {
+    const query = {};
+    // Handle dynamic search across multiple fields
+    if (filter?.search && searchFields?.length) {
+        const searchRegex = new RegExp(filter.search, 'i');
+        query.$or = searchFields.map(field => ({ [field]: searchRegex }));
+    }
+    // Handle dynamic filters
+    if (filter) {
+        for (const [key, value] of Object.entries(filter)) {
+            if (key !== 'search') { // Exclude search from normal filter processing
+                query[key] = value;
+            }
+        }
+    }
+    console.log(query);
+    return query;
+}
+async function queryHandler(model, options) {
+    const { limit = 10, page = 1, filter, sort, searchFields, search } = options;
+    const { limit: parsedLimit, offset } = (0, exports.getPaginationParams)(limit, page);
+    const query = buildQuery({ ...filter, search }, searchFields);
+    const documents = model
+        .find(query)
+        .sort(sort)
+        .skip(offset)
+        .limit(parsedLimit);
+    return {
+        documents,
+        limit: parsedLimit,
+        offset,
+        page: Number(page)
+    };
+}
+exports.queryHandler = queryHandler;
+function convertSortOrder(obj) {
+    const newObj = {};
+    for (const key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+            // Recursively handle nested objects
+            newObj[key] = convertSortOrder(obj[key]);
+        }
+        else if (obj[key] === 'asc') {
+            newObj[key] = 1;
+        }
+        else if (obj[key] === 'desc') {
+            newObj[key] = -1;
+        }
+        else {
+            newObj[key] = obj[key]; // Keep other values unchanged
+        }
+    }
+    return newObj;
+}
+exports.convertSortOrder = convertSortOrder;

@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OTPModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const OTPSchema = new mongoose_1.Schema({
-    userId: { type: String, unique: true },
     otp: String,
     expirationTime: Date,
     verified: { type: Boolean, default: false },

@@ -97,23 +97,18 @@ exports.getAllByCourseId = getAllByCourseId;
 // Function to retrieve all courses
 const getAll = async (options) => {
     try {
-        const { limit = 10, page = 1, filter } = options;
-        const query = {};
-        const paginationData = (0, helpers_1.getPaginationParams)(limit, page);
-        if (filter && filter.search) {
-            const searchRegex = new RegExp(filter.search, 'i');
-            query.$or = [{ name: searchRegex }, { email: searchRegex }];
-        }
-        const skip = (page - 1) * limit;
-        const users = await CourseEnrollment_1.default
-            .find(query)
-            .skip(skip)
-            .limit(limit)
-            .populate("userId", ["email", "name", "profilePic"])
+        // console.log(options)
+        const { documents, limit, page } = await (0, helpers_1.queryHandler)(CourseEnrollment_1.default, {
+            ...options,
+        });
+        const searcQ = options?.search ? new RegExp(options.search, 'i') : '';
+        const users = await documents
+            .populate({ path: "userId", select: ["email", "name", "profilePic"] })
             .populate("courseId", "title slug")
-            .select(['_id', "status", "paymentStatus", "otp.verified", "createdAt", "updatedAt", "paymentMethod"]);
-        const count = await CourseEnrollment_1.default.countDocuments(query);
-        return (0, helpers_1.convertToPagination)(users, count, paginationData.limit, paginationData.offset);
+            .populate(['qualification', 'mode', 'occupation', 'widget'])
+            .sort({ createdAt: -1 });
+        const count = await CourseEnrollment_1.default.countDocuments(documents.getQuery());
+        return (0, helpers_1.convertToPagination)(users, count, limit, page);
     }
     catch (error) {
         throw new Error(`Error: retrieving courseQuery: ${error.message}`);
@@ -125,7 +120,7 @@ const getById = async (id) => {
     try {
         return await CourseEnrollment_1.default.findById(id)
             .populate("userId", "email name profilePic")
-            .populate("courseId");
+            .populate(["courseId", 'qualification', 'mode', 'occupation', 'widget']);
     }
     catch (error) {
         throw new Error(`Error: retrieving course query: ${error.message}`);

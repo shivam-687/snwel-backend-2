@@ -19,11 +19,15 @@ const createJobVacancy = async (jobData) => {
 exports.createJobVacancy = createJobVacancy;
 const getAllJobVacancies = async (options) => {
     try {
-        const { limit = 10, page = 1, search } = options;
+        const { limit = 10, page = 1, search, filter } = options;
         const query = {};
         if (search) {
             const searchRegex = new RegExp(search, 'i');
             query.$or = [{ title: searchRegex }, { companyName: searchRegex }];
+        }
+        if (filter && filter['location']) {
+            const searchRegex = new RegExp(filter['location'], 'i');
+            query.$or = [{ "location.city": searchRegex }, { "location.country": searchRegex }, { "location.state": searchRegex }];
         }
         const skip = (page - 1) * limit;
         const jobVacancies = await JobVacancy_1.default.find(query)

@@ -29,12 +29,16 @@ async function handleUpload(file) {
 exports.handleUpload = handleUpload;
 // Multer file filter
 const fileFilter = (req, file, cb) => {
-    // Allow only specific file types, you can customize this according to your requirements
-    if (file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/')) {
-        cb(null, true);
+    // Allow images, videos, PDFs, and DOC/DOCX files
+    if (file.mimetype.startsWith('image/') ||
+        file.mimetype.startsWith('video/') ||
+        file.mimetype === 'application/pdf' ||
+        file.mimetype === 'application/msword' ||
+        file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        cb(null, true); // Accept the file
     }
     else {
-        cb(new Error('Only images and videos are allowed'));
+        cb(new Error('Only images, videos, PDFs, and DOC/DOCX files are allowed')); // Reject the file
     }
 };
 // Multer middleware instance

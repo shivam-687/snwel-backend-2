@@ -7,6 +7,7 @@ exports.getWidgetTypes = exports.deleteWidgetById = exports.updateWidgetById = e
 // services/widgetService.ts
 const Widgets_1 = __importDefault(require("../models/Widgets"));
 const helpers_1 = require("../utils/helpers");
+const mongoose_1 = __importDefault(require("mongoose"));
 const createWidget = async (widgetData) => {
     try {
         const newWidget = new Widgets_1.default(widgetData);
@@ -38,7 +39,12 @@ const getAllWidgets = async (options) => {
 exports.getAllWidgets = getAllWidgets;
 const getWidgetById = async (widgetId) => {
     try {
-        return await Widgets_1.default.findById(widgetId);
+        if (mongoose_1.default.Types.ObjectId.isValid(widgetId)) {
+            return await Widgets_1.default.findById(widgetId);
+        }
+        else {
+            return await Widgets_1.default.findOne({ code: widgetId });
+        }
     }
     catch (error) {
         throw new Error(`Error: retrieving widget: ${error.message}`);

@@ -3,13 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeFileById = exports.listFiles = exports.uploadFile = void 0;
+exports.removeFileById = exports.listFiles = exports.uploadFileV2Controller = exports.uploadFile = void 0;
 const FileModal_1 = require("../models/FileModal");
 const mime_types_1 = __importDefault(require("mime-types"));
 const helpers_1 = require("../utils/helpers");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const fs_1 = __importDefault(require("fs"));
 const upload_1 = require("../middleware/upload");
+const uploadV2_1 = require("../middleware/uploadV2");
 const uploadFile = async (req, res) => {
     try {
         let file;
@@ -36,6 +37,49 @@ const uploadFile = async (req, res) => {
     }
 };
 exports.uploadFile = uploadFile;
+const uploadFileV2Controller = async (req, res) => {
+    try {
+        const files = req.files;
+        const { externalUrl } = req.body;
+        // Array to store file upload results
+        let uploadedFiles = [];
+        // Handle file uploads if they exist
+        if (files && files.length > 0) {
+            for (const file of files) {
+                // Convert buffer to base64 and upload to Cloudinary
+                const cldRes = await (0, uploadV2_1.handleUploadV2)(file.buffer, file.mimetype);
+                if (!cldRes)
+                    return;
+                const mimeType = cldRes ? mime_types_1.default.lookup(cldRes?.url) : 'application/octet-stream';
+                const uploadedFile = new FileModal_1.FileModel({
+                    fileName: cldRes.public_id,
+                    filePath: cldRes.url,
+                    mimeType
+                });
+                await uploadedFile.save();
+                uploadedFiles.push(uploadedFile);
+            }
+        }
+        // Handle external URL uploads
+        if (externalUrl) {
+            const file = new FileModal_1.FileModel({ fileName: externalUrl, filePath: externalUrl });
+            await file.save();
+            uploadedFiles.push(file);
+        }
+        if (uploadedFiles.length === 0) {
+            throw new Error('No file uploaded or external URL provided.');
+        }
+        return res.status(200).json({
+            message: 'Files uploaded successfully',
+            data: uploadedFiles,
+        });
+    }
+    catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+exports.uploadFileV2Controller = uploadFileV2Controller;
 const listFiles = async (req, res) => {
     try {
         const { limit = 10, page = 1, search = '' } = { ...req.query };
