@@ -7,8 +7,9 @@ import { CreateCourseQuery } from '@/entity-schema/course-enrollment';
 import CourseEnrollmentModel, { CourseEnrollment } from '@/models/CourseEnrollment';
 import { Constants } from '@/config/constants';
 import { logger } from '@/utils/logger';
-import emailService from './emailService';
 import { UserModel } from '@/models/User';
+import { otpEmailTemplate } from '@/email-templates/templateFactory';
+import { NotificationService } from './notificationService';
 
 // Function to create a new course
 const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, isVerified: boolean, enrollmentId?: string }> => {
@@ -22,9 +23,11 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
         }
         const user = await UserModel.findById(queryData.userId);
         const otpObject = generateOTPObject({})
+        const emailTemplate = await otpEmailTemplate(otpObject.otp);
+        const nfs = await NotificationService.getInstance()
         if (exists) {
             const updated = await exists.updateOne({ otp: otpObject });
-            await emailService.sendOtp(user?.email || '', otpObject.otp)
+            await nfs.sendEmail(user?.email||"", emailTemplate.subject, emailTemplate.template)
             return {
                 isVerified: false,
                 token: generateJwtToken({
@@ -36,7 +39,7 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
         } else {
             let newCourseQuery = new CourseEnrollmentModel({ ...queryData, otp: otpObject });
             await newCourseQuery.save()
-            await emailService.sendOtp(user?.email || '', otpObject.otp)
+            await nfs.sendEmail(user?.email||"", emailTemplate.subject, emailTemplate.template)
             return {
                 isVerified: false,
                 token: generateJwtToken({

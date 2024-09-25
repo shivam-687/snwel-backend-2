@@ -3,6 +3,8 @@ import emailService from "./emailService";
 import { sendOtpViaWhatsApp } from "./whatsappService";
 import crypto from 'crypto'
 import { Constants } from "@/config/constants";
+import { NotificationService } from "./notificationService";
+import { otpEmailTemplate } from "@/email-templates/templateFactory";
 
 export const sendOtp = async (phoneNumber: string, email: string, otp: string) => {
     try {
@@ -45,7 +47,15 @@ export async function generateOtp(data: { email?: string, phone?: string }, acti
     });
 
     await otpDocument.save();
-
+    const notificationService = await NotificationService.getInstance();
+    if(data.email){
+        const template = await otpEmailTemplate(otp)
+        await notificationService.sendEmail(
+            data.email,
+            "Otp",
+            template.template
+        )
+    }
     // Send OTP via email or phone (use a separate service for this)
     // sendOtp()
     // Return the token
@@ -74,6 +84,7 @@ export async function verifyOtp(token: string, otp: string) {
     // Mark as verified
     otpDocument.verified = true;
     await otpDocument.save();
+
   
     return { success: true, message: 'OTP verified successfully.', otp: otpDocument };
   }

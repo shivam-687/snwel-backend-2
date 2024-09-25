@@ -5,8 +5,10 @@ const index_1 = require("./../utils/helpers/index");
 const setting_schema_1 = require("../entity-schema/setting-schema");
 const Setting_1 = require("../models/Setting");
 const helpers_1 = require("../utils/helpers");
+const notificationService_1 = require("./notificationService");
 class SettingsService {
     async createSetting(input) {
+        const nfs = await notificationService_1.NotificationService.getInstance();
         const exist = await Setting_1.SettingModel.findOne({ code: input.code });
         if (exist)
             throw new Error("Setting already exists");
@@ -30,6 +32,7 @@ class SettingsService {
         // Save to database
         const setting = new Setting_1.SettingModel(validatedInput);
         await setting.save();
+        await nfs.refreshSettings();
         return setting;
     }
     async getSetting(code) {
@@ -42,12 +45,15 @@ class SettingsService {
     async updateSetting(code, input) {
         // Validate input
         let validatedInput;
+        const nfs = await notificationService_1.NotificationService.getInstance();
         switch (code) {
             case setting_schema_1.SETTINGS.INTEGRATION:
                 validatedInput = setting_schema_1.IntegrationSettingTypeSchema.pick({ data: true, isChangable: true }).parse(input);
+                // await nfs.refreshSettings()
                 break;
             case setting_schema_1.SETTINGS.EMAIL:
                 validatedInput = setting_schema_1.EmailSettingTypeSchema.pick({ data: true, isChangable: true }).parse(input);
+                // await nfs.refreshSettings()
                 break;
             case setting_schema_1.SETTINGS.GENERAL:
                 validatedInput = setting_schema_1.GeneralSettingSchema.pick({ data: true, isChangable: true }).parse(input);
@@ -60,6 +66,7 @@ class SettingsService {
         }
         // Update in database
         const updatedSetting = await Setting_1.SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true, upsert: true });
+        await nfs.refreshSettings();
         if (!updatedSetting) {
             throw new Error(`Setting with code ${code} not found`);
         }

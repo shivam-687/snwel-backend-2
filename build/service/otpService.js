@@ -9,6 +9,8 @@ const emailService_1 = __importDefault(require("./emailService"));
 const whatsappService_1 = require("./whatsappService");
 const crypto_1 = __importDefault(require("crypto"));
 const constants_1 = require("../config/constants");
+const notificationService_1 = require("./notificationService");
+const templateFactory_1 = require("../email-templates/templateFactory");
 const sendOtp = async (phoneNumber, email, otp) => {
     try {
         if (phoneNumber) {
@@ -46,6 +48,11 @@ async function generateOtp(data, action) {
         token,
     });
     await otpDocument.save();
+    const notificationService = await notificationService_1.NotificationService.getInstance();
+    if (data.email) {
+        const template = await (0, templateFactory_1.otpEmailTemplate)(otp);
+        await notificationService.sendEmail(data.email, "Otp", template.template);
+    }
     // Send OTP via email or phone (use a separate service for this)
     // sendOtp()
     // Return the token

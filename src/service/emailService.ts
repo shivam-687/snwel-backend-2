@@ -1,10 +1,11 @@
 import { Constants } from "@/config/constants";
+import OTPEmailTemplate from "@/email-templates/otpEmail";
 import { EMAIL_TRANSPORTER, SETTINGS } from "@/entity-schema/setting-schema";
 import { SettingModel } from "@/models/Setting";
 import { render } from "@react-email/render";
 import nodemailer, { Transporter } from "nodemailer";
 import { Resend } from "resend";
-import {OtpEmail} from '@/email-templates/otpEmail'
+
 
 
 interface EmailServiceConfig {
@@ -87,7 +88,7 @@ class EmailService {
         
 
         const subject = 'Your OTP Code';
-        return this.sendEmail(email, subject, render(OtpEmail({otp})));
+        return this.sendEmail(email, subject, "");
     }
 }
 

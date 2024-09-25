@@ -6,10 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../config/constants");
 const setting_schema_1 = require("../entity-schema/setting-schema");
 const Setting_1 = require("../models/Setting");
-const render_1 = require("@react-email/render");
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const resend_1 = require("resend");
-const otpEmail_1 = require("../email-templates/otpEmail");
 class EmailService {
     constructor() {
         this.transporter = null;
@@ -67,7 +65,7 @@ class EmailService {
     }
     async sendOtp(email, otp) {
         const subject = 'Your OTP Code';
-        return this.sendEmail(email, subject, (0, render_1.render)((0, otpEmail_1.OtpEmail)({ otp })));
+        return this.sendEmail(email, subject, "");
     }
 }
 exports.default = new EmailService();

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MenuSettingSchema = exports.MenuSchemaWithChildren = exports.MenuItemSchema = exports.GeneralSettingSchema = exports.EmailSettingTypeSchema = exports.IntegrationSettingTypeSchema = exports.EMAIL_TRANSPORTER = exports.SettingSchema = exports.SETTINGS = void 0;
+exports.MenuSettingSchema = exports.MenuSchemaWithChildren = exports.MenuItemSchema = exports.GeneralSettingSchema = exports.GeneralSettingDataSchema = exports.EmailSettingTypeSchema = exports.IntegrationSettingTypeSchema = exports.EMAIL_TRANSPORTER = exports.SettingSchema = exports.SETTINGS = void 0;
 const zod_1 = require("zod");
 var SETTINGS;
 (function (SETTINGS) {
@@ -54,6 +54,29 @@ exports.EmailSettingTypeSchema = exports.SettingSchema.merge(zod_1.z.object({
         }).optional()
     })
 }));
+exports.GeneralSettingDataSchema = zod_1.z.object({
+    siteName: zod_1.z.string(),
+    logoUrl: zod_1.z.string().optional(),
+    location: zod_1.z.object({
+        address: zod_1.z.string(),
+        city: zod_1.z.string(),
+        state: zod_1.z.string(),
+        country: zod_1.z.string()
+    }).optional(),
+    contacts: zod_1.z.object({
+        phone: zod_1.z.string().optional(),
+        email: zod_1.z.string().optional(),
+    }).optional(),
+    socialLinks: zod_1.z.object({
+        facebook: zod_1.z.string().optional(),
+        insta: zod_1.z.string().optional(),
+        x: zod_1.z.string().optional(),
+        youtube: zod_1.z.string().optional(),
+        linkedin: zod_1.z.string().optional()
+    }).optional(),
+    emailTransport: zod_1.z.enum([EMAIL_TRANSPORTER.NODEMAILER, EMAIL_TRANSPORTER.RESEND, EMAIL_TRANSPORTER.SENDGRID]).default(EMAIL_TRANSPORTER.NODEMAILER).optional(),
+    senderEmail: zod_1.z.string()
+});
 exports.GeneralSettingSchema = exports.SettingSchema.merge(zod_1.z.object({
     code: zod_1.z.enum([SETTINGS.GENERAL]),
     data: zod_1.z.object({
