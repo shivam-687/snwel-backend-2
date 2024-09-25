@@ -10,8 +10,9 @@ const mongodb_1 = require("mongodb");
 const CourseEnrollment_1 = __importDefault(require("../models/CourseEnrollment"));
 const constants_1 = require("../config/constants");
 const logger_1 = require("../utils/logger");
-const emailService_1 = __importDefault(require("./emailService"));
 const User_1 = require("../models/User");
+const templateFactory_1 = require("../email-templates/templateFactory");
+const notificationService_1 = require("./notificationService");
 // Function to create a new course
 const create = async (queryData) => {
     try {
@@ -24,9 +25,11 @@ const create = async (queryData) => {
         }
         const user = await User_1.UserModel.findById(queryData.userId);
         const otpObject = (0, helpers_1.generateOTPObject)({});
+        const emailTemplate = await (0, templateFactory_1.otpEmailTemplate)(otpObject.otp);
+        const nfs = await notificationService_1.NotificationService.getInstance();
         if (exists) {
             const updated = await exists.updateOne({ otp: otpObject });
-            await emailService_1.default.sendOtp(user?.email || '', otpObject.otp);
+            await nfs.sendEmail(user?.email || "", emailTemplate.subject, emailTemplate.template);
             return {
                 isVerified: false,
                 token: (0, helpers_1.generateJwtToken)({
@@ -39,7 +42,7 @@ const create = async (queryData) => {
         else {
             let newCourseQuery = new CourseEnrollment_1.default({ ...queryData, otp: otpObject });
             await newCourseQuery.save();
-            await emailService_1.default.sendOtp(user?.email || '', otpObject.otp);
+            await nfs.sendEmail(user?.email || "", emailTemplate.subject, emailTemplate.template);
             return {
                 isVerified: false,
                 token: (0, helpers_1.generateJwtToken)({

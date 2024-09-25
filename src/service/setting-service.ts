@@ -3,10 +3,12 @@ import { CreateSettingInput, EmailSettingTypeSchema, GeneralSettingSchema, Integ
 import { SettingModel } from '@/models/Setting';
 import { ListOptions, PaginatedList } from '@/types/custom';
 import { getPaginationParams } from '@/utils/helpers';
+import { NotificationService } from './notificationService';
 
 class SettingsService {
   
   async createSetting<T>(input: CreateSettingInput<T>) {
+    const nfs = await NotificationService.getInstance();
     const exist = await SettingModel.findOne({ code: input.code });
     if(exist)throw new Error("Setting already exists");
 
@@ -31,6 +33,7 @@ class SettingsService {
     // Save to database
     const setting = new SettingModel(validatedInput);
     await setting.save();
+    await nfs.refreshSettings()
     return setting;
   }
 
@@ -45,12 +48,15 @@ class SettingsService {
   async updateSetting<T>(code: SETTINGS, input: UpdateSettingInput<T>) {
     // Validate input
     let validatedInput;
+    const nfs = await NotificationService.getInstance();
     switch (code) {
       case SETTINGS.INTEGRATION:
         validatedInput = IntegrationSettingTypeSchema.pick({ data: true, isChangable: true }).parse(input);
+        // await nfs.refreshSettings()
         break;
       case SETTINGS.EMAIL:
         validatedInput = EmailSettingTypeSchema.pick({ data: true, isChangable: true }).parse(input);
+        // await nfs.refreshSettings()
         break;
       case SETTINGS.GENERAL:
         validatedInput = GeneralSettingSchema.pick({ data: true, isChangable: true }).parse(input);
@@ -65,6 +71,7 @@ class SettingsService {
     // Update in database
   
     const updatedSetting = await SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true, upsert: true});
+    await nfs.refreshSettings()
     if (!updatedSetting) {
       throw new Error(`Setting with code ${code} not found`);
     }

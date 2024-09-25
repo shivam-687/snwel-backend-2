@@ -88,6 +88,32 @@ export const EmailSettingTypeSchema = SettingSchema.merge(z.object({
 
 export type EmailSetting = z.infer<typeof EmailSettingTypeSchema>;
 
+export const GeneralSettingDataSchema = z.object({
+    siteName: z.string(),
+    logoUrl: z.string().optional(),
+    location: z.object({
+        address: z.string(),
+        city: z.string(),
+        state: z.string(),
+        country: z.string()
+    }).optional(),
+    contacts: z.object({
+        phone: z.string().optional(),
+        email: z.string().optional(),
+    }).optional(),
+    socialLinks: z.object({
+        facebook: z.string().optional(),
+        insta: z.string().optional(),
+        x: z.string().optional(),
+        youtube: z.string().optional(),
+        linkedin: z.string().optional()
+    }).optional(),
+    emailTransport: z.enum([EMAIL_TRANSPORTER.NODEMAILER, EMAIL_TRANSPORTER.RESEND, EMAIL_TRANSPORTER.SENDGRID]).default(EMAIL_TRANSPORTER.NODEMAILER).optional(),
+    senderEmail: z.string()
+})
+
+export type GeneralSettingData = z.infer<typeof GeneralSettingDataSchema>;
+
 
 export const GeneralSettingSchema = SettingSchema.merge(z.object({
     code: z.enum([SETTINGS.GENERAL]),
