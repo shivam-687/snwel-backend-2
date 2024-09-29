@@ -95,7 +95,8 @@ export const GeneralSettingDataSchema = z.object({
         address: z.string(),
         city: z.string(),
         state: z.string(),
-        country: z.string()
+        country: z.string(),
+        url: z.string().optional()
     }).optional(),
     contacts: z.object({
         phone: z.string().optional(),
@@ -124,7 +125,8 @@ export const GeneralSettingSchema = SettingSchema.merge(z.object({
             address: z.string(),
             city: z.string(),
             state: z.string(),
-            country: z.string()
+            country: z.string(),
+            url: z.string().optional()
         }).optional(),
         contacts: z.object({
             phone: z.string().optional(),

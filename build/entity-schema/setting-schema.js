@@ -61,7 +61,8 @@ exports.GeneralSettingDataSchema = zod_1.z.object({
         address: zod_1.z.string(),
         city: zod_1.z.string(),
         state: zod_1.z.string(),
-        country: zod_1.z.string()
+        country: zod_1.z.string(),
+        url: zod_1.z.string().optional()
     }).optional(),
     contacts: zod_1.z.object({
         phone: zod_1.z.string().optional(),
@@ -86,7 +87,8 @@ exports.GeneralSettingSchema = exports.SettingSchema.merge(zod_1.z.object({
             address: zod_1.z.string(),
             city: zod_1.z.string(),
             state: zod_1.z.string(),
-            country: zod_1.z.string()
+            country: zod_1.z.string(),
+            url: zod_1.z.string().optional()
         }).optional(),
         contacts: zod_1.z.object({
             phone: zod_1.z.string().optional(),
