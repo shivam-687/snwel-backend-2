@@ -1,16 +1,14 @@
 import { OTPModel } from "@/models/OtpModel";
-import emailService from "./emailService";
 import { sendOtpViaWhatsApp } from "./whatsappService";
 import crypto from 'crypto'
 import { Constants } from "@/config/constants";
-import { NotificationService } from "./notificationService";
-import { otpEmailTemplate } from "@/email-templates/templateFactory";
+import { sendOTPNotification, sendOTPWhatsapp } from "./notificationService";
 
-export const sendOtp = async (phoneNumber: string, email: string, otp: string) => {
+export const sendOtp = async (otp: string, phoneNumber?: string, email?: string) => {
     try {
 
         if (phoneNumber) {
-            await sendOtpViaWhatsApp(phoneNumber, otp);
+            await sendOTPWhatsapp(otp, phoneNumber)
             console.log(`OTP sent via WhatsApp to ${phoneNumber}`);
         }
     } catch (error) {
@@ -19,7 +17,7 @@ export const sendOtp = async (phoneNumber: string, email: string, otp: string) =
 
     try {
         if (email) {
-            await emailService.sendOtp(email, otp);
+            await sendOTPNotification(otp, email)
             console.log(`OTP sent via email to ${email}`);
         }
     } catch (error) {
@@ -47,18 +45,7 @@ export async function generateOtp(data: { email?: string, phone?: string }, acti
     });
 
     await otpDocument.save();
-    const notificationService = await NotificationService.getInstance();
-    if(data.email){
-        const template = await otpEmailTemplate(otp)
-        await notificationService.sendEmail(
-            data.email,
-            "Otp",
-            template.template
-        )
-    }
-    // Send OTP via email or phone (use a separate service for this)
-    // sendOtp()
-    // Return the token
+   await sendOtp(otp, data?.phone, data?.email)
     return { token, id: otpDocument._id };
 }
 

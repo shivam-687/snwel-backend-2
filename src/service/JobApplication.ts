@@ -5,16 +5,34 @@ import { ListOptions, PaginatedList } from '@/types/custom';
 import { convertSortOrder, convertToPagination, getPaginationParams } from '@/utils/helpers';
 import { Types } from 'mongoose';
 import { Parser } from 'json2csv';
+import { sendJobApplyConfirmation } from './notificationService';
 
 // Function to create a new job application
 export async function createJobApplication(data: JobApplication): Promise<JobApplication> {
   try {
     const jobApplication = await JobApplicationModel.create(data);
+
+    try {
+      // Ensure populate is awaited
+      await jobApplication.populate("jobId");
+
+      // Sending job application confirmation
+      await sendJobApplyConfirmation(jobApplication, {
+        email: jobApplication.email,
+        phone: jobApplication.phone
+      });
+    } catch (error) {
+      console.error("Failed to send mail to", jobApplication.email, error); // Log error details
+    }
+
     return jobApplication.toObject();
   } catch (error: any) {
+    // Better error handling with logging the full error
+    console.error(`Failed to create job application: ${error.message}`, error);
     throw new Error(`Failed to create job application: ${error.message}`);
   }
 }
+
 
 // Function to get a job application by ID
 export async function getJobApplicationById(jobApplicationId: string): Promise<JobApplication | null> {

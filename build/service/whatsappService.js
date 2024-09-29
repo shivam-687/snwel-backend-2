@@ -29,12 +29,12 @@ const sendWhatsAppMessage = async (phoneNumber, message) => {
         throw new Error('WhatsApp settings not found');
     }
     try {
-        const response = await axios_1.default.post(whatsappSettings.url, {
-            appKey: whatsappSettings.appKey,
-            authKey: whatsappSettings.authKey,
-            to: phoneNumber,
-            message: message,
-        });
+        const url = new URL(whatsappSettings.url);
+        url.searchParams.append("api_key", whatsappSettings.appKey);
+        url.searchParams.append("sender", whatsappSettings.authKey);
+        url.searchParams.append("to", phoneNumber);
+        url.searchParams.append("message", phoneNumber);
+        const response = await axios_1.default.post(url.toString());
         return response.data;
     }
     catch (error) {
@@ -42,8 +42,20 @@ const sendWhatsAppMessage = async (phoneNumber, message) => {
         throw error;
     }
 };
-const sendOtpViaWhatsApp = async (phoneNumber, otp) => {
-    const message = `Your OTP code is ${otp}`;
+const sendOtpViaWhatsApp = async (phoneNumber, otp, setting) => {
+    const message = `
+    ${setting.siteName} - Your Verification Code
+
+Your one-time password (OTP) is ${otp}. Please enter this code on the verification page to proceed.
+
+This OTP is valid for the next 10 minutes. Do not share this code with anyone. If you did not request this, please contact our support team immediately at [support contact].
+
+Thank you for choosing ${setting.siteName}!
+
+Best regards,
+The ${setting.siteName} Team
+https://snwelacademy.in
+    `;
     return await sendWhatsAppMessage(phoneNumber, message);
 };
 exports.sendOtpViaWhatsApp = sendOtpViaWhatsApp;

@@ -1,12 +1,29 @@
-import { EMAIL_TRANSPORTER, EmailSetting, IntegrationSetting, SETTINGS } from "@/entity-schema/setting-schema";
+import { courseEnquiryTemplate, jobApplyConfirmTemplate, otpEmailTemplate } from "@/email-templates/templateFactory";
+import { SMTPSchema } from "@/entity-schema/email-apps-schema";
+import { EMAIL_TRANSPORTER, EmailSetting, GeneralSettingData, IntegrationSetting, SETTINGS } from "@/entity-schema/setting-schema";
+import { WhatsappConfig } from "@/entity-schema/whatsapp-schema";
+import { Course } from "@/models/CourseModel";
+import IntegrationModel, { IIntegration } from "@/models/IntegrationModel";
+import { IJobApplication } from "@/models/JobApplicationModel";
 import { SettingModel } from "@/models/Setting";
 import axios from "axios";
 import nodemailer from 'nodemailer'
+
+enum AppIds {
+    WHATSAPP = "whatsapp",
+    SMTP = "smtp",
+    RENDER_EMAIL = "render",
+    TELEGRAM = "telegram",
+    SMS = "sms",
+    PUSH = "push"
+}
 
 export class NotificationService {
     private static instance: NotificationService;
     private emailSetting: EmailSetting | undefined;
     private integrationSetting: IntegrationSetting | undefined;
+    private generalSetting: GeneralSettingData | undefined;
+    private ingerations: IIntegration[] = [];
 
     // Private constructor to prevent direct instantiation
     private constructor() { }
@@ -25,8 +42,10 @@ export class NotificationService {
     // Load settings from the database (this would typically call your database or config service)
     private async loadSettings(): Promise<void> {
         // Simulate loading settings from the database
+        await this.loadIntegrations();
         this.emailSetting = await this.loadEmailSettingsFromDB();
         this.integrationSetting = await this.loadIntegrationSettingsFromDB();
+        this.generalSetting = await this.loadGeneralSettingsFromDB()
     }
 
     // Load email settings from DB (replace this with actual DB call)
@@ -37,8 +56,18 @@ export class NotificationService {
 
     // Load integration (WhatsApp) settings from DB (replace this with actual DB call)
     private async loadIntegrationSettingsFromDB(): Promise<IntegrationSetting | undefined> {
-        const emailSetting = await SettingModel.findOne({ code: SETTINGS.INTEGRATION});
+        const emailSetting = await SettingModel.findOne({ code: SETTINGS.INTEGRATION });
         return emailSetting as IntegrationSetting;
+    }
+    private async loadGeneralSettingsFromDB(): Promise<GeneralSettingData | undefined> {
+        const emailSetting = await SettingModel.findOne({ code: SETTINGS.GENERAL });
+        return emailSetting?.data as GeneralSettingData;
+    }
+
+    private async loadIntegrations() {
+        const res = await IntegrationModel.find({}).lean();
+        this.ingerations = res;
+        console.log("Integration: ", this.ingerations)
     }
 
     // Refresh settings manually
@@ -49,51 +78,45 @@ export class NotificationService {
 
     // Send Email Notification
     async sendEmail(to: string, subject: string, message: string): Promise<void> {
-        if (!this.emailSetting || !this.emailSetting.data) {
-            throw new Error("Email settings not configured");
-        }
-
-        const emailTransporter = this.emailSetting.data[EMAIL_TRANSPORTER.NODEMAILER];
-        if (!emailTransporter) {
-            throw new Error("Email transporter is not configured");
-        }
-
-        if (this.emailSetting.data[EMAIL_TRANSPORTER.NODEMAILER]) {
+        try {
+            const smtp = this.ingerations.find(it => it.serviceName === AppIds.SMTP);
+            if(!smtp || !smtp.enabled) return;
+            const smtpConfig = SMTPSchema.parse(smtp?.config);
             console.log("Start sending mail to", to)
             const transporter = nodemailer.createTransport({
-                host: emailTransporter.host,
-                port: parseInt(emailTransporter.port),
-                secure: emailTransporter.secure,
+                host: smtpConfig.host,
+                port: parseInt(smtpConfig.port),
+                secure: false,
                 auth: {
-                    user: emailTransporter.auth.user,
-                    pass: emailTransporter.auth.pass
+                    user: smtpConfig.auth.username,
+                    pass: smtpConfig.auth.password
                 },
                 tls: {
                     rejectUnauthorized: false, // Add this only for testing environments; avoid using it in production
-                  }
+                }
             });
 
             await transporter.sendMail({
-                from: `"No Reply" <${emailTransporter.auth.user}>`,
+                from: this.generalSetting?.senderEmail || `"No Reply" <${smtpConfig.auth.username}>`,
                 to,
                 subject,
                 html: `<b>${message}</b>`
             });
-
-        } else {
-            throw new Error("Unsupported email transporter");
+        } catch (error) {
+            console.error("sendEmail",error);
+            throw error;
         }
     }
 
-    // Send WhatsApp Notification
     async sendWhatsApp(number: string, message: string): Promise<void> {
-        if (!this.integrationSetting || !this.integrationSetting.data?.whatsapp) {
+        const whatsapp = this.ingerations.find(it => it.serviceName === AppIds.WHATSAPP);
+        if(!whatsapp || !whatsapp.enabled) return console.log("Whatsapp otp is not enabled");
+        const whatsappConfig = WhatsappConfig.safeParse(whatsapp?.config);
+        if(!whatsappConfig.success){
             throw new Error("WhatsApp integration settings not configured");
         }
-
-        const whatsappConfig = this.integrationSetting.data.whatsapp;
-        const url = `${whatsappConfig.url}?api_key=${whatsappConfig.appKey}&sender=${number}&number=${number}&message=${message}`;
-
+       
+        const url = `${whatsappConfig.data.url}?api_key=${whatsappConfig.data.apiKey}&sender=${whatsappConfig.data.phoneNumber}&number=${number}&message=${message}`;
         try {
             const response = await axios.get(url);
             console.log(`WhatsApp message sent: ${response.data}`);
@@ -104,17 +127,50 @@ export class NotificationService {
     }
 }
 
-// Example usage:
-// Get the notification service instance
+
 (async () => {
-     await NotificationService.getInstance();
-  })();
+    await NotificationService.getInstance();
+})();
 
-// // Send email
-// notificationService.sendEmail('to@example.com', 'Subject', 'Email message content');
 
-// // Send WhatsApp message
-// notificationService.sendWhatsApp('62888xxxx', 'Hello World');
 
-// // To refresh settings manually
-// await notificationService.refreshSettings();
+export const sendOTPNotification = async (otp: string, to: string) => {
+    const template = await otpEmailTemplate(otp);
+    const ns = await NotificationService.getInstance();
+    await ns.sendEmail(
+        to,
+        template.subject,
+        template.template
+    )
+}
+export const sendOTPWhatsapp = async (otp: string, number: string) => {
+    const ns = await NotificationService.getInstance();
+    await ns.sendWhatsApp(
+        number,
+        `Your OTP is ${otp}`
+    )
+}
+
+
+export const sendCourseEnquiryNotification = async (course: Course, to: {email?: string, phone?: string, userName?: string}) => {
+    const ns = await NotificationService.getInstance();
+    if(to.email){
+        const template = await courseEnquiryTemplate(course, to.userName||"");
+        await ns.sendEmail(
+            to.email,
+            template.subject,
+            template.template
+        )
+    }
+}
+export const sendJobApplyConfirmation = async (jobApp: IJobApplication, to: {email?: string, phone?: string}) => {
+    const ns = await NotificationService.getInstance();
+    if(to.email){
+        const template = await jobApplyConfirmTemplate(jobApp);
+        await ns.sendEmail(
+            to.email,
+            template.subject,
+            template.template
+        )
+    }
+}

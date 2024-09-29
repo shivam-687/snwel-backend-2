@@ -155,7 +155,7 @@ async function verifyOtpAndUpdate(token, otp) {
     try {
         const decoded = jsonwebtoken_1.default.verify(token, constants_1.Constants.TOKEN_SECRET);
         const { enrollmentId, courseId, userId } = decoded;
-        const enrollment = await CourseEnrollment_1.default.findById(enrollmentId);
+        const enrollment = await CourseEnrollment_1.default.findById(enrollmentId).populate(["courseId", "userId"]);
         if (!enrollment || !enrollment.otp) {
             return {
                 isVerified: false,
@@ -180,6 +180,8 @@ async function verifyOtpAndUpdate(token, otp) {
         // Update the verified field to true
         enrollment.otp.verified = true;
         await enrollment.save();
+        const user = enrollment.userId;
+        await (0, notificationService_1.sendCourseEnquiryNotification)(enrollment.courseId, { email: user?.email, phone: user?.phone, userName: user?.name });
         return {
             isVerified: true,
             enrollmentId: enrollment._id

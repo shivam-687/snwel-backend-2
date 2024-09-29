@@ -24,6 +24,7 @@ const paymentRoutes_1 = __importDefault(require("../components/payment/paymentRo
 const jobApplicationRoutes_1 = require("./jobApplicationRoutes");
 const otpRoutes_1 = require("./otpRoutes");
 const gallerRoutes_1 = require("./gallerRoutes");
+const integration_routes_1 = require("./integration.routes");
 const router = express_1.default.Router();
 exports.indexRoute = router;
 router.get('/', helloController_1.helloController);
@@ -45,3 +46,4 @@ router.use("/payments", paymentRoutes_1.default);
 router.use("/job-application", jobApplicationRoutes_1.JobApplicationRouter);
 router.use("/otp", otpRoutes_1.OtpRouter);
 router.use("/gallery", gallerRoutes_1.GalleryRouter);
+router.use("/integrations", integration_routes_1.IntegrationRouter);

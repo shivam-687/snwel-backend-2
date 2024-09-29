@@ -1,5 +1,5 @@
 // services/whatsappService.ts
-import { IntegrationSetting, SETTINGS } from '@/entity-schema/setting-schema';
+import { GeneralSettingData, IntegrationSetting, SETTINGS } from '@/entity-schema/setting-schema';
 import { SettingModel } from '@/models/Setting';
 import axios from 'axios';
 
@@ -25,12 +25,13 @@ const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
         throw new Error('WhatsApp settings not found');
     }
     try {
-        const response = await axios.post(whatsappSettings.url, {
-            appKey: whatsappSettings.appKey,
-            authKey: whatsappSettings.authKey,
-            to: phoneNumber,
-            message: message,
-        });
+        const url = new URL(whatsappSettings.url);
+        url.searchParams.append( "api_key", whatsappSettings.appKey);
+        url.searchParams.append( "sender", whatsappSettings.authKey);
+        url.searchParams.append( "to", phoneNumber);
+        url.searchParams.append( "message", phoneNumber);
+
+        const response = await axios.post(url.toString());
         return response.data;
     } catch (error) {
         console.error('Error sending WhatsApp message:', error);
@@ -38,7 +39,19 @@ const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
     }
 };
 
-export const sendOtpViaWhatsApp = async (phoneNumber: string, otp: string) => {
-    const message = `Your OTP code is ${otp}`;
+export const sendOtpViaWhatsApp = async (phoneNumber: string, otp: string, setting: GeneralSettingData) => {
+    const message = `
+    ${setting.siteName} - Your Verification Code
+
+Your one-time password (OTP) is ${otp}. Please enter this code on the verification page to proceed.
+
+This OTP is valid for the next 10 minutes. Do not share this code with anyone. If you did not request this, please contact our support team immediately at [support contact].
+
+Thank you for choosing ${setting.siteName}!
+
+Best regards,
+The ${setting.siteName} Team
+https://snwelacademy.in
+    `;
     return await sendWhatsAppMessage(phoneNumber, message);
 };
