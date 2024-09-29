@@ -5,16 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOtp = exports.generateOtp = exports.sendOtp = void 0;
 const OtpModel_1 = require("../models/OtpModel");
-const emailService_1 = __importDefault(require("./emailService"));
-const whatsappService_1 = require("./whatsappService");
 const crypto_1 = __importDefault(require("crypto"));
 const constants_1 = require("../config/constants");
 const notificationService_1 = require("./notificationService");
-const templateFactory_1 = require("../email-templates/templateFactory");
-const sendOtp = async (phoneNumber, email, otp) => {
+const sendOtp = async (otp, phoneNumber, email) => {
     try {
         if (phoneNumber) {
-            await (0, whatsappService_1.sendOtpViaWhatsApp)(phoneNumber, otp);
+            await (0, notificationService_1.sendOTPWhatsapp)(otp, phoneNumber);
             console.log(`OTP sent via WhatsApp to ${phoneNumber}`);
         }
     }
@@ -23,7 +20,7 @@ const sendOtp = async (phoneNumber, email, otp) => {
     }
     try {
         if (email) {
-            await emailService_1.default.sendOtp(email, otp);
+            await (0, notificationService_1.sendOTPNotification)(otp, email);
             console.log(`OTP sent via email to ${email}`);
         }
     }
@@ -48,14 +45,7 @@ async function generateOtp(data, action) {
         token,
     });
     await otpDocument.save();
-    const notificationService = await notificationService_1.NotificationService.getInstance();
-    if (data.email) {
-        const template = await (0, templateFactory_1.otpEmailTemplate)(otp);
-        await notificationService.sendEmail(data.email, "Otp", template.template);
-    }
-    // Send OTP via email or phone (use a separate service for this)
-    // sendOtp()
-    // Return the token
+    await (0, exports.sendOtp)(otp, data?.phone, data?.email);
     return { token, id: otpDocument._id };
 }
 exports.generateOtp = generateOtp;

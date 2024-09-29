@@ -11,13 +11,15 @@ const CommonConfigSchema = zod_1.default.object({
     DATABASE_URL: zod_1.default.string(),
     PORT: zod_1.default.number(),
     JWT_SECRET: zod_1.default.string(),
-    DATA_LIMIT: zod_1.default.number()
+    DATA_LIMIT: zod_1.default.number(),
+    FRONT_URL: zod_1.default.string()
 });
 exports.CommonConfig = {
     DATABASE_URL: process.env.DATABASE_URL || '',
     PORT: process.env.PORT ? Number(process.env.PORT) : 9876,
     JWT_SECRET: process.env.JWT_SECRET || 'SNWELACADEMY',
-    DATA_LIMIT: 10
+    DATA_LIMIT: 10,
+    FRONT_URL: process.env.FRONT_URL || (process.env.NODE_ENV === 'production' ? "https://snwelacademy.in" : 'http://localhost:3000')
 };
 try {
     CommonConfigSchema.parseAsync(exports.CommonConfig);

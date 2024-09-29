@@ -9,13 +9,28 @@ const JobApplicationModel_1 = __importDefault(require("../models/JobApplicationM
 const helpers_1 = require("../utils/helpers");
 const mongoose_1 = require("mongoose");
 const json2csv_1 = require("json2csv");
+const notificationService_1 = require("./notificationService");
 // Function to create a new job application
 async function createJobApplication(data) {
     try {
         const jobApplication = await JobApplicationModel_1.default.create(data);
+        try {
+            // Ensure populate is awaited
+            await jobApplication.populate("jobId");
+            // Sending job application confirmation
+            await (0, notificationService_1.sendJobApplyConfirmation)(jobApplication, {
+                email: jobApplication.email,
+                phone: jobApplication.phone
+            });
+        }
+        catch (error) {
+            console.error("Failed to send mail to", jobApplication.email, error); // Log error details
+        }
         return jobApplication.toObject();
     }
     catch (error) {
+        // Better error handling with logging the full error
+        console.error(`Failed to create job application: ${error.message}`, error);
         throw new Error(`Failed to create job application: ${error.message}`);
     }
 }

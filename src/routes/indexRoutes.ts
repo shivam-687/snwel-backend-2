@@ -19,6 +19,7 @@ import PaymentRouter from '@/components/payment/paymentRoutes';
 import { JobApplicationRouter } from './jobApplicationRoutes';
 import { OtpRouter } from './otpRoutes';
 import { GalleryRouter } from './gallerRoutes';
+import { IntegrationRouter } from './integration.routes';
 
 const router = express.Router();
 
@@ -40,7 +41,8 @@ router.use("/master", MasterRouter);
 router.use("/payments", PaymentRouter)
 router.use("/job-application", JobApplicationRouter)
 router.use("/otp", OtpRouter)
-router.use("/gallery", GalleryRouter)
+router.use("/gallery", GalleryRouter);
+router.use("/integrations", IntegrationRouter);
 
 
 export { router as indexRoute };

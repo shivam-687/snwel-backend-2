@@ -7,9 +7,10 @@ import { CreateCourseQuery } from '@/entity-schema/course-enrollment';
 import CourseEnrollmentModel, { CourseEnrollment } from '@/models/CourseEnrollment';
 import { Constants } from '@/config/constants';
 import { logger } from '@/utils/logger';
-import { UserModel } from '@/models/User';
+import { User, UserModel } from '@/models/User';
 import { otpEmailTemplate } from '@/email-templates/templateFactory';
-import { NotificationService } from './notificationService';
+import { NotificationService, sendCourseEnquiryNotification } from './notificationService';
+import { Course } from '@/models/CourseModel';
 
 // Function to create a new course
 const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, isVerified: boolean, enrollmentId?: string }> => {
@@ -139,7 +140,7 @@ async function verifyOtpAndUpdate(token: string, otp: string) {
     try {
         const decoded = jwt.verify(token, Constants.TOKEN_SECRET) as any;
         const { enrollmentId, courseId, userId } = decoded;
-        const enrollment = await CourseEnrollmentModel.findById(enrollmentId);
+        const enrollment = await CourseEnrollmentModel.findById(enrollmentId).populate(["courseId", "userId"]);
         if (!enrollment || !enrollment.otp) {
             return {
                 isVerified: false,
@@ -168,6 +169,8 @@ async function verifyOtpAndUpdate(token: string, otp: string) {
         // Update the verified field to true
         enrollment.otp.verified = true;
         await enrollment.save();
+        const user = enrollment.userId as unknown as User
+        await sendCourseEnquiryNotification(enrollment.courseId as unknown as Course, {email: user?.email, phone: user?.phone, userName: user?.name})
         return {
             isVerified: true,
             enrollmentId: enrollment._id
