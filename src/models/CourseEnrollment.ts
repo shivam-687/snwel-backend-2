@@ -1,4 +1,8 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 
 export interface CourseEnrollment extends Document {
@@ -41,7 +45,8 @@ const CourseEnrollmentSchema = new Schema<CourseEnrollment>({
     widget: {type: Schema.Types.ObjectId, ref: 'Widget', default: null}
 }, { timestamps: true }); // This option enables Mongoose to add createdAt and updatedAt timestamps automatically
 
-const CourseEnrollmentModel = mongoose.model<CourseEnrollment>('CourseEnrollment', CourseEnrollmentSchema);
+CourseEnrollmentSchema.plugin(mongoosePaginate);
+const CourseEnrollmentModel = mongoose.model<CourseEnrollment,  mongoose.PaginateModel<CourseEnrollment>>('CourseEnrollment', CourseEnrollmentSchema);
 
 export default CourseEnrollmentModel;
 

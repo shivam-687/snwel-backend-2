@@ -1,4 +1,9 @@
 import { Schema, model, Document } from 'mongoose';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
+
 
 export interface IMaster extends Document {
     code: string;
@@ -29,6 +34,9 @@ masterSchema.pre('save', async function (next) {
     }
     next();
   });
+
+
+  masterSchema.plugin(mongoosePaginate);
 
 const Master = model<IMaster>('Master', masterSchema);
 

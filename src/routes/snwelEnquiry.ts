@@ -33,4 +33,4 @@ router.put('/:id', passport.authenticate('jwt', { session: false }), validateSch
 // Route to delete an enquiry by ID
 router.delete('/:id', passport.authenticate('jwt', { session: false }), deleteEnquiryByIdController);
 
-export { router as EnquiryRouter };
+export { router as SnwelEnquiryRouter };

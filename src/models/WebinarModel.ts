@@ -1,4 +1,8 @@
 import mongoose, {Document, Schema, Types} from 'mongoose';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 export interface Webinar extends Document {
     id: string;
@@ -39,4 +43,4 @@ const WebinarSchema = new Schema<Webinar>({
 
 
 
-export const WebinarModel = mongoose.model<Webinar>('Webinar', WebinarSchema);
+export const WebinarModel = mongoose.model<Webinar, mongoose.PaginateModel<Webinar>>('Webinar', WebinarSchema);

@@ -1,7 +1,7 @@
 // src/models/JobApplication.ts
 
-import { paginateOptions } from '@/config/common';
 import mongoose, { Schema, model, Document } from 'mongoose';
+import { paginateOptions } from '@/config/common';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 mongoosePaginate.paginate.options = paginateOptions;

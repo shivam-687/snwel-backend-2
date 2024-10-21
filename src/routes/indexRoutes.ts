@@ -20,6 +20,9 @@ import { JobApplicationRouter } from './jobApplicationRoutes';
 import { OtpRouter } from './otpRoutes';
 import { GalleryRouter } from './gallerRoutes';
 import { IntegrationRouter } from './integration.routes';
+import { SnwelEnquiryRouter } from './snwelEnquiry';
+import { BlogRouter } from '@/components/blog/admin-routes';
+import { BlogCategoryRouter } from '@/components/blog-category/blog-category-routes';
 
 const router = express.Router();
 
@@ -43,6 +46,10 @@ router.use("/job-application", JobApplicationRouter)
 router.use("/otp", OtpRouter)
 router.use("/gallery", GalleryRouter);
 router.use("/integrations", IntegrationRouter);
+router.use("/snwel-enquiry", SnwelEnquiryRouter);
+router.use(BlogRouter)
+router.use(BlogCategoryRouter)
+
 
 
 export { router as indexRoute };

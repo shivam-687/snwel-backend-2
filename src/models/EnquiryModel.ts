@@ -1,6 +1,12 @@
 // models/Enquiry.ts
 import mongoose, { Schema, Document } from 'mongoose';
 
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
+
+
 export interface Enquiry extends Document {
   fullName: string;
   email: string;
@@ -26,4 +32,6 @@ const EnquirySchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.model<Enquiry>('Enquiry', EnquirySchema);
+EnquirySchema.plugin(mongoosePaginate);
+
+export default mongoose.model<Enquiry, mongoose.PaginateModel<Enquiry>>('Enquiry', EnquirySchema);

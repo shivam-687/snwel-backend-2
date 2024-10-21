@@ -1,4 +1,8 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 export interface IJobCategory {
     _id: string;
@@ -20,6 +24,8 @@ const jobCategorySchema: Schema<JobCategoryDocument> = new Schema({
   description: { type: String },
 });
 
-const JobCategoryModel = mongoose.model<JobCategoryDocument>('JobCategory', jobCategorySchema);
+jobCategorySchema.plugin(mongoosePaginate);
+
+const JobCategoryModel = mongoose.model<JobCategoryDocument, mongoose.PaginateModel<JobCategoryDocument>>('JobCategory', jobCategorySchema);
 
 export default JobCategoryModel;

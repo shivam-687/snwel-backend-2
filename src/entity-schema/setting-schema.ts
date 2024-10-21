@@ -137,7 +137,8 @@ export const GeneralSettingSchema = SettingSchema.merge(z.object({
             insta: z.string().optional(),
             x: z.string().optional(),
             youtube: z.string().optional(),
-            linkedin: z.string().optional()
+            linkedin: z.string().optional(),
+            googleb: z.string().optional()
         }).optional(),
         emailTransport: z.enum([EMAIL_TRANSPORTER.NODEMAILER, EMAIL_TRANSPORTER.RESEND, EMAIL_TRANSPORTER.SENDGRID]).default(EMAIL_TRANSPORTER.NODEMAILER).optional(),
         senderEmail: z.string()

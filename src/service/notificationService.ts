@@ -15,7 +15,8 @@ enum AppIds {
     RENDER_EMAIL = "render",
     TELEGRAM = "telegram",
     SMS = "sms",
-    PUSH = "push"
+    PUSH = "push",
+    SNWEL_SMTP="snwel"
 }
 
 export class NotificationService {
@@ -24,6 +25,7 @@ export class NotificationService {
     private integrationSetting: IntegrationSetting | undefined;
     private generalSetting: GeneralSettingData | undefined;
     private ingerations: IIntegration[] = [];
+
 
     // Private constructor to prevent direct instantiation
     private constructor() { }
@@ -108,6 +110,37 @@ export class NotificationService {
         }
     }
 
+    async sendSnwelEmail(to: string, subject: string, message: string): Promise<void> {
+        try {
+            const smtp = this.ingerations.find(it => it.serviceName === AppIds.SNWEL_SMTP);
+            if(!smtp || !smtp.enabled) return;
+            const smtpConfig = SMTPSchema.parse(smtp?.config);
+            console.log("Start sending mail to", to)
+            const transporter = nodemailer.createTransport({
+                host: smtpConfig.host,
+                port: parseInt(smtpConfig.port),
+                secure: false,
+                auth: {
+                    user: smtpConfig.auth.username,
+                    pass: smtpConfig.auth.password
+                },
+                tls: {
+                    rejectUnauthorized: false,
+                }
+            });
+
+            await transporter.sendMail({
+                from: smtpConfig.sender || this.generalSetting?.senderEmail || `"No Reply" <${smtpConfig.auth.username}>`,
+                to,
+                subject,
+                html: `<b>${message}</b>`
+            });
+        } catch (error) {
+            console.error("sendEmail",error);
+            throw error;
+        }
+    }
+
     async sendWhatsApp(number: string, message: string): Promise<void> {
         const whatsapp = this.ingerations.find(it => it.serviceName === AppIds.WHATSAPP);
         if(!whatsapp || !whatsapp.enabled) return console.log("Whatsapp otp is not enabled");
@@ -174,3 +207,19 @@ export const sendJobApplyConfirmation = async (jobApp: IJobApplication, to: {ema
         )
     }
 }
+
+export const sendSnwelOTPNotification = async (otp: string, to: string) => {
+    const template = await otpEmailTemplate(otp);
+    const ns = await NotificationService.getInstance();
+    await ns.sendSnwelEmail(
+        to,
+        template.subject,
+        template.template
+    )
+}
+
+
+
+
+
+

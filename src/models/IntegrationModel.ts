@@ -1,4 +1,8 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, model, Document } from 'mongoose';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 // Define the interface for TypeScript
 export interface IIntegration extends Document {
@@ -20,7 +24,9 @@ const IntegrationSchema = new Schema<IIntegration>({
   updatedAt: { type: Date, default: Date.now }
 });
 
+IntegrationSchema.plugin(mongoosePaginate);
+
 // Create the model
-const IntegrationModel = model<IIntegration>('Integration', IntegrationSchema);
+const IntegrationModel = model<IIntegration, mongoose.PaginateModel<IIntegration>>('Integration', IntegrationSchema);
 
 export default IntegrationModel;

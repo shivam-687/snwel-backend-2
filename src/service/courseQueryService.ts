@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { convertToPagination, generateJwtToken, generateOTPObject, getPaginationParams, queryHandler } from '@/utils/helpers';
+import { convertSortOrder, convertToPagination, generateJwtToken, generateOTPObject, getPaginationParams, queryHandler } from '@/utils/helpers';
 import { ObjectId } from 'mongodb';
 import { ListOptions, PaginatedList } from '@/types/custom'
 import { CreateCourseQuery } from '@/entity-schema/course-enrollment';
@@ -88,24 +88,60 @@ const getAllByCourseId = async (userId: string) => {
 }
 
 // Function to retrieve all courses
-const getAll = async (options: ListOptions): Promise<PaginatedList<CourseEnrollment>> => {
+const getAll = async (options: ListOptions) => {
     try {
-        // console.log(options)
-        const {documents, limit, page} = await queryHandler(CourseEnrollmentModel, {
-            ...options,
-        })
-        const searcQ = options?.search ? new RegExp(options.search, 'i') : '' 
-        const users = await documents
-            .populate({path: "userId", select:["email", "name", "profilePic"]})
-            .populate("courseId", "title slug")
-            .populate(['qualification', 'mode', 'occupation', 'widget'])
-            .sort({createdAt: -1})
-        const count = await CourseEnrollmentModel.countDocuments(documents.getQuery());
-        return convertToPagination(users, count, limit, page);
+        const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
+        const query: any = {};
+
+        // Handle search
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query.$or = [{ "userId.name": searchRegex }, { "courseId.title": searchRegex }];
+        }
+
+        // Handle filtering
+        if (filter) {
+            if (filter.status) {
+                query.status = filter.status;
+            }
+            // Add more filters if necessary
+        }
+
+        // Handle date filtering
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) {
+                query.createdAt.$gte = new Date(startDate);
+            }
+            if (endDate) {
+                query.createdAt.$lte = new Date(endDate);
+            }
+        }
+
+        // Fetch and paginate the results
+        const courseEnrollments = await CourseEnrollmentModel.paginate(
+            query,
+            {
+                populate: [
+                    { path: "userId", select: ["email", "name", "profilePic"] },
+                    { path: "courseId", select: ["title", "slug"] },
+                    { path: "qualification" },   // Use object for path
+                    { path: "mode" },            // Use object for path
+                    { path: "occupation" },      // Use object for path
+                    { path: "widget" }           // Use object for path
+                ],
+                page,
+                limit,
+                sort: sort ? convertSortOrder(sort) : { createdAt: -1 }
+            }
+        );
+
+        return courseEnrollments;
     } catch (error: any) {
-        throw new Error(`Error: retrieving courseQuery: ${error.message}`);
+        throw new Error(`Error retrieving course enrollments: ${error.message}`);
     }
 };
+
 
 // Function to retrieve a course by ID
 const getById = async (id: string): Promise<CourseEnrollment | null> => {

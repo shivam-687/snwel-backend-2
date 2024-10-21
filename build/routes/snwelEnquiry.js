@@ -4,14 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EnquiryRouter = void 0;
+exports.SnwelEnquiryRouter = void 0;
 const express_1 = require("express");
 const snwelEnquiryController_1 = require("../controllers/snwelEnquiryController");
 const validateSchema_1 = require("../middleware/validateSchema");
 const snwelEnquirySchema_1 = require("../entity-schema/snwelEnquirySchema");
 const passport_1 = __importDefault(require("passport"));
 const router = (0, express_1.Router)();
-exports.EnquiryRouter = router;
+exports.SnwelEnquiryRouter = router;
 // Route to create a new enquiry
 router.post('/', (0, validateSchema_1.validateSchema)(snwelEnquirySchema_1.createEnquirySchema), snwelEnquiryController_1.createEnquiryController);
 // Route to export enquiries to a CSV file

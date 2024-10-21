@@ -99,7 +99,8 @@ exports.GeneralSettingSchema = exports.SettingSchema.merge(zod_1.z.object({
             insta: zod_1.z.string().optional(),
             x: zod_1.z.string().optional(),
             youtube: zod_1.z.string().optional(),
-            linkedin: zod_1.z.string().optional()
+            linkedin: zod_1.z.string().optional(),
+            googleb: zod_1.z.string().optional()
         }).optional(),
         emailTransport: zod_1.z.enum([EMAIL_TRANSPORTER.NODEMAILER, EMAIL_TRANSPORTER.RESEND, EMAIL_TRANSPORTER.SENDGRID]).default(EMAIL_TRANSPORTER.NODEMAILER).optional(),
         senderEmail: zod_1.z.string()

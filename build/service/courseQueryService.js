@@ -100,21 +100,48 @@ exports.getAllByCourseId = getAllByCourseId;
 // Function to retrieve all courses
 const getAll = async (options) => {
     try {
-        // console.log(options)
-        const { documents, limit, page } = await (0, helpers_1.queryHandler)(CourseEnrollment_1.default, {
-            ...options,
+        const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
+        const query = {};
+        // Handle search
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query.$or = [{ "userId.name": searchRegex }, { "courseId.title": searchRegex }];
+        }
+        // Handle filtering
+        if (filter) {
+            if (filter.status) {
+                query.status = filter.status;
+            }
+            // Add more filters if necessary
+        }
+        // Handle date filtering
+        if (startDate || endDate) {
+            query.createdAt = {};
+            if (startDate) {
+                query.createdAt.$gte = new Date(startDate);
+            }
+            if (endDate) {
+                query.createdAt.$lte = new Date(endDate);
+            }
+        }
+        // Fetch and paginate the results
+        const courseEnrollments = await CourseEnrollment_1.default.paginate(query, {
+            populate: [
+                { path: "userId", select: ["email", "name", "profilePic"] },
+                { path: "courseId", select: ["title", "slug"] },
+                { path: "qualification" }, // Use object for path
+                { path: "mode" }, // Use object for path
+                { path: "occupation" }, // Use object for path
+                { path: "widget" } // Use object for path
+            ],
+            page,
+            limit,
+            sort: sort ? (0, helpers_1.convertSortOrder)(sort) : { createdAt: -1 }
         });
-        const searcQ = options?.search ? new RegExp(options.search, 'i') : '';
-        const users = await documents
-            .populate({ path: "userId", select: ["email", "name", "profilePic"] })
-            .populate("courseId", "title slug")
-            .populate(['qualification', 'mode', 'occupation', 'widget'])
-            .sort({ createdAt: -1 });
-        const count = await CourseEnrollment_1.default.countDocuments(documents.getQuery());
-        return (0, helpers_1.convertToPagination)(users, count, limit, page);
+        return courseEnrollments;
     }
     catch (error) {
-        throw new Error(`Error: retrieving courseQuery: ${error.message}`);
+        throw new Error(`Error retrieving course enrollments: ${error.message}`);
     }
 };
 exports.getAll = getAll;
