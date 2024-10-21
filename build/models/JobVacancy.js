@@ -28,6 +28,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const slugify_1 = __importDefault(require("slugify"));
+const common_1 = require("../config/common");
+const mongoose_paginate_v2_1 = __importDefault(require("mongoose-paginate-v2"));
+mongoose_paginate_v2_1.default.paginate.options = common_1.paginateOptions;
 const locationSchema = new mongoose_1.Schema({
     country: { type: String, required: true },
     state: { type: String, required: true },
@@ -73,5 +76,6 @@ jobVacancySchema.pre('save', async function (next) {
     // }
     next();
 });
+jobVacancySchema.plugin(mongoose_paginate_v2_1.default);
 const JobVacancyModel = mongoose_1.default.model('JobVacancy', jobVacancySchema);
 exports.default = JobVacancyModel;

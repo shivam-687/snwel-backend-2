@@ -1,5 +1,8 @@
 import mongoose, {Document, Schema, Types} from 'mongoose'
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
+mongoosePaginate.paginate.options = paginateOptions;
 
 interface Job extends Document {
     title: string;
@@ -16,5 +19,7 @@ const JobSchema = new Schema<Job>({
     applicants: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Reference to User model
 });
 
+JobSchema.plugin(mongoosePaginate);
 
-export const JobModel = mongoose.model<Job>('Job', JobSchema);
+
+export const JobModel = mongoose.model<Job, mongoose.PaginateModel<Job>>('Job', JobSchema);

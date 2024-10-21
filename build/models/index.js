@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebinarModel = exports.User = exports.Setting = exports.OtpModel = exports.JobModel = exports.FileModal = exports.CourseCategory = exports.BlogModel = exports.CourseEnrollment = exports.CourseModel = void 0;
 exports.CourseModel = __importStar(require("./CourseModel"));
 exports.CourseEnrollment = __importStar(require("./CourseEnrollment"));
-exports.BlogModel = __importStar(require("./BlogModel"));
+exports.BlogModel = __importStar(require("../components/blog/blog-model"));
 exports.CourseCategory = __importStar(require("./CourseCategory"));
 exports.FileModal = __importStar(require("./FileModal"));
 exports.JobModel = __importStar(require("./JobModel"));

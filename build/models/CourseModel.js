@@ -29,6 +29,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CourseModel = exports.COURSE_STATUS = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const slugify_1 = __importDefault(require("slugify"));
+const common_1 = require("../config/common");
+const mongoose_paginate_v2_1 = __importDefault(require("mongoose-paginate-v2"));
+mongoose_paginate_v2_1.default.paginate.options = common_1.paginateOptions;
 var COURSE_STATUS;
 (function (COURSE_STATUS) {
     COURSE_STATUS["SAVED"] = "SAVED";
@@ -106,4 +109,5 @@ CourseSchema.pre('save', async function (next) {
         next(error);
     }
 });
+CourseSchema.plugin(mongoose_paginate_v2_1.default);
 exports.CourseModel = mongoose_1.default.model('Course', CourseSchema);

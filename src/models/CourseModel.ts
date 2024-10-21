@@ -1,5 +1,9 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 import slugify from 'slugify';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 
 export enum COURSE_STATUS {
@@ -122,6 +126,6 @@ CourseSchema.pre<Course>('save', async function (next) {
         next(error)
     }
 });
+CourseSchema.plugin(mongoosePaginate);
 
-
-export const CourseModel = mongoose.model<Course>('Course', CourseSchema);
+export const CourseModel = mongoose.model<Course,  mongoose.PaginateModel<Course>>('Course', CourseSchema);

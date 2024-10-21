@@ -2,7 +2,7 @@
 
 export * as CourseModel from './CourseModel';
 export * as CourseEnrollment from './CourseEnrollment';
-export * as BlogModel from './BlogModel';
+export * as BlogModel from '../components/blog/blog-model';
 export * as CourseCategory from './CourseCategory';
 export * as FileModal from './FileModal';
 export * as JobModel from './JobModel';

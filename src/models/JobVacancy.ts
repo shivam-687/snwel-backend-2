@@ -1,6 +1,10 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { JobCategory } from './JobCategory';
 import slugify from 'slugify';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 export interface Location {
     country: string;
@@ -87,6 +91,9 @@ jobVacancySchema.pre<JobVacancy>('save', async function (next) {
     next();
   });
 
-const JobVacancyModel = mongoose.model<JobVacancyDocument>('JobVacancy', jobVacancySchema);
+
+  jobVacancySchema.plugin(mongoosePaginate);
+
+const JobVacancyModel = mongoose.model<JobVacancyDocument, mongoose.PaginateModel<JobVacancy>>('JobVacancy', jobVacancySchema);
 
 export default JobVacancyModel;

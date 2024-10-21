@@ -1,5 +1,9 @@
 // FileModel.ts
 import mongoose, { Schema, Document } from 'mongoose';
+import { paginateOptions } from '@/config/common';
+import mongoosePaginate from 'mongoose-paginate-v2';
+
+mongoosePaginate.paginate.options = paginateOptions;
 
 export interface IFile extends Document {
   fileName: string;
@@ -17,5 +21,7 @@ const FileSchema: Schema = new Schema({
   uploadDate: { type: Date, default: Date.now }
 }, {timestamps: true});
 
-export const FileModel =  mongoose.model<IFile>('File', FileSchema);
+FileSchema.plugin(mongoosePaginate);
+
+export const FileModel =  mongoose.model<IFile, mongoose.PaginateModel<IFile>>('File', FileSchema);
 

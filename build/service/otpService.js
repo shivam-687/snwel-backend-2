@@ -9,6 +9,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const constants_1 = require("../config/constants");
 const notificationService_1 = require("./notificationService");
 const sendOtp = async (otp, phoneNumber, email) => {
+    console.log({ otp, phoneNumber, email });
     try {
         if (phoneNumber) {
             await (0, notificationService_1.sendOTPWhatsapp)(otp, phoneNumber);
@@ -30,6 +31,7 @@ const sendOtp = async (otp, phoneNumber, email) => {
 };
 exports.sendOtp = sendOtp;
 async function generateOtp(data, action) {
+    const predefinedActions = 'snwel-com';
     // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     // Generate a strong token using crypto
@@ -45,7 +47,13 @@ async function generateOtp(data, action) {
         token,
     });
     await otpDocument.save();
-    await (0, exports.sendOtp)(otp, data?.phone, data?.email);
+    console.log({ action });
+    if (action && action === "snwel-com") {
+        await (0, notificationService_1.sendSnwelOTPNotification)(otp, data?.email || '');
+    }
+    else {
+        await (0, exports.sendOtp)(otp, data?.phone, data?.email);
+    }
     return { token, id: otpDocument._id };
 }
 exports.generateOtp = generateOtp;

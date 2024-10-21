@@ -1,6 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const common_1 = require("../config/common");
+const mongoose_paginate_v2_1 = __importDefault(require("mongoose-paginate-v2"));
+mongoose_paginate_v2_1.default.paginate.options = common_1.paginateOptions;
 const masterSchema = new mongoose_1.Schema({
     code: { type: String, required: true, unique: true },
     parentCode: { type: String, required: false },
@@ -19,5 +25,6 @@ masterSchema.pre('save', async function (next) {
     }
     next();
 });
+masterSchema.plugin(mongoose_paginate_v2_1.default);
 const Master = (0, mongoose_1.model)('Master', masterSchema);
 exports.default = Master;
