@@ -13,11 +13,11 @@ const logger_1 = require("../utils/logger");
 const User_1 = require("../models/User");
 const templateFactory_1 = require("../email-templates/templateFactory");
 const notificationService_1 = require("./notificationService");
-// Function to create a new course
 const create = async (queryData) => {
+    var _a;
     try {
         const exists = await CourseEnrollment_1.default.findOne({ userId: queryData.userId, courseId: queryData.courseId });
-        if (exists && exists.otp?.verified) {
+        if (exists && ((_a = exists.otp) === null || _a === void 0 ? void 0 : _a.verified)) {
             return {
                 isVerified: true,
                 enrollmentId: exists._id
@@ -29,7 +29,7 @@ const create = async (queryData) => {
         const nfs = await notificationService_1.NotificationService.getInstance();
         if (exists) {
             const updated = await exists.updateOne({ otp: otpObject });
-            await nfs.sendEmail(user?.email || "", emailTemplate.subject, emailTemplate.template);
+            await nfs.sendEmail((user === null || user === void 0 ? void 0 : user.email) || "", emailTemplate.subject, emailTemplate.template);
             return {
                 isVerified: false,
                 token: (0, helpers_1.generateJwtToken)({
@@ -40,9 +40,9 @@ const create = async (queryData) => {
             };
         }
         else {
-            let newCourseQuery = new CourseEnrollment_1.default({ ...queryData, otp: otpObject });
+            let newCourseQuery = new CourseEnrollment_1.default(Object.assign(Object.assign({}, queryData), { otp: otpObject }));
             await newCourseQuery.save();
-            await nfs.sendEmail(user?.email || "", emailTemplate.subject, emailTemplate.template);
+            await nfs.sendEmail((user === null || user === void 0 ? void 0 : user.email) || "", emailTemplate.subject, emailTemplate.template);
             return {
                 isVerified: false,
                 token: (0, helpers_1.generateJwtToken)({
@@ -97,24 +97,19 @@ const getAllByCourseId = async (userId) => {
     }
 };
 exports.getAllByCourseId = getAllByCourseId;
-// Function to retrieve all courses
 const getAll = async (options) => {
     try {
         const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
         const query = {};
-        // Handle search
         if (search) {
             const searchRegex = new RegExp(search, 'i');
             query.$or = [{ "userId.name": searchRegex }, { "courseId.title": searchRegex }];
         }
-        // Handle filtering
         if (filter) {
             if (filter.status) {
                 query.status = filter.status;
             }
-            // Add more filters if necessary
         }
-        // Handle date filtering
         if (startDate || endDate) {
             query.createdAt = {};
             if (startDate) {
@@ -124,15 +119,14 @@ const getAll = async (options) => {
                 query.createdAt.$lte = new Date(endDate);
             }
         }
-        // Fetch and paginate the results
         const courseEnrollments = await CourseEnrollment_1.default.paginate(query, {
             populate: [
                 { path: "userId", select: ["email", "name", "profilePic"] },
                 { path: "courseId", select: ["title", "slug"] },
-                { path: "qualification" }, // Use object for path
-                { path: "mode" }, // Use object for path
-                { path: "occupation" }, // Use object for path
-                { path: "widget" } // Use object for path
+                { path: "qualification" },
+                { path: "mode" },
+                { path: "occupation" },
+                { path: "widget" }
             ],
             page,
             limit,
@@ -145,7 +139,6 @@ const getAll = async (options) => {
     }
 };
 exports.getAll = getAll;
-// Function to retrieve a course by ID
 const getById = async (id) => {
     try {
         return await CourseEnrollment_1.default.findById(id)
@@ -157,7 +150,6 @@ const getById = async (id) => {
     }
 };
 exports.getById = getById;
-// Function to update a course by ID
 const updateById = async (id, updateData) => {
     try {
         await CourseEnrollment_1.default.findByIdAndUpdate(id, updateData, { new: true }).exec();
@@ -168,7 +160,6 @@ const updateById = async (id, updateData) => {
     }
 };
 exports.updateById = updateById;
-// Function to delete a course by ID
 const deleteById = async (id) => {
     try {
         await CourseEnrollment_1.default.findByIdAndDelete(id).exec();
@@ -188,13 +179,13 @@ async function verifyOtpAndUpdate(token, otp) {
                 isVerified: false,
                 enrollmentId: null,
                 invalidToken: true,
-            }; // Document not found
+            };
         }
         if (enrollment.otp.verified) {
             return {
                 isVerified: true,
                 enrollmentId: enrollment._id
-            }; // OTP already verified
+            };
         }
         const now = new Date();
         if ((enrollment.otp.otp !== otp && Number(otp) !== constants_1.Constants.OTP.MASTER_OTP) || now > enrollment.otp.expirationTime) {
@@ -202,17 +193,16 @@ async function verifyOtpAndUpdate(token, otp) {
                 isVerified: false,
                 enrollmentId: null,
                 invalidOtp: true
-            }; // OTP is incorrect or expired
+            };
         }
-        // Update the verified field to true
         enrollment.otp.verified = true;
         await enrollment.save();
         const user = enrollment.userId;
-        await (0, notificationService_1.sendCourseEnquiryNotification)(enrollment.courseId, { email: user?.email, phone: user?.phone, userName: user?.name });
+        await (0, notificationService_1.sendCourseEnquiryNotification)(enrollment.courseId, { email: user === null || user === void 0 ? void 0 : user.email, phone: user === null || user === void 0 ? void 0 : user.phone, userName: user === null || user === void 0 ? void 0 : user.name });
         return {
             isVerified: true,
             enrollmentId: enrollment._id
-        }; // OTP verified and updated successfully
+        };
     }
     catch (error) {
         console.error(error);
@@ -223,11 +213,8 @@ async function verifyOtpAndUpdate(token, otp) {
 exports.verifyOtpAndUpdate = verifyOtpAndUpdate;
 async function resendOtp(token) {
     try {
-        // Verify the JWT token
         const decoded = jsonwebtoken_1.default.verify(token, constants_1.Constants.TOKEN_SECRET);
-        // Extract enrollmentId from the decoded token
         const { enrollmentId, courseId, userId } = decoded;
-        // Find the document by enrollmentId
         const enrollment = await CourseEnrollment_1.default.findById(enrollmentId);
         if (!enrollment) {
             return {
@@ -236,12 +223,9 @@ async function resendOtp(token) {
                 invalidToken: true,
             };
         }
-        // Generate a new OTP and expiration time
         const newOtp = (0, helpers_1.generateOTPObject)({});
-        // Update the OTP in the document
         enrollment.otp = newOtp;
         await enrollment.save();
-        // Generate a new JWT token
         const newToken = (0, helpers_1.generateJwtToken)({
             enrollmentId: enrollment._id.toString(),
             courseId: enrollment.courseId,

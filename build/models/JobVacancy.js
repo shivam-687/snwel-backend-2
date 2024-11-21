@@ -63,19 +63,18 @@ const jobVacancySchema = new mongoose_1.Schema({
 });
 jobVacancySchema.pre('save', async function (next) {
     const job = this;
-    // Check if title field is modified or job is new
-    // if (true) {
     let baseSlug = (0, slugify_1.default)(job.title, { lower: true, strict: true });
     let uniqueSlug = baseSlug;
     let counter = 1;
-    // Check for existing slugs
     while (await mongoose_1.default.models.JobVacancy.findOne({ slug: uniqueSlug })) {
         uniqueSlug = `${baseSlug}-${counter++}`;
     }
     job.slug = uniqueSlug;
-    // }
     next();
 });
 jobVacancySchema.plugin(mongoose_paginate_v2_1.default);
+jobVacancySchema.index({ title: 'text', companyName: 'text' });
+jobVacancySchema.index({ 'location.city': 1, 'location.country': 1, 'location.state': 1 });
+jobVacancySchema.index({ slug: 1 }, { unique: true });
 const JobVacancyModel = mongoose_1.default.model('JobVacancy', jobVacancySchema);
 exports.default = JobVacancyModel;

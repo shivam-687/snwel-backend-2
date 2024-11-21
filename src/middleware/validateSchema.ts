@@ -1,4 +1,4 @@
-import { EmailSettingTypeSchema, GeneralSettingSchema, IntegrationSettingTypeSchema, MenuSettingSchema, SETTINGS, SettingSchema } from "@/entity-schema/setting-schema";
+import { EmailSettingTypeSchema, GeneralSettingSchema, IntegrationSettingTypeSchema, MenuSettingSchema, SETTINGS } from "@/entity-schema/setting-schema";
 import { NextFunction, Response, Request } from "express";
 import { ZodError, ZodSchema } from "zod";
 

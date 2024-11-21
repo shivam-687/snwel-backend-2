@@ -4,10 +4,9 @@ exports.hardDeleteAllSoftDeletedBlogsController = exports.getAllBlogsController 
 const admin_blog_service_1 = require("./admin-blog-service");
 const appResponse_1 = require("../../utils/helpers/appResponse");
 const catchAsync_1 = require("../../utils/helpers/catchAsync");
-// Controller function to create a new blog
 async function createBlogController(req, res) {
     try {
-        const blogData = req.body; // Assuming blog data is sent in the request body
+        const blogData = req.body;
         const newBlog = await (0, admin_blog_service_1.adminCreateBlog)(blogData);
         (0, appResponse_1.successResponse)(newBlog, res);
     }
@@ -16,7 +15,6 @@ async function createBlogController(req, res) {
     }
 }
 exports.createBlogController = createBlogController;
-// Controller function to get a blog by ID
 async function getBlogByIdController(req, res) {
     try {
         const blogId = req.params.id;
@@ -32,7 +30,6 @@ async function getBlogByIdController(req, res) {
     }
 }
 exports.getBlogByIdController = getBlogByIdController;
-// Controller function to update a blog by ID
 async function updateBlogByIdController(req, res) {
     try {
         const blogId = req.params.id;
@@ -49,7 +46,6 @@ async function updateBlogByIdController(req, res) {
     }
 }
 exports.updateBlogByIdController = updateBlogByIdController;
-// Controller function to soft delete a blog by ID
 async function deleteBlogByIdController(req, res) {
     try {
         const blogId = req.params.id;
@@ -61,13 +57,11 @@ async function deleteBlogByIdController(req, res) {
     }
 }
 exports.deleteBlogByIdController = deleteBlogByIdController;
-// Controller function to get all blogs with pagination
 exports.getAllBlogsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = req.query; // Assuming options are passed as query params
+    const options = req.query;
     const blogs = await (0, admin_blog_service_1.adminGetAllBlogs)(options);
     return (0, appResponse_1.successResponse)(blogs, res, { message: "Blogs fetched successfully!" });
 });
-// Controller function to hard delete all soft deleted blogs
 exports.hardDeleteAllSoftDeletedBlogsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     await (0, admin_blog_service_1.hardDeleteSoftDeletedBlogs)();
     return (0, appResponse_1.successResponse)({ message: "All soft-deleted blogs have been permanently deleted!" }, res);

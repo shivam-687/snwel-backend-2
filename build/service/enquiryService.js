@@ -4,13 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getEnquiryByEmailAndType = exports.getEnquiryTypes = exports.deleteEnquiryById = exports.updateEnquiryById = exports.getEnquiryById = exports.getAllEnquiries = exports.createEnquiry = void 0;
-// services/enquiryService.ts
 const EnquiryModel_1 = __importDefault(require("../models/EnquiryModel"));
 const helpers_1 = require("../utils/helpers");
 const mongoose_1 = __importDefault(require("mongoose"));
 const createEnquiry = async (enquiryData) => {
     try {
-        // Check if the type is 'webinar' and convert webinarId to ObjectId
         if (enquiryData.type === 'webinar' && enquiryData.extraInfo && enquiryData.extraInfo.webinarId) {
             enquiryData.extraInfo.webinarId = new mongoose_1.default.Types.ObjectId(enquiryData.extraInfo.webinarId);
         }
@@ -23,6 +21,7 @@ const createEnquiry = async (enquiryData) => {
 };
 exports.createEnquiry = createEnquiry;
 async function getAllEnquiries(options) {
+    var _a, _b, _c;
     try {
         const { limit = 10, page = 1, search } = options;
         const query = {};
@@ -30,18 +29,16 @@ async function getAllEnquiries(options) {
             const searchRegex = new RegExp(search, 'i');
             query.$or = [{ type: searchRegex }, { 'extraInfo.webinarId': searchRegex }];
         }
-        if (options?.filter?.type) {
-            query.type = options?.filter?.type;
+        if ((_a = options === null || options === void 0 ? void 0 : options.filter) === null || _a === void 0 ? void 0 : _a.type) {
+            query.type = (_b = options === null || options === void 0 ? void 0 : options.filter) === null || _b === void 0 ? void 0 : _b.type;
         }
         const skip = (page - 1) * limit;
-        // Start with the basic pipeline
         const pipeline = [
             { $match: query },
             { $skip: skip },
             { $limit: limit }
         ];
-        // Check if there are any webinar enquiries in the query
-        if (options?.filter?.type === 'webinar' || search?.toLowerCase().includes('webinar')) {
+        if (((_c = options === null || options === void 0 ? void 0 : options.filter) === null || _c === void 0 ? void 0 : _c.type) === 'webinar' || (search === null || search === void 0 ? void 0 : search.toLowerCase().includes('webinar'))) {
             pipeline.push({
                 $lookup: {
                     from: 'webinars',

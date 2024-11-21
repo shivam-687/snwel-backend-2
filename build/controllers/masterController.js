@@ -12,8 +12,7 @@ const createMasterItemController = (0, catchAsync_1.catchAsync)(async (req, res)
 });
 exports.createMasterItemController = createMasterItemController;
 const getAllMasterItemsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = { ...req.query };
-    // console.log(options)
+    const options = Object.assign({}, req.query);
     const masterItems = await (0, master_1.getAllMasterItems)((0, helpers_1.extractListOptions)(req));
     (0, appResponse_1.successResponse)(masterItems, res, { message: 'Master items fetched successfully!' });
 });

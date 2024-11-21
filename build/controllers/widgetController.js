@@ -11,7 +11,7 @@ const createWidgetController = (0, catchAsync_1.catchAsync)(async (req, res) => 
 });
 exports.createWidgetController = createWidgetController;
 const getAllWidgetsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = { ...req.query };
+    const options = Object.assign({}, req.query);
     const widgets = await (0, widgetService_1.getAllWidgets)(options);
     (0, appResponse_1.successResponse)(widgets, res, { message: 'Widgets fetched successfully!' });
 });

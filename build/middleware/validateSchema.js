@@ -6,18 +6,14 @@ const zod_1 = require("zod");
 function validateSchema(schema) {
     return (req, res, next) => {
         try {
-            // Validate request body against the schema
             schema.parse(req.body);
-            // If validation passes, move to the next middleware
             next();
         }
         catch (error) {
             if (error instanceof zod_1.ZodError) {
-                // If validation fails, send a 400 Bad Request response with error details
                 res.status(400).json({ error: 'Validation failed', details: error.errors });
             }
             else {
-                // For any other errors, pass them along to the error handling middleware
                 next(error);
             }
         }

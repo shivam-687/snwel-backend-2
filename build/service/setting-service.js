@@ -29,7 +29,6 @@ class SettingsService {
             default:
                 throw new Error('Invalid setting code');
         }
-        // Save to database
         const setting = new Setting_1.SettingModel(validatedInput);
         await setting.save();
         await nfs.refreshSettings();
@@ -43,17 +42,14 @@ class SettingsService {
         return setting;
     }
     async updateSetting(code, input) {
-        // Validate input
         let validatedInput;
         const nfs = await notificationService_1.NotificationService.getInstance();
         switch (code) {
             case setting_schema_1.SETTINGS.INTEGRATION:
                 validatedInput = setting_schema_1.IntegrationSettingTypeSchema.pick({ data: true, isChangable: true }).parse(input);
-                // await nfs.refreshSettings()
                 break;
             case setting_schema_1.SETTINGS.EMAIL:
                 validatedInput = setting_schema_1.EmailSettingTypeSchema.pick({ data: true, isChangable: true }).parse(input);
-                // await nfs.refreshSettings()
                 break;
             case setting_schema_1.SETTINGS.GENERAL:
                 validatedInput = setting_schema_1.GeneralSettingSchema.pick({ data: true, isChangable: true }).parse(input);
@@ -64,7 +60,6 @@ class SettingsService {
             default:
                 throw new Error('Invalid setting code');
         }
-        // Update in database
         const updatedSetting = await Setting_1.SettingModel.findOneAndUpdate({ code }, validatedInput, { new: true, upsert: true });
         await nfs.refreshSettings();
         if (!updatedSetting) {
@@ -73,13 +68,13 @@ class SettingsService {
         return updatedSetting;
     }
     async partialUpdateSetting(code, input) {
+        var _a;
         const existingSetting = await Setting_1.SettingModel.findOne({ code });
         if (!existingSetting) {
             throw new Error(`Setting with code ${code} not found`);
         }
-        // Merge existing data with new input data
-        const newData = { ...existingSetting.data, ...input.data };
-        const updatedSetting = await Setting_1.SettingModel.findOneAndUpdate({ code }, { data: newData, isChangable: input.isChangable ?? existingSetting.isChangable }, { new: true });
+        const newData = Object.assign(Object.assign({}, existingSetting.data), input.data);
+        const updatedSetting = await Setting_1.SettingModel.findOneAndUpdate({ code }, { data: newData, isChangable: (_a = input.isChangable) !== null && _a !== void 0 ? _a : existingSetting.isChangable }, { new: true });
         if (!updatedSetting) {
             throw new Error(`Setting with code ${code} not found`);
         }

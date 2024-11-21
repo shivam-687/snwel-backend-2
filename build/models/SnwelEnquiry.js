@@ -1,5 +1,4 @@
 "use strict";
-// src/models/Enquiry.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -14,7 +13,6 @@ const enquirySchema = new mongoose_1.Schema({
     company: { type: String, required: true },
     enquiryType: {
         type: String,
-        enum: ['General Enquiry', 'Analysis Services', '3D Modelling', '3D Laser Scanning', 'Piping Engineering', 'Structural Engineering', 'Instrumentation Engineering', '3D Printing', 'Fire Fighting Engineering'],
         required: true
     },
     mobileNo: { type: String, required: true },

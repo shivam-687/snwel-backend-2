@@ -27,7 +27,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FileModel = void 0;
-// FileModel.ts
 const mongoose_1 = __importStar(require("mongoose"));
 const common_1 = require("../config/common");
 const mongoose_paginate_v2_1 = __importDefault(require("mongoose-paginate-v2"));
@@ -40,4 +39,7 @@ const FileSchema = new mongoose_1.Schema({
     uploadDate: { type: Date, default: Date.now }
 }, { timestamps: true });
 FileSchema.plugin(mongoose_paginate_v2_1.default);
+FileSchema.index({ fileName: 1 });
+FileSchema.index({ uploadDate: -1 });
+FileSchema.index({ mimeType: 1 });
 exports.FileModel = mongoose_1.default.model('File', FileSchema);

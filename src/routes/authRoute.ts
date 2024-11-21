@@ -1,7 +1,5 @@
-
 import express from 'express';
-import { register, login } from '@/controllers/authController';
-import { authenticateJWT } from '@/middleware/auth.middleware';
+import { register } from '@/controllers/authController';
 import passport from '@/config/passport-config';
 import { CommonConfig } from '@/config/common';
 import { errorResponse } from '@/utils/helpers/appResponse';

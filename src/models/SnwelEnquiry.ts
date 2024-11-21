@@ -24,8 +24,7 @@ const enquirySchema = new Schema<ISnwelEnquiry>({
   businessEmail: { type: String, required: true },
   company: { type: String, required: true },
   enquiryType: { 
-    type: String, 
-    enum: ['General Enquiry', 'Analysis Services', '3D Modelling', '3D Laser Scanning', 'Piping Engineering', 'Structural Engineering', 'Instrumentation Engineering', '3D Printing', 'Fire Fighting Engineering'],
+    type: String,
     required: true 
   },
   mobileNo: { type: String, required: true },

@@ -1,5 +1,4 @@
 "use strict";
-// src/services/blogService.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,7 +8,6 @@ const blog_model_1 = __importDefault(require("./blog-model"));
 const helpers_1 = require("../../utils/helpers");
 const mongoose_1 = require("mongoose");
 const json2csv_1 = require("json2csv");
-// Function to create a new blog
 async function createBlog(data) {
     try {
         const blog = await blog_model_1.default.create(data);
@@ -21,7 +19,6 @@ async function createBlog(data) {
     }
 }
 exports.createBlog = createBlog;
-// Function to get a blog by ID
 async function getBlogById(blogId) {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(blogId)
@@ -35,7 +32,6 @@ async function getBlogById(blogId) {
     }
 }
 exports.getBlogById = getBlogById;
-// Function to update a blog by ID
 async function updateBlogById(blogId, updateData) {
     try {
         const blog = await blog_model_1.default.findByIdAndUpdate(blogId, updateData, { new: true });
@@ -46,7 +42,6 @@ async function updateBlogById(blogId, updateData) {
     }
 }
 exports.updateBlogById = updateBlogById;
-// Function to delete a blog by ID
 async function deleteBlogById(blogId) {
     try {
         await blog_model_1.default.findByIdAndDelete(blogId);
@@ -56,7 +51,6 @@ async function deleteBlogById(blogId) {
     }
 }
 exports.deleteBlogById = deleteBlogById;
-// Function to get all blogs with pagination
 const getAllBlogs = async (options) => {
     try {
         const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
@@ -92,19 +86,16 @@ const getAllBlogs = async (options) => {
     }
 };
 exports.getAllBlogs = getAllBlogs;
-// Function to export blogs to CSV
 const exportBlogs = async (options) => {
     try {
         const blogs = await (0, exports.getAllBlogs)(options);
-        const blogData = blogs.docs; // Extract the documents from the paginated result
-        // Convert the data to CSV format
+        const blogData = blogs.docs;
         const parser = new json2csv_1.Parser();
         const csv = parser.parse(blogData);
-        return csv; // You can return the CSV string or save it to a file
+        return csv;
     }
     catch (error) {
         throw new Error(`Error exporting blogs: ${error.message}`);
     }
 };
 exports.exportBlogs = exportBlogs;
-// Function to hard delete all soft-deleted blogs

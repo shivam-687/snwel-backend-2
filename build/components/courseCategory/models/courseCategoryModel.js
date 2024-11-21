@@ -34,13 +34,12 @@ const CourseCategorySchema = new mongoose_1.Schema({
     description: String,
     shortDescription: String,
     isPremium: Boolean,
-    parentCategory: { type: mongoose_1.Schema.Types.ObjectId, ref: 'CourseCategory' }, // Assuming CourseCategory has a self-referencing relationship
+    parentCategory: { type: mongoose_1.Schema.Types.ObjectId, ref: 'CourseCategory' },
     slug: { type: String, unique: true },
     isActive: { type: Boolean, default: true }
 });
 CourseCategorySchema.pre('save', async function (next) {
     const category = this;
-    // Generate slug from title using slugify
     try {
         const slug = (0, slugify_1.default)(category.title, { lower: true });
         const existingCategory = await exports.CourseCategoryModel.findOne({ slug });

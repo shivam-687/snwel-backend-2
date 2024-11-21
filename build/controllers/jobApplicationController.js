@@ -4,10 +4,9 @@ exports.exportJobApplicationsController = exports.getAllJobApplicationsControlle
 const JobApplication_1 = require("../service/JobApplication");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const catchAsync_1 = require("../utils/helpers/catchAsync");
-// Controller function to create a new job application
 async function createJobApplicationController(req, res) {
     try {
-        const jobApplicationData = req.body; // Assuming job application data is sent in the request body
+        const jobApplicationData = req.body;
         const newJobApplication = await (0, JobApplication_1.createJobApplication)(jobApplicationData);
         (0, appResponse_1.successResponse)(newJobApplication, res);
     }
@@ -16,7 +15,6 @@ async function createJobApplicationController(req, res) {
     }
 }
 exports.createJobApplicationController = createJobApplicationController;
-// Controller function to get a job application by ID
 async function getJobApplicationByIdController(req, res) {
     try {
         const jobApplicationId = req.params.id;
@@ -32,7 +30,6 @@ async function getJobApplicationByIdController(req, res) {
     }
 }
 exports.getJobApplicationByIdController = getJobApplicationByIdController;
-// Controller function to update a job application by ID
 async function updateJobApplicationByIdController(req, res) {
     try {
         const jobApplicationId = req.params.id;
@@ -49,7 +46,6 @@ async function updateJobApplicationByIdController(req, res) {
     }
 }
 exports.updateJobApplicationByIdController = updateJobApplicationByIdController;
-// Controller function to delete a job application by ID
 async function deleteJobApplicationByIdController(req, res) {
     try {
         const jobApplicationId = req.params.id;
@@ -61,7 +57,6 @@ async function deleteJobApplicationByIdController(req, res) {
     }
 }
 exports.deleteJobApplicationByIdController = deleteJobApplicationByIdController;
-// Controller function to get all job applications with pagination
 exports.getAllJobApplicationsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const options = req.query;
     const jobApplications = await (0, JobApplication_1.getAllJobApplications)(options);

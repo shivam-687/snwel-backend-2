@@ -5,7 +5,7 @@ const userService_1 = require("../service/userService");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const getUserListController = async (req, res) => {
     try {
-        const user = await (0, userService_1.listUsers)({ ...req.query });
+        const user = await (0, userService_1.listUsers)(Object.assign({}, req.query));
         return (0, appResponse_1.successResponse)(user, res);
     }
     catch (error) {
@@ -37,7 +37,8 @@ const getUserController = async (req, res) => {
 exports.getUserController = getUserController;
 const getMeController = async (req, res) => {
     try {
-        const user = await (0, userService_1.me)(req.user?._id || '');
+        const userId = req.user && '_id' in req.user ? req.user._id : '';
+        const user = await (0, userService_1.me)(userId);
         return (0, appResponse_1.successResponse)(user, res);
     }
     catch (error) {

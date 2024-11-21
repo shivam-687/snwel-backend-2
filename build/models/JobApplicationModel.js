@@ -1,5 +1,4 @@
 "use strict";
-// src/models/JobApplication.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -20,5 +19,9 @@ const jobApplicationSchema = new mongoose_1.Schema({
     notes: { type: String },
 }, { timestamps: true });
 jobApplicationSchema.plugin(mongoose_paginate_v2_1.default);
+jobApplicationSchema.index({ jobId: 1 });
+jobApplicationSchema.index({ email: 1 });
+jobApplicationSchema.index({ status: 1 });
+jobApplicationSchema.index({ appliedDate: -1 });
 const JobApplication = (0, mongoose_1.model)('JobApplication', jobApplicationSchema);
 exports.default = JobApplication;

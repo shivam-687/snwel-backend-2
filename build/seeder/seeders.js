@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.seedEnrollments = exports.seedAllSettings = void 0;
-// seeders/seeders.ts
 const User_1 = require("../models/User");
 const Setting_1 = require("../models/Setting");
 const seedConfig_1 = require("./seedConfig");
@@ -12,8 +11,7 @@ const CourseModel_1 = require("../models/CourseModel");
 const CourseEnrollment_1 = __importDefault(require("../models/CourseEnrollment"));
 const seedSetting = async (setting) => {
     try {
-        const existingSetting = await Setting_1.SettingModel.findOneAndUpdate({ code: setting.code }, { data: setting.data, isChangable: setting.isChangable }, { new: true, upsert: true } // Create if not found, update if found
-        );
+        const existingSetting = await Setting_1.SettingModel.findOneAndUpdate({ code: setting.code }, { data: setting.data, isChangable: setting.isChangable }, { new: true, upsert: true });
         if (existingSetting) {
             console.log(`Setting with code ${setting.code} updated successfully`);
         }
@@ -31,8 +29,6 @@ const seedAllSettings = async () => {
     }
 };
 exports.seedAllSettings = seedAllSettings;
-// Add other seeding functions for different collections as needed
-// For example, seeding users, courses, etc.
 const seedEnrollments = async () => {
     async function getRandomElement(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
@@ -59,7 +55,7 @@ const seedEnrollments = async () => {
                 expiredAt: new Date(new Date().setMonth(new Date().getMonth() + 1)),
                 otp: {
                     otp: Math.random().toString(36).substring(7),
-                    expirationTime: new Date(new Date().getTime() + 15 * 60 * 1000), // OTP valid for 15 minutes
+                    expirationTime: new Date(new Date().getTime() + 15 * 60 * 1000),
                     verified: false,
                 }
             });

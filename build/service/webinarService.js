@@ -4,7 +4,6 @@ exports.getAllWebinars = exports.addHosts = exports.deleteWebinarById = exports.
 const WebinarModel_1 = require("../models/WebinarModel");
 const helpers_1 = require("../utils/helpers");
 const mongoose_1 = require("mongoose");
-// Function to create a new webinar
 async function createWebinar(data) {
     try {
         const webinar = await WebinarModel_1.WebinarModel.create(data);
@@ -15,7 +14,6 @@ async function createWebinar(data) {
     }
 }
 exports.createWebinar = createWebinar;
-// Function to get a webinar by ID
 async function getWebinarById(webinarId) {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(webinarId)
@@ -32,7 +30,6 @@ async function getWebinarById(webinarId) {
     }
 }
 exports.getWebinarById = getWebinarById;
-// Function to get a webinar by ID
 async function getWebinarBySlug(slug) {
     try {
         const webinar = await WebinarModel_1.WebinarModel
@@ -46,7 +43,6 @@ async function getWebinarBySlug(slug) {
     }
 }
 exports.getWebinarBySlug = getWebinarBySlug;
-// Function to update a webinar by ID
 async function updateWebinarById(webinarId, updateData) {
     try {
         const webinar = await WebinarModel_1.WebinarModel
@@ -60,7 +56,6 @@ async function updateWebinarById(webinarId, updateData) {
     }
 }
 exports.updateWebinarById = updateWebinarById;
-// Function to delete a webinar by ID
 async function deleteWebinarById(webinarId) {
     try {
         await WebinarModel_1.WebinarModel.findByIdAndDelete(webinarId);
@@ -72,20 +67,14 @@ async function deleteWebinarById(webinarId) {
 exports.deleteWebinarById = deleteWebinarById;
 async function addHosts(webinarId, hosts) {
     try {
-        // Find the webinar by ID
         const webinar = await WebinarModel_1.WebinarModel.findById(webinarId);
         if (!webinar) {
             throw new Error('Webinar not found');
         }
-        // Convert hosts array to Set to ensure uniqueness
         const uniqueHosts = new Set(hosts.map(h => new mongoose_1.Types.ObjectId(h)));
-        // Filter out host IDs that are already present in the webinar.hosts array
         const newHosts = [...uniqueHosts].filter(host => !webinar.hosts.includes(host));
-        // Add new hosts to the webinar
         webinar.hosts.push(...newHosts);
-        // Save the updated webinar
         await webinar.save();
-        // Return the updated webinar
         return webinar.toObject();
     }
     catch (error) {
@@ -100,14 +89,13 @@ const getAllWebinars = async (options, adminMode = false) => {
         const paginationData = (0, helpers_1.getPaginationParams)(limit, page);
         if (adminMode) {
             const currentDate = new Date();
-            // query.isActive = true,
             query.startDate = { $gte: currentDate };
         }
         if (search) {
             const searchRegex = new RegExp(search, 'i');
             query.$and = [{ title: searchRegex }];
         }
-        if (filter && filter?.startDate) {
+        if (filter && (filter === null || filter === void 0 ? void 0 : filter.startDate)) {
             const startDate = new Date(filter.startDate);
             console.log(startDate);
             query.startDate = { $gte: startDate };

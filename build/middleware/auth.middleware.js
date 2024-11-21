@@ -14,7 +14,6 @@ const authenticateJWT = (req, res, next) => {
         if (!user) {
             return (0, appResponse_1.errorResponse)(null, res, { status: 401, message: "Unauthenticated!" });
         }
-        // If authentication is successful, attach the user object to the request
         req.user = user;
         next();
     })(req, res, next);

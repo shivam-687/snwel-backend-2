@@ -51,13 +51,12 @@ exports.handleWebhook = (0, catchAsync_1.catchAsync)(async (req, res) => {
                 orderId: data.order_id,
                 paymentId: data.id,
                 signature: signature,
-                amount: data.amount / 100, // Converting paise to rupees
+                amount: data.amount / 100,
                 currency: data.currency,
                 status: data.status,
             });
             await transaction.save();
         }
-        // Handle other event types as needed
         res.status(200).json({ status: 'success' });
     }
     catch (error) {

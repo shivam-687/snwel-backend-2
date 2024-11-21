@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class GlobalState {
     constructor() {
-        this.state = {}; // Initialize an empty state object
+        this.state = {};
     }
     static getInstance() {
         if (!GlobalState.instance) {
@@ -20,4 +20,4 @@ class GlobalState {
         return this.state;
     }
 }
-exports.default = GlobalState.getInstance(); // Export an instance of GlobalState
+exports.default = GlobalState.getInstance();

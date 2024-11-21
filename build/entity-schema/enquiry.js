@@ -20,7 +20,7 @@ exports.createEnquiry = zod_1.z.object({
     email: zod_1.z.string().email(),
     phone: zod_1.z.string().min(10).max(15),
     message: zod_1.z.string().optional(),
-    type: zod_1.z.enum(['general', 'job', 'support', 'webinar', 'contact']), // Add more types as needed
+    type: zod_1.z.enum(['general', 'job', 'support', 'webinar', 'contact']),
     extraInfo: zod_1.z.union([GeneralEnquiry, WebinarEnquiry]).optional(),
     isUnique: zod_1.z.boolean().optional()
 });

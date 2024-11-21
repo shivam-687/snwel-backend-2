@@ -38,6 +38,11 @@ masterSchema.pre('save', async function (next) {
 
   masterSchema.plugin(mongoosePaginate);
 
+masterSchema.index({ code: 1 }, { unique: true });
+masterSchema.index({ parentCode: 1 });
+masterSchema.index({ type: 1 });
+masterSchema.index({ sequence: -1 });
+
 const Master = model<IMaster>('Master', masterSchema);
 
 export default Master;

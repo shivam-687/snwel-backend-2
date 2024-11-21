@@ -12,7 +12,7 @@ const createJobCategoryController = (0, catchAsync_1.catchAsync)(async (req, res
 });
 exports.createJobCategoryController = createJobCategoryController;
 const getAllJobCategoriesController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = { ...req.query };
+    const options = Object.assign({}, req.query);
     const jobCategories = await (0, jobCategoryService_1.getAllJobCategories)((0, helpers_1.extractListOptions)(req));
     (0, appResponse_1.successResponse)(jobCategories, res, { message: 'Job categories fetched successfully!' });
 });

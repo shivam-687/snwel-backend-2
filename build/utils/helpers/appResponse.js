@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.courseEnrollmentResponse = exports.errorResponseFromError = exports.courseErrorResponse = exports.errorResponse = exports.successResponse = exports.StatusCode = exports.sendResponse = void 0;
 const _1 = require(".");
-// Define enum for status codes
 var StatusCode;
 (function (StatusCode) {
     StatusCode[StatusCode["OK"] = 200] = "OK";
@@ -23,7 +22,6 @@ const CommonResponses = {
     BAD_REQUEST: { status: StatusCode.BAD_REQUEST, message: "Bad Request" },
     OK: { status: StatusCode.OK, message: "Success" }
 };
-// Function to send response with proper status code, message, and optional data
 const sendResponse = (res, response) => {
     const responseData = {
         status: response.status || 200,
@@ -35,17 +33,17 @@ const sendResponse = (res, response) => {
 exports.sendResponse = sendResponse;
 const successResponse = (data, res, options) => {
     const op = {
-        status: options?.status || 200,
-        message: options?.message || 'Success',
+        status: (options === null || options === void 0 ? void 0 : options.status) || 200,
+        message: (options === null || options === void 0 ? void 0 : options.message) || 'Success',
         data
     };
     return sendResponse(res, op);
 };
 exports.successResponse = successResponse;
-const errorResponse = (data, res, options = CommonResponses.INTERNAL_SERVER_ERROR) => {
+const errorResponse = (_data, res, options = CommonResponses.INTERNAL_SERVER_ERROR) => {
     const op = {
-        status: options?.status || CommonResponses.INTERNAL_SERVER_ERROR.status,
-        message: options?.message || CommonResponses.INTERNAL_SERVER_ERROR.message
+        status: (options === null || options === void 0 ? void 0 : options.status) || CommonResponses.INTERNAL_SERVER_ERROR.status,
+        message: (options === null || options === void 0 ? void 0 : options.message) || CommonResponses.INTERNAL_SERVER_ERROR.message
     };
     return sendResponse(res, op);
 };
@@ -53,17 +51,17 @@ exports.errorResponse = errorResponse;
 const errorResponseFromError = (error, res) => {
     const parsedError = (0, _1.parseErrorMessage)(error);
     const op = {
-        status: parsedError?.status || CommonResponses.INTERNAL_SERVER_ERROR.status,
-        message: parsedError?.message || CommonResponses.INTERNAL_SERVER_ERROR.message
+        status: (parsedError === null || parsedError === void 0 ? void 0 : parsedError.status) || CommonResponses.INTERNAL_SERVER_ERROR.status,
+        message: (parsedError === null || parsedError === void 0 ? void 0 : parsedError.message) || CommonResponses.INTERNAL_SERVER_ERROR.message
     };
     return sendResponse(res, op);
 };
 exports.errorResponseFromError = errorResponseFromError;
 const courseErrorResponse = {
-    notFound: (data, res) => errorResponse(data, res, { ...CommonResponses.NOT_FOUND, message: "Course not found!" }),
+    notFound: (data, res) => errorResponse(data, res, Object.assign(Object.assign({}, CommonResponses.NOT_FOUND), { message: "Course not found!" })),
 };
 exports.courseErrorResponse = courseErrorResponse;
 const courseEnrollmentResponse = {
-    notFound: (data, res) => errorResponse(data, res, { ...CommonResponses.NOT_FOUND, message: "Course Enrollment not found!" }),
+    notFound: (data, res) => errorResponse(data, res, Object.assign(Object.assign({}, CommonResponses.NOT_FOUND), { message: "Course Enrollment not found!" })),
 };
 exports.courseEnrollmentResponse = courseEnrollmentResponse;

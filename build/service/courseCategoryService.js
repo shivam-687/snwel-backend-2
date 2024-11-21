@@ -4,7 +4,6 @@ exports.deleteCourseCategoryById = exports.updateCourseCategoryById = exports.ge
 const CourseCategory_1 = require("../models/CourseCategory");
 const helpers_1 = require("../utils/helpers");
 const mongodb_1 = require("mongodb");
-// Function to create a new course category
 const createCourseCategory = async (categoryData) => {
     try {
         const newCategory = new CourseCategory_1.CourseCategoryModel(categoryData);
@@ -15,7 +14,6 @@ const createCourseCategory = async (categoryData) => {
     }
 };
 exports.createCourseCategory = createCourseCategory;
-// Function to retrieve all course categories
 const getAllCourseCategories = async (options) => {
     try {
         const { limit = 10, page = 1, filter } = options;
@@ -71,7 +69,6 @@ const getAllCourseCategories = async (options) => {
     }
 };
 exports.getAllCourseCategories = getAllCourseCategories;
-// Function to retrieve a course category by ID
 const getCourseCategoryById = async (categoryId) => {
     try {
         return await CourseCategory_1.CourseCategoryModel.findById(categoryId).exec();
@@ -81,7 +78,6 @@ const getCourseCategoryById = async (categoryId) => {
     }
 };
 exports.getCourseCategoryById = getCourseCategoryById;
-// Function to update a course category by ID
 const updateCourseCategoryById = async (categoryId, updateData) => {
     try {
         return await CourseCategory_1.CourseCategoryModel.findByIdAndUpdate(categoryId, updateData, { new: true }).exec();
@@ -91,7 +87,6 @@ const updateCourseCategoryById = async (categoryId, updateData) => {
     }
 };
 exports.updateCourseCategoryById = updateCourseCategoryById;
-// Function to delete a course category by ID
 const deleteCourseCategoryById = async (categoryId) => {
     try {
         await CourseCategory_1.CourseCategoryModel.findByIdAndDelete(categoryId).exec();
@@ -103,17 +98,14 @@ const deleteCourseCategoryById = async (categoryId) => {
 exports.deleteCourseCategoryById = deleteCourseCategoryById;
 async function attachParentCategory(targetCategoryId, parentCategoryId) {
     try {
-        // Find the target category by ID
         const targetCategory = await CourseCategory_1.CourseCategoryModel.findOne({ _id: new mongodb_1.ObjectId(targetCategoryId) });
         if (!targetCategory) {
             throw new Error('Error: 404:Target category not found');
         }
-        // Update the parent category ID
         targetCategory.parentCategory = parentCategoryId ? new mongodb_1.ObjectId(parentCategoryId) : undefined;
         await targetCategory.save();
         const updatedCategory = await targetCategory.populate('parentCategory');
         return updatedCategory;
-        // return {}
     }
     catch (error) {
         throw new Error(`Error: 500:Failed to attach parent category: ${error.message}`);

@@ -34,8 +34,8 @@ mongoose_paginate_v2_1.default.paginate.options = common_1.paginateOptions;
 const JobSchema = new mongoose_1.Schema({
     title: String,
     description: String,
-    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }, // Reference to User model
-    applicants: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }], // Reference to User model
+    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' },
+    applicants: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }],
 });
 JobSchema.plugin(mongoose_paginate_v2_1.default);
 exports.JobModel = mongoose_1.default.model('Job', JobSchema);

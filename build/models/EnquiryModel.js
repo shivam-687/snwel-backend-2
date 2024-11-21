@@ -26,7 +26,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// models/Enquiry.ts
 const mongoose_1 = __importStar(require("mongoose"));
 const common_1 = require("../config/common");
 const mongoose_paginate_v2_1 = __importDefault(require("mongoose-paginate-v2"));
@@ -41,4 +40,7 @@ const EnquirySchema = new mongoose_1.Schema({
     priority: { type: String, enum: ['low', 'medium', 'high'], default: 'low' },
 }, { timestamps: true });
 EnquirySchema.plugin(mongoose_paginate_v2_1.default);
+EnquirySchema.index({ email: 1, type: 1 });
+EnquirySchema.index({ type: 1 });
+EnquirySchema.index({ createdAt: -1 });
 exports.default = mongoose_1.default.model('Enquiry', EnquirySchema);

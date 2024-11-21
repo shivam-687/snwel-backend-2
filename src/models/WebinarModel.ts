@@ -41,6 +41,9 @@ const WebinarSchema = new Schema<Webinar>({
     videoUrl: {type: String, default: null}
 }, {timestamps: true});
 
-
+WebinarSchema.index({ slug: 1 }, { unique: true });
+WebinarSchema.index({ startDate: 1 });
+WebinarSchema.index({ isActive: 1 });
+WebinarSchema.index({ hosts: 1 });
 
 export const WebinarModel = mongoose.model<Webinar, mongoose.PaginateModel<Webinar>>('Webinar', WebinarSchema);

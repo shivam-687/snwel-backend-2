@@ -34,4 +34,8 @@ const EnquirySchema: Schema = new Schema(
 
 EnquirySchema.plugin(mongoosePaginate);
 
+EnquirySchema.index({ email: 1, type: 1 });
+EnquirySchema.index({ type: 1 });
+EnquirySchema.index({ createdAt: -1 });
+
 export default mongoose.model<Enquiry, mongoose.PaginateModel<Enquiry>>('Enquiry', EnquirySchema);

@@ -12,7 +12,6 @@ const validateSchema_1 = require("../middleware/validateSchema");
 const zod_1 = require("zod");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const AuthRouter = express_1.default.Router();
-// Register route
 AuthRouter.post('/register', authController_1.register);
 AuthRouter.post('/login', (0, validateSchema_1.validateSchema)(zod_1.z.object({ email: zod_1.z.string().email(), password: zod_1.z.string().min(3) })), async (req, res, next) => {
     passport_config_1.default.authenticate('login', async (err, user, _info) => {
@@ -28,7 +27,7 @@ AuthRouter.post('/login', (0, validateSchema_1.validateSchema)(zod_1.z.object({ 
                     return next(error);
                 const token = jsonwebtoken_1.default.sign({ user }, common_1.CommonConfig.JWT_SECRET);
                 console.log({ user });
-                return res.json({ token, email: user.email, name: user.name, roles: user.roles, picture: user.profilePic, id: user?._id });
+                return res.json({ token, email: user.email, name: user.name, roles: user.roles, picture: user.profilePic, id: user === null || user === void 0 ? void 0 : user._id });
             });
         }
         catch (error) {

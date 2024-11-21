@@ -26,7 +26,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Footer = void 0;
 const React = __importStar(require("react"));
 const components_1 = require("@react-email/components");
-//© 2023 Your Company Name. All rights reserved.
 const Footer = ({ footerText }) => (React.createElement(components_1.Text, { style: footer },
     "This is an automated message, please do not reply to this email.",
     React.createElement("br", null),

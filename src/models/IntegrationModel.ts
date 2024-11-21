@@ -26,6 +26,9 @@ const IntegrationSchema = new Schema<IIntegration>({
 
 IntegrationSchema.plugin(mongoosePaginate);
 
+IntegrationSchema.index({ serviceName: 1 }, { unique: true }); // For service name lookups
+IntegrationSchema.index({ enabled: 1 }); // For enabled/disabled filtering
+
 // Create the model
 const IntegrationModel = model<IIntegration, mongoose.PaginateModel<IIntegration>>('Integration', IntegrationSchema);
 

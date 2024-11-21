@@ -1,19 +1,18 @@
-// import { Language, User } from "../custom";
-
-// to make the file a module and avoid the TypeScript error
-export { }
+import { Request } from 'express';
 
 declare global {
   namespace Express {
+    // Define User interface directly in the namespace
     interface User {
-      _id: string,
-      name: string,
-      email: string,
-      authenticationToken?: string | null
+      _id: string;
+      name: string;
+      email: string;
+      authenticationToken?: string | null;
     }
-    export interface Request {
+    
+    interface Request {
       user?: User;
-      file?: any
+      file?: any;
     }
   }
 }

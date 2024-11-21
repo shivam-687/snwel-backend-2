@@ -11,7 +11,7 @@ const createIntegrationController = (0, catchAsync_1.catchAsync)(async (req, res
 });
 exports.createIntegrationController = createIntegrationController;
 const getAllIntegrationsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = { ...req.query };
+    const options = Object.assign({}, req.query);
     const integrations = await (0, IntegrationService_1.getAllIntegrations)(options);
     (0, appResponse_1.successResponse)(integrations, res, { message: 'Integrations fetched successfully!' });
 });

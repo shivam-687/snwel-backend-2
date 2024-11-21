@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendOtpViaWhatsApp = exports.loadSetting = void 0;
-// services/whatsappService.ts
 const setting_schema_1 = require("../entity-schema/setting-schema");
 const Setting_1 = require("../models/Setting");
 const axios_1 = __importDefault(require("axios"));

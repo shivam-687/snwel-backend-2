@@ -48,4 +48,8 @@ const WebinarSchema = new mongoose_1.Schema({
     curriculum: [{ title: String, duration: String }],
     videoUrl: { type: String, default: null }
 }, { timestamps: true });
+WebinarSchema.index({ slug: 1 }, { unique: true });
+WebinarSchema.index({ startDate: 1 });
+WebinarSchema.index({ isActive: 1 });
+WebinarSchema.index({ hosts: 1 });
 exports.WebinarModel = mongoose_1.default.model('Webinar', WebinarSchema);
