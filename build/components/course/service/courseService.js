@@ -6,11 +6,10 @@ const helpers_1 = require("../../../utils/helpers");
 const mongodb_1 = require("mongodb");
 const CourseCategory_1 = require("../../../models/CourseCategory");
 const mongoose_1 = require("mongoose");
-// Function to create a new course
 const createCourse = async (courseData) => {
     try {
-        const curData = courseData.curriculum.map(cr => ({ ...cr, curriculumType: cr.curriculumType ? new mongodb_1.ObjectId(cr.curriculumType) : undefined }));
-        const newCourse = new courseModel_1.CourseModel({ ...courseData, curriculum: curData });
+        const curData = courseData.curriculum.map(cr => (Object.assign(Object.assign({}, cr), { curriculumType: cr.curriculumType ? new mongodb_1.ObjectId(cr.curriculumType) : undefined })));
+        const newCourse = new courseModel_1.CourseModel(Object.assign(Object.assign({}, courseData), { curriculum: curData }));
         return await newCourse.save();
     }
     catch (error) {
@@ -18,7 +17,6 @@ const createCourse = async (courseData) => {
     }
 };
 exports.createCourse = createCourse;
-// Function to retrieve all courses
 const getAllCourses = async (options, adminMode = false) => {
     try {
         const { limit = 10, page = 1, filter, search } = options;
@@ -39,13 +37,13 @@ const getAllCourses = async (options, adminMode = false) => {
         if (filter && filter.category) {
             const ctg = await CourseCategory_1.CourseCategoryModel.findOne({ slug: filter.category });
             query['categories'] = {
-                $in: new mongodb_1.ObjectId(ctg?._id)
+                $in: new mongodb_1.ObjectId(ctg === null || ctg === void 0 ? void 0 : ctg._id)
             };
         }
-        if (filter && filter?.isPremium) {
+        if (filter && (filter === null || filter === void 0 ? void 0 : filter.isPremium)) {
             query["isPremium"] = true;
         }
-        if (filter && filter?.isPopular) {
+        if (filter && (filter === null || filter === void 0 ? void 0 : filter.isPopular)) {
             query["isPopular"] = true;
         }
         const skip = (page - 1) * limit;
@@ -64,7 +62,6 @@ const getAllCourses = async (options, adminMode = false) => {
     }
 };
 exports.getAllCourses = getAllCourses;
-// Function to retrieve a course by ID
 const getCourseById = async (courseId) => {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(courseId)
@@ -93,11 +90,11 @@ const getCourseBySlug = async (slug, admin = false) => {
     }
 };
 exports.getCourseBySlug = getCourseBySlug;
-// Function to update a course by ID
 const updateCourseById = async (courseId, updateData) => {
+    var _a;
     try {
         if (updateData.curriculum) {
-            updateData.curriculum = updateData?.curriculum?.map(cr => ({ ...cr, curriculumType: cr.curriculumType ? new mongodb_1.ObjectId(cr.curriculumType) : undefined }));
+            updateData.curriculum = (_a = updateData === null || updateData === void 0 ? void 0 : updateData.curriculum) === null || _a === void 0 ? void 0 : _a.map(cr => (Object.assign(Object.assign({}, cr), { curriculumType: cr.curriculumType ? new mongodb_1.ObjectId(cr.curriculumType) : undefined })));
         }
         await courseModel_1.CourseModel.findByIdAndUpdate(courseId, updateData, { new: true }).exec();
         return courseModel_1.CourseModel.findOne({ _id: new mongodb_1.ObjectId(courseId) });
@@ -117,7 +114,6 @@ const partialUpdateCourse = async (courseId, updateData) => {
     }
 };
 exports.partialUpdateCourse = partialUpdateCourse;
-// Function to delete a course by ID
 const deleteCourseById = async (courseId) => {
     try {
         await courseModel_1.CourseModel.findByIdAndDelete(courseId).exec();

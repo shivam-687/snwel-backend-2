@@ -7,13 +7,11 @@ const courseQueryService_1 = require("../service/courseQueryService");
 const userService_1 = require("../service/userService");
 const helpers_1 = require("../utils/helpers");
 const constants_1 = require("../config/constants");
-// Function to get all courses
 const getAllController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const courses = await (0, courseQueryService_1.getAll)({ ...req.query });
+    const courses = await (0, courseQueryService_1.getAll)(Object.assign({}, req.query));
     return (0, appResponse_1.successResponse)(courses, res, { message: "Course Enrollments Fetched successfully!" });
 });
 exports.getAllController = getAllController;
-// Function to create a new course
 const createController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const courseData = req.body;
     const newCourse = await (0, courseQueryService_1.create)(courseData);
@@ -45,7 +43,7 @@ const createByAnonymous = (0, catchAsync_1.catchAsync)(async (req, res) => {
     });
     const newEnroll = await (0, courseQueryService_1.create)({
         courseId: courseData.courseId,
-        userId: newUser._id,
+        userId: newUser === null || newUser === void 0 ? void 0 : newUser._id,
         extra: courseData.extra,
         qualification: courseData.qualification,
         mode: courseData.mode,
@@ -55,7 +53,6 @@ const createByAnonymous = (0, catchAsync_1.catchAsync)(async (req, res) => {
     (0, appResponse_1.successResponse)(newEnroll, res);
 });
 exports.createByAnonymous = createByAnonymous;
-// Function to get course by id
 const getByIdController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const { id } = req.params;
     if (!id) {

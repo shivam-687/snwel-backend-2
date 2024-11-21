@@ -7,7 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
 import { Constants } from '@/config/constants';
 import {Request} from 'express'
-import { Model, Models } from 'mongoose';
+import { Model } from 'mongoose';
+import slugify from 'slugify';
 
 
 
@@ -233,6 +234,10 @@ interface QueryOptions {
     }
   
     return newObj;
+  }
+
+  export const createSlug = (text: string): string =>{
+    return slugify(text)
   }
   
   

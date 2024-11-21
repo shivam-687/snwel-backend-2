@@ -26,5 +26,9 @@ masterSchema.pre('save', async function (next) {
     next();
 });
 masterSchema.plugin(mongoose_paginate_v2_1.default);
+masterSchema.index({ code: 1 }, { unique: true });
+masterSchema.index({ parentCode: 1 });
+masterSchema.index({ type: 1 });
+masterSchema.index({ sequence: -1 });
 const Master = (0, mongoose_1.model)('Master', masterSchema);
 exports.default = Master;

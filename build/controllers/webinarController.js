@@ -1,14 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllPublicWebinarController = exports.getAllWebinarController = exports.addHostsToWebinarController = exports.deleteWebinarByIdController = exports.updateWebinarByIdController = exports.getWebinarBySlugController = exports.getWebinarByIdController = exports.createWebinarController = void 0;
-// Import webinar service functions
 const webinarService_1 = require("../service/webinarService");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const catchAsync_1 = require("../utils/helpers/catchAsync");
-// Controller function to create a new webinar
 async function createWebinarController(req, res) {
     try {
-        const webinarData = req.body; // Assuming webinar data is sent in the request body
+        const webinarData = req.body;
         const newWebinar = await (0, webinarService_1.createWebinar)(webinarData);
         (0, appResponse_1.successResponse)(newWebinar, res);
     }
@@ -17,7 +15,6 @@ async function createWebinarController(req, res) {
     }
 }
 exports.createWebinarController = createWebinarController;
-// Controller function to get a webinar by ID
 async function getWebinarByIdController(req, res) {
     try {
         const webinarId = req.params.id;
@@ -48,7 +45,6 @@ async function getWebinarBySlugController(req, res) {
     }
 }
 exports.getWebinarBySlugController = getWebinarBySlugController;
-// Controller function to update a webinar by ID
 async function updateWebinarByIdController(req, res) {
     try {
         const webinarId = req.params.id;
@@ -65,7 +61,6 @@ async function updateWebinarByIdController(req, res) {
     }
 }
 exports.updateWebinarByIdController = updateWebinarByIdController;
-// Controller function to delete a webinar by ID
 async function deleteWebinarByIdController(req, res) {
     try {
         const webinarId = req.params.id;
@@ -77,7 +72,6 @@ async function deleteWebinarByIdController(req, res) {
     }
 }
 exports.deleteWebinarByIdController = deleteWebinarByIdController;
-// Controller function to add hosts to a webinar
 async function addHostsToWebinarController(req, res) {
     try {
         const webinarId = req.params.id;

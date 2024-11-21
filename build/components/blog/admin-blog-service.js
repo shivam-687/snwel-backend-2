@@ -1,5 +1,4 @@
 "use strict";
-// src/services/adminBlogService.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,10 +8,8 @@ const blog_model_1 = __importDefault(require("./blog-model"));
 const helpers_1 = require("../../utils/helpers");
 const mongoose_1 = require("mongoose");
 const json2csv_1 = require("json2csv");
-// Function to create a new blog (Admins may have access to create published blogs directly)
 async function adminCreateBlog(data) {
     try {
-        // If the blog should be published immediately, set the `publishedAt`
         if (data.published && !data.publishedAt) {
             data.publishedAt = new Date();
         }
@@ -25,7 +22,6 @@ async function adminCreateBlog(data) {
     }
 }
 exports.adminCreateBlog = adminCreateBlog;
-// Function to get a blog by ID (Admins can retrieve both published and unpublished blogs)
 async function adminGetBlogById(blogId) {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(blogId)
@@ -39,7 +35,6 @@ async function adminGetBlogById(blogId) {
     }
 }
 exports.adminGetBlogById = adminGetBlogById;
-// Function to update a blog by ID (Admins can update everything, including publication status)
 async function adminUpdateBlogById(blogId, updateData) {
     try {
         if (updateData.published && !updateData.publishedAt) {
@@ -53,7 +48,6 @@ async function adminUpdateBlogById(blogId, updateData) {
     }
 }
 exports.adminUpdateBlogById = adminUpdateBlogById;
-// Function to delete a blog by ID (Admins can delete blogs regardless of the published status)
 async function adminDeleteBlogById(blogId) {
     try {
         await blog_model_1.default.delete({ _id: blogId });
@@ -63,8 +57,6 @@ async function adminDeleteBlogById(blogId) {
     }
 }
 exports.adminDeleteBlogById = adminDeleteBlogById;
-// Function to get all blogs with pagination (Admins can view all blogs including unpublished)
-// Function to get all blogs with pagination (Admins can view blogs based on predefined filter keywords)
 const adminGetAllBlogs = async (options) => {
     try {
         const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
@@ -82,8 +74,7 @@ const adminGetAllBlogs = async (options) => {
                 query.createdAt.$lte = new Date(endDate);
             }
         }
-        // Apply filter based on the 'show' keyword
-        switch (filter?.statusFilter) {
+        switch (filter === null || filter === void 0 ? void 0 : filter.statusFilter) {
             case 'published':
                 query.published = true;
                 break;
@@ -91,10 +82,9 @@ const adminGetAllBlogs = async (options) => {
                 query.published = false;
                 break;
             case 'all':
-                query.published = { $in: [true, false] }; // Shows both published and unpublished blogs
+                query.published = { $in: [true, false] };
                 break;
             default:
-                // No filter for 'undefined', returning only published blogs by default
                 query.published = { $in: [true, false] };
                 break;
         }
@@ -111,15 +101,13 @@ const adminGetAllBlogs = async (options) => {
     }
 };
 exports.adminGetAllBlogs = adminGetAllBlogs;
-// Function to export blogs to CSV (Admins can export all blogs including unpublished)
 const adminExportBlogs = async (options) => {
     try {
         const blogs = await (0, exports.adminGetAllBlogs)(options);
-        const blogData = blogs.docs; // Extract the documents from the paginated result
-        // Convert the data to CSV format
+        const blogData = blogs.docs;
         const parser = new json2csv_1.Parser();
         const csv = parser.parse(blogData);
-        return csv; // You can return the CSV string or save it to a file
+        return csv;
     }
     catch (error) {
         throw new Error(`Error exporting blogs: ${error.message}`);
@@ -128,7 +116,6 @@ const adminExportBlogs = async (options) => {
 exports.adminExportBlogs = adminExportBlogs;
 const hardDeleteSoftDeletedBlogs = async () => {
     try {
-        // Find and remove all soft-deleted blogs
         await blog_model_1.default.deleteMany({ deleted: true });
         console.log("Successfully hard deleted all soft-deleted blogs");
     }
@@ -137,7 +124,6 @@ const hardDeleteSoftDeletedBlogs = async () => {
     }
 };
 exports.hardDeleteSoftDeletedBlogs = hardDeleteSoftDeletedBlogs;
-// Function to soft delete a blog by ID
 const softDeleteBlogById = async (blogId) => {
     try {
         await blog_model_1.default.delete({ _id: blogId });

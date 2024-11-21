@@ -48,7 +48,7 @@ const successResponse = (data: any, res: Response, options?:{status?: number, me
     return sendResponse(res, op);
 }
 
-const errorResponse = (data: any, res: Response, options: {status: number, message: string} = CommonResponses.INTERNAL_SERVER_ERROR) => {
+const errorResponse = (_data: any, res: Response, options: {status: number, message: string} = CommonResponses.INTERNAL_SERVER_ERROR) => {
     const op: CustomResponse = {
         status: options?.status || CommonResponses.INTERNAL_SERVER_ERROR.status,
         message: options?.message || CommonResponses.INTERNAL_SERVER_ERROR.message

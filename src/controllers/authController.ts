@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { UserModel } from '@/models/User';
-import bcrypt from 'bcrypt'
 import { registerUser } from '@/service/userService';
 import { errorResponse, errorResponseFromError, successResponse } from '@/utils/helpers/appResponse';
-import { Constants } from '@/config/constants';
 
 // Controller for user registration
 export const register = async (req: Request, res: Response) => {
@@ -21,7 +18,7 @@ export const register = async (req: Request, res: Response) => {
 
 // Controller for user login
 export const login = (req: Request, res: Response, next: NextFunction) => {
-    passport.authenticate('jwt', { session: false }, (error: any, user: { id: any; }, info: any) => {
+    passport.authenticate('jwt', { session: false }, (error: any, user: { id: any; }, _info: any) => {
         if (error) {
             return errorResponseFromError(error, res);
         }

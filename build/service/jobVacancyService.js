@@ -66,13 +66,11 @@ const updateJobVacancyById = async (jobId, updateData) => {
 exports.updateJobVacancyById = updateJobVacancyById;
 const getJobVacancy = async (identifier) => {
     try {
-        // Check if the identifier is a valid ObjectId
         if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
             return await JobVacancy_1.default.findById(identifier).populate('categories', 'name');
             ;
         }
         else {
-            // Otherwise, assume it's a slug and find by slug
             return await JobVacancy_1.default.findOne({ slug: identifier }).populate('categories', 'name');
             ;
         }

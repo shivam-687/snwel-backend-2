@@ -41,16 +41,13 @@ const uploadFileV2Controller = async (req, res) => {
     try {
         const files = req.files;
         const { externalUrl } = req.body;
-        // Array to store file upload results
         let uploadedFiles = [];
-        // Handle file uploads if they exist
         if (files && files.length > 0) {
             for (const file of files) {
-                // Convert buffer to base64 and upload to Cloudinary
                 const cldRes = await (0, uploadV2_1.handleUploadV2)(file.buffer, file.mimetype);
                 if (!cldRes)
                     return;
-                const mimeType = cldRes ? mime_types_1.default.lookup(cldRes?.url) : 'application/octet-stream';
+                const mimeType = cldRes ? mime_types_1.default.lookup(cldRes === null || cldRes === void 0 ? void 0 : cldRes.url) : 'application/octet-stream';
                 const uploadedFile = new FileModal_1.FileModel({
                     fileName: cldRes.public_id,
                     filePath: cldRes.url,
@@ -60,7 +57,6 @@ const uploadFileV2Controller = async (req, res) => {
                 uploadedFiles.push(uploadedFile);
             }
         }
-        // Handle external URL uploads
         if (externalUrl) {
             const file = new FileModal_1.FileModel({ fileName: externalUrl, filePath: externalUrl });
             await file.save();
@@ -82,7 +78,7 @@ const uploadFileV2Controller = async (req, res) => {
 exports.uploadFileV2Controller = uploadFileV2Controller;
 const listFiles = async (req, res) => {
     try {
-        const { limit = 10, page = 1, search = '' } = { ...req.query };
+        const { limit = 10, page = 1, search = '' } = Object.assign({}, req.query);
         const paginationData = (0, helpers_1.getPaginationParams)(limit, page);
         const query = (0, helpers_1.getFilterQuery)({ filter: { search: String(search) } });
         const files = await FileModal_1.FileModel.find().sort({ uploadDate: -1 }).skip(paginationData.offset).limit(paginationData.limit);
@@ -102,7 +98,6 @@ const removeFileById = async (req, res) => {
         if (!file) {
             return res.status(404).send('File not found');
         }
-        // Remove file from filesystem
         fs_1.default.unlinkSync(file.filePath);
         res.status(200).send('File deleted successfully');
     }

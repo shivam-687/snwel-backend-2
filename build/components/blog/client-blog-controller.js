@@ -4,7 +4,6 @@ exports.getAllBlogsController = exports.getBlogByIdController = void 0;
 const client_blog_service_1 = require("./client-blog-service");
 const appResponse_1 = require("../../utils/helpers/appResponse");
 const catchAsync_1 = require("../../utils/helpers/catchAsync");
-// Controller function to get a blog by ID
 async function getBlogByIdController(req, res) {
     try {
         const blogId = req.params.id;
@@ -20,9 +19,8 @@ async function getBlogByIdController(req, res) {
     }
 }
 exports.getBlogByIdController = getBlogByIdController;
-// Controller function to get all blogs with pagination
 exports.getAllBlogsController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = req.query; // Assuming options are passed as query params
+    const options = req.query;
     const blogs = await (0, client_blog_service_1.getAllBlogs)(options);
     return (0, appResponse_1.successResponse)(blogs, res, { message: "Blogs fetched successfully!" });
 });

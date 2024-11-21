@@ -27,7 +27,7 @@ const cld = cloudinary.v2.config();
   }
 
 // Multer file filter
-const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: any) => {
+const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: any) => {
   // Allow images, videos, PDFs, and DOC/DOCX files
   if (
     file.mimetype.startsWith('image/') || 

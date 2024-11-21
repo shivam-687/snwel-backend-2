@@ -4,7 +4,6 @@ import { ObjectId } from 'mongodb';
 import {ListOptions, PaginatedList} from '@/types/custom'
 import { CourseCategoryModel } from '@/models/CourseCategory';
 import { Types } from 'mongoose';
-import Master from '@/models/MasterModel';
 
 // Function to create a new course
 const createCourse = async (courseData: Course): Promise<Course> => {

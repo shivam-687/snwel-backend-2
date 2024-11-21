@@ -128,4 +128,10 @@ CourseSchema.pre<Course>('save', async function (next) {
 });
 CourseSchema.plugin(mongoosePaginate);
 
+CourseSchema.index({ slug: 1 }, { unique: true });
+CourseSchema.index({ title: 'text' });
+CourseSchema.index({ categories: 1 });
+CourseSchema.index({ status: 1 });
+CourseSchema.index({ isPopular: 1 });
+
 export const CourseModel = mongoose.model<Course,  mongoose.PaginateModel<Course>>('Course', CourseSchema);

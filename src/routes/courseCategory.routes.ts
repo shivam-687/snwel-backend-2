@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllCategories, createCategory, getCategoryById, updateCategoryById, deleteCategoryById, attachParent } from '../controllers/courseCategoryController';
-import { validateSchema } from '@/middleware/validateSchema';
+// import { validateSchema } from '@/middleware/validateSchema';
 
 
 

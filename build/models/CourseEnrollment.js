@@ -47,7 +47,7 @@ const CourseEnrollmentSchema = new mongoose_1.Schema({
     mode: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Master', required: true },
     occupation: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Master', required: true },
     widget: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Widget', default: null }
-}, { timestamps: true }); // This option enables Mongoose to add createdAt and updatedAt timestamps automatically
+}, { timestamps: true });
 CourseEnrollmentSchema.plugin(mongoose_paginate_v2_1.default);
 const CourseEnrollmentModel = mongoose_1.default.model('CourseEnrollment', CourseEnrollmentSchema);
 exports.default = CourseEnrollmentModel;

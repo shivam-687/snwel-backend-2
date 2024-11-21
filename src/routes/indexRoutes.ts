@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { helloController } from '../controllers/helloController';
 import AuthRouter from './authRoute';
@@ -23,6 +22,8 @@ import { IntegrationRouter } from './integration.routes';
 import { SnwelEnquiryRouter } from './snwelEnquiry';
 import { BlogRouter } from '@/components/blog/admin-routes';
 import { BlogCategoryRouter } from '@/components/blog-category/blog-category-routes';
+import { AdminUserRouter, ClientUserRouter } from '@/modules/UserManagement';
+import { RoleRouter } from '@/modules/UserManagement/routes/roleRoutes';
 
 const router = express.Router();
 
@@ -49,7 +50,8 @@ router.use("/integrations", IntegrationRouter);
 router.use("/snwel-enquiry", SnwelEnquiryRouter);
 router.use(BlogRouter)
 router.use(BlogCategoryRouter)
-
-
+router.use('/admin/users', AdminUserRouter);
+router.use('/users', ClientUserRouter);
+router.use('/roles', RoleRouter);
 
 export { router as indexRoute };

@@ -6,7 +6,6 @@ class NodemailerService {
     }
     async sendMessage(recipient, subject, html) {
         try {
-            // Use an email API to send the email (e.g., nodemailer, SendGrid, etc.)
             console.log(`Sending email to ${recipient}: ${html}`);
             return { success: true, message: 'Email sent successfully' };
         }

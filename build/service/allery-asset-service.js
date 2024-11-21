@@ -7,7 +7,6 @@ exports.bulkUpsertDigitalAssets = exports.getAllDigitalAssets = exports.deleteDi
 const GalleryAssets_1 = __importDefault(require("../models/GalleryAssets"));
 const helpers_1 = require("../utils/helpers");
 const mongoose_1 = require("mongoose");
-// Function to create a new digital asset
 async function createDigitalAsset(data) {
     try {
         const digitalAsset = await GalleryAssets_1.default.create(data);
@@ -18,7 +17,6 @@ async function createDigitalAsset(data) {
     }
 }
 exports.createDigitalAsset = createDigitalAsset;
-// Function to get a digital asset by ID
 async function getDigitalAssetById(digitalAssetId) {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(digitalAssetId)
@@ -32,7 +30,6 @@ async function getDigitalAssetById(digitalAssetId) {
     }
 }
 exports.getDigitalAssetById = getDigitalAssetById;
-// Function to update a digital asset by ID
 async function updateDigitalAssetById(digitalAssetId, updateData) {
     try {
         const digitalAsset = await GalleryAssets_1.default.findByIdAndUpdate(digitalAssetId, updateData, { new: true });
@@ -43,7 +40,6 @@ async function updateDigitalAssetById(digitalAssetId, updateData) {
     }
 }
 exports.updateDigitalAssetById = updateDigitalAssetById;
-// Function to delete a digital asset by ID
 async function deleteDigitalAssetById(digitalAssetId) {
     try {
         await GalleryAssets_1.default.findByIdAndDelete(digitalAssetId);
@@ -53,7 +49,6 @@ async function deleteDigitalAssetById(digitalAssetId) {
     }
 }
 exports.deleteDigitalAssetById = deleteDigitalAssetById;
-// Function to get all digital assets with pagination
 const getAllDigitalAssets = async (options) => {
     try {
         const { limit = 10, page = 1, search, sort, filter } = options;
@@ -82,7 +77,7 @@ const bulkUpsertDigitalAssets = async (assets) => {
     try {
         const bulkOps = assets.map(asset => ({
             updateOne: {
-                filter: { link: asset.link }, // Assuming URL is unique
+                filter: { link: asset.link },
                 update: { $set: asset },
                 upsert: true,
             },

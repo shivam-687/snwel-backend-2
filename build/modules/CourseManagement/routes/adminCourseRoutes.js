@@ -1,0 +1,23 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AdminCourseRouter = void 0;
+const express_1 = __importDefault(require("express"));
+const auth_middleware_1 = require("../../../middleware/auth.middleware");
+const permissionMiddleware_1 = require("../../../middleware/permissionMiddleware");
+const router = express_1.default.Router();
+router.post('/courses', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('COURSE_CREATE'));
+router.get('/courses', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('COURSE_VIEW'));
+router.get('/courses/:id', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('COURSE_VIEW'));
+router.put('/courses/:id', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('COURSE_UPDATE'));
+router.delete('/courses/:id', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('COURSE_DELETE'));
+router.patch('/courses/:id/publish', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('COURSE_PUBLISH'));
+router.post('/categories', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('CATEGORY_MANAGE'));
+router.get('/categories', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('CATEGORY_MANAGE'));
+router.put('/categories/:id', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('CATEGORY_MANAGE'));
+router.delete('/categories/:id', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('CATEGORY_MANAGE'));
+router.get('/enrollments', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('ENROLLMENT_VIEW'));
+router.patch('/enrollments/:id/status', auth_middleware_1.authenticateJWT, (0, permissionMiddleware_1.checkPermission)('ENROLLMENT_MANAGE'));
+exports.AdminCourseRouter = router;

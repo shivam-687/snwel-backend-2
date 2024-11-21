@@ -1,4 +1,3 @@
-
 import { Request, Response } from 'express';
 import { courseEnrollmentResponse, courseErrorResponse, successResponse } from '@/utils/helpers/appResponse';
 import { catchAsync } from '@/utils/helpers/catchAsync';
@@ -25,6 +24,7 @@ const createController = catchAsync(async (req: Request, res: Response): Promise
 const createByAnonymous = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const courseData: CreateEnrollmentAnonymously = req.body;
     const userExists = await getUserByEmail(courseData.email);
+    
     if (userExists) {
         const createdCourse = await create({
             userId: userExists._id,
@@ -37,6 +37,7 @@ const createByAnonymous = catchAsync(async (req: Request, res: Response): Promis
         });
         return successResponse(createdCourse, res);
     }
+
     const newUser = await registerUser({
         email: courseData.email,
         name: courseData.name,
@@ -48,7 +49,7 @@ const createByAnonymous = catchAsync(async (req: Request, res: Response): Promis
 
     const newEnroll = await create({
         courseId: courseData.courseId,
-        userId: newUser._id,
+        userId: newUser?._id,
         extra: courseData.extra,
         qualification: courseData.qualification,
         mode: courseData.mode,

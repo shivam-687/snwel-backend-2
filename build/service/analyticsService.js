@@ -7,7 +7,7 @@ exports.getYearlySalesData = exports.getUserEnrollments = exports.getTotalUsers 
 const CourseEnrollment_1 = __importDefault(require("../models/CourseEnrollment"));
 const CourseModel_1 = require("../models/CourseModel");
 const User_1 = require("../models/User");
-const WebinarModel_1 = require("../models/WebinarModel"); // Adjust the import path as necessary
+const WebinarModel_1 = require("../models/WebinarModel");
 const helpers_1 = require("../utils/helpers");
 const mongodb_1 = require("mongodb");
 const date_fns_1 = require("date-fns");
@@ -35,7 +35,6 @@ const getImportantEntitiesCount = async (options) => {
                 webinarQuery['startDate'].$lte = endDate;
             }
         }
-        // Fetch counts in parallel
         const [totalCourses, totalUsers, paidEnrollments, totalWebinars, allEnrollments] = await Promise.all([
             CourseModel_1.CourseModel.countDocuments(courseQuery).exec(),
             User_1.UserModel.countDocuments(userQuery).exec(),
@@ -56,7 +55,6 @@ const getImportantEntitiesCount = async (options) => {
     }
 };
 exports.getImportantEntitiesCount = getImportantEntitiesCount;
-// Fetch popular courses with pagination and filters
 const getPopularCourses = async (options) => {
     try {
         const { limit = 10, page = 1, filter, search } = options;
@@ -88,7 +86,6 @@ const getPopularCourses = async (options) => {
     }
 };
 exports.getPopularCourses = getPopularCourses;
-// Fetch total number of enrolled users
 const getTotalEnrolledUsers = async (options) => {
     try {
         const { limit = 10, page = 1, filter } = options;
@@ -116,7 +113,6 @@ const getTotalEnrolledUsers = async (options) => {
     }
 };
 exports.getTotalEnrolledUsers = getTotalEnrolledUsers;
-// Fetch upcoming webinars with pagination and filters
 const getUpcomingWebinars = async (options) => {
     try {
         const { limit = 10, page = 1, filter, search } = options;
@@ -145,7 +141,6 @@ const getUpcomingWebinars = async (options) => {
     }
 };
 exports.getUpcomingWebinars = getUpcomingWebinars;
-// Fetch courses by category with pagination and filters
 const getCoursesByCategory = async (categoryId, options) => {
     try {
         const { limit = 10, page = 1, filter, search } = options;
@@ -174,7 +169,6 @@ const getCoursesByCategory = async (categoryId, options) => {
     }
 };
 exports.getCoursesByCategory = getCoursesByCategory;
-// Fetch total revenue from course enrollments with filters
 const getTotalRevenueWithComparision = async (options) => {
     try {
         const query = { paymentStatus: 'PAID' };
@@ -190,7 +184,7 @@ const getTotalRevenueWithComparision = async (options) => {
         }
         const enrollments = await CourseEnrollment_1.default.find(query).populate('courseId');
         const totalRevenue = enrollments.reduce((total, enrollment) => {
-            const course = enrollment.courseId; // Casting to any to access course properties
+            const course = enrollment.courseId;
             return total + course.price;
         }, 0);
         return totalRevenue;
@@ -201,6 +195,7 @@ const getTotalRevenueWithComparision = async (options) => {
 };
 exports.getTotalRevenueWithComparision = getTotalRevenueWithComparision;
 const getTotalRevenue = async (startDate) => {
+    var _a, _b;
     try {
         const selectedMonthStart = (0, date_fns_1.startOfMonth)(startDate);
         const selectedMonthEnd = (0, date_fns_1.endOfMonth)(startDate);
@@ -256,12 +251,12 @@ const getTotalRevenue = async (startDate) => {
                 }
             }
         ]);
-        const currentAmount = selectedMonthRevenue[0]?.totalAmount || 0;
-        const previousAmount = previousMonthRevenue[0]?.totalAmount || 0;
+        const currentAmount = ((_a = selectedMonthRevenue[0]) === null || _a === void 0 ? void 0 : _a.totalAmount) || 0;
+        const previousAmount = ((_b = previousMonthRevenue[0]) === null || _b === void 0 ? void 0 : _b.totalAmount) || 0;
         const comparison = currentAmount - previousAmount;
         return {
             amount: currentAmount,
-            currency: 'INR', // Assuming the currency is INR, adjust if needed
+            currency: 'INR',
             comparison: comparison
         };
     }
@@ -270,7 +265,6 @@ const getTotalRevenue = async (startDate) => {
     }
 };
 exports.getTotalRevenue = getTotalRevenue;
-// Fetch top rated courses with pagination
 const getTopRatedCourses = async (limit) => {
     try {
         const courses = await CourseModel_1.CourseModel.find().sort({ rating: -1 }).limit(limit).populate(['instructors', 'categories']);
@@ -281,7 +275,6 @@ const getTopRatedCourses = async (limit) => {
     }
 };
 exports.getTopRatedCourses = getTopRatedCourses;
-// Fetch total number of courses with filters
 const getTotalCourses = async (options) => {
     try {
         const query = {};
@@ -303,13 +296,12 @@ const getTotalCourses = async (options) => {
     }
 };
 exports.getTotalCourses = getTotalCourses;
-// Fetch total number of users with filters
 const getTotalUsers = async (options) => {
     try {
         const query = {};
         if (options && options.filter) {
             const filter = options.filter;
-            if (filter?.roles && filter?.roles.length > 0) {
+            if ((filter === null || filter === void 0 ? void 0 : filter.roles) && (filter === null || filter === void 0 ? void 0 : filter.roles.length) > 0) {
                 query['roles'] = { $in: filter.roles };
             }
         }
@@ -321,7 +313,6 @@ const getTotalUsers = async (options) => {
     }
 };
 exports.getTotalUsers = getTotalUsers;
-// Fetch user enrollments with pagination and filters
 const getUserEnrollments = async (userId, options) => {
     try {
         const { limit = 10, page = 1, filter } = options;
@@ -385,7 +376,6 @@ const getYearlySalesData = async (year) => {
                 }
             }
         ]);
-        // Mapping months to their names
         const monthNames = [
             'January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'
@@ -394,7 +384,6 @@ const getYearlySalesData = async (year) => {
             month,
             totalAmount: 0
         }));
-        // Merge sales data with full year data
         salesData.forEach(data => {
             fullYearData[data.month - 1].totalAmount = data.totalAmount;
         });

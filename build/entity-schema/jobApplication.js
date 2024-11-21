@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateJobApplicationSchema = exports.createJobApplicationSchema = void 0;
 const zod_1 = require("zod");
-// Schema for creating a job application
 exports.createJobApplicationSchema = zod_1.z.object({
     jobId: zod_1.z.string().min(1, "Job ID is required"),
     applicantName: zod_1.z.string().min(1, "Applicant name is required"),
@@ -14,7 +13,6 @@ exports.createJobApplicationSchema = zod_1.z.object({
     appliedDate: zod_1.z.date().default(() => new Date()),
     notes: zod_1.z.string().optional(),
 });
-// Schema for updating a job application
 exports.updateJobApplicationSchema = zod_1.z.object({
     jobId: zod_1.z.string().min(1, "Job ID is required").optional(),
     applicantName: zod_1.z.string().min(1, "Applicant name is required").optional(),

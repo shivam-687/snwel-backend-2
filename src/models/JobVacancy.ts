@@ -94,6 +94,10 @@ jobVacancySchema.pre<JobVacancy>('save', async function (next) {
 
   jobVacancySchema.plugin(mongoosePaginate);
 
+jobVacancySchema.index({ title: 'text', companyName: 'text' });
+jobVacancySchema.index({ 'location.city': 1, 'location.country': 1, 'location.state': 1 });
+jobVacancySchema.index({ slug: 1 }, { unique: true });
+
 const JobVacancyModel = mongoose.model<JobVacancyDocument, mongoose.PaginateModel<JobVacancy>>('JobVacancy', jobVacancySchema);
 
 export default JobVacancyModel;

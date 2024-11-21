@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EnquiryRouter = void 0;
-// routes/enquiryRoutes.ts
 const express_1 = require("express");
 const enquiryController_1 = require("../controllers/enquiryController");
 const validateSchema_1 = require("../middleware/validateSchema");

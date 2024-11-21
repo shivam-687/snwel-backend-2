@@ -1,5 +1,4 @@
 "use strict";
-// src/services/enquiryService.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,20 +8,9 @@ const SnwelEnquiry_1 = __importDefault(require("../models/SnwelEnquiry"));
 const helpers_1 = require("../utils/helpers");
 const json2csv_1 = require("json2csv");
 const mongoose_1 = require("mongoose");
-// import { sendEnquiryConfirmation } from './notificationService';
-// Function to create a new enquiry
 async function createEnquiry(data) {
     try {
         const enquiry = await SnwelEnquiry_1.default.create(data);
-        // try {
-        //   // Sending enquiry confirmation
-        //   await sendEnquiryConfirmation(enquiry, {
-        //     email: enquiry.businessEmail,
-        //     phone: enquiry.mobileNo,
-        //   });
-        // } catch (error) {
-        //   console.error("Failed to send confirmation to", enquiry.businessEmail, error);
-        // }
         return enquiry.toObject();
     }
     catch (error) {
@@ -31,7 +19,6 @@ async function createEnquiry(data) {
     }
 }
 exports.createEnquiry = createEnquiry;
-// Function to get an enquiry by ID
 async function getEnquiryById(enquiryId) {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(enquiryId)
@@ -45,7 +32,6 @@ async function getEnquiryById(enquiryId) {
     }
 }
 exports.getEnquiryById = getEnquiryById;
-// Function to update an enquiry by ID
 async function updateEnquiryById(enquiryId, updateData) {
     try {
         const enquiry = await SnwelEnquiry_1.default.findByIdAndUpdate(enquiryId, updateData, { new: true });
@@ -56,7 +42,6 @@ async function updateEnquiryById(enquiryId, updateData) {
     }
 }
 exports.updateEnquiryById = updateEnquiryById;
-// Function to delete an enquiry by ID
 async function deleteEnquiryById(enquiryId) {
     try {
         await SnwelEnquiry_1.default.findByIdAndDelete(enquiryId);
@@ -66,7 +51,6 @@ async function deleteEnquiryById(enquiryId) {
     }
 }
 exports.deleteEnquiryById = deleteEnquiryById;
-// Function to get all enquiries with pagination
 const getAllEnquiries = async (options) => {
     try {
         const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
@@ -96,15 +80,13 @@ const getAllEnquiries = async (options) => {
     }
 };
 exports.getAllEnquiries = getAllEnquiries;
-// Function to export enquiries to CSV
 const exportEnquiries = async (options) => {
     try {
         const enquiries = await (0, exports.getAllEnquiries)(options);
-        const enquiryData = enquiries.docs; // Extract the documents from the paginated result
-        // Convert the data to CSV format
+        const enquiryData = enquiries.docs;
         const parser = new json2csv_1.Parser();
         const csv = parser.parse(enquiryData);
-        return csv; // You can return the CSV string or save it to a file
+        return csv;
     }
     catch (error) {
         throw new Error(`Error exporting enquiries: ${error.message}`);

@@ -1,45 +1,50 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
+import { IRole } from '../modules/UserManagement/models/Role';
 
 // Define interfaces for TypeScript type checking
 export interface User extends Document {
   name: string;
   email: string;
   password: string;
-  profilePic: string;
-  phone: string,
+  profilePic?: string;
+  phone?: string,
   location?: {
     addr?: string,
     state?: string,
     city?: string,
     country?: string
   },
-  roles: string[]; // Assuming roles are stored as an array of strings
+  roles: IRole['_id'][];
+  isActive: boolean;
+  lastLogin?: Date;
   isValidPassword: (password: string) => Promise<boolean>
 }
 
 
 const UserSchema = new Schema<User>({
-  name: String,
-  email: String,
-  password: String,
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   profilePic: String,
   phone: String,
-  location: {type: {
+  location: {
     addr: String,
     state: String,
     city: String,
     country: String
-  }},
-  roles: {type: [String], default: ['USER']},
-});
+  },
+  roles: [{ type: Schema.Types.ObjectId, ref: 'Role' }],
+  isActive: { type: Boolean, default: true },
+  lastLogin: Date
+}, { timestamps: true });
 
 UserSchema.pre(
   'save',
   async function (next) {
-    const user = this;
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
+    if (this.isModified('password')) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
     next();
   }
 );

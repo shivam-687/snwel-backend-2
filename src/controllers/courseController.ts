@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createCourse, deleteCourseById, getAllCourses, getCourseById, getCourseBySlug, partialUpdateCourse, updateCourseById } from '@/service/courseService'
-import { courseErrorResponse, errorResponse, errorResponseFromError, successResponse } from '@/utils/helpers/appResponse';
+import { courseErrorResponse, errorResponse, successResponse } from '@/utils/helpers/appResponse';
 import { Course } from '@/models/CourseModel';
 import { catchAsync } from '@/utils/helpers/catchAsync';
 import { extractListOptions } from '@/utils/helpers';

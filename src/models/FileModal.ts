@@ -23,5 +23,9 @@ const FileSchema: Schema = new Schema({
 
 FileSchema.plugin(mongoosePaginate);
 
+FileSchema.index({ fileName: 1 });
+FileSchema.index({ uploadDate: -1 });
+FileSchema.index({ mimeType: 1 });
+
 export const FileModel =  mongoose.model<IFile, mongoose.PaginateModel<IFile>>('File', FileSchema);
 

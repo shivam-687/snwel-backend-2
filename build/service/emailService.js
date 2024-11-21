@@ -15,12 +15,13 @@ class EmailService {
         this.defaultService = setting_schema_1.EMAIL_TRANSPORTER.RESEND;
     }
     async initialize() {
+        var _a, _b;
         const setting = await Setting_1.SettingModel.findOne({ code: setting_schema_1.SETTINGS.EMAIL });
         if (!setting || !setting.data) {
             throw new Error('Email settings not found or misconfigured');
         }
         this.settings = setting.data;
-        if (this.settings?.NODEMAILER && this.defaultService === setting_schema_1.EMAIL_TRANSPORTER.NODEMAILER) {
+        if (((_a = this.settings) === null || _a === void 0 ? void 0 : _a.NODEMAILER) && this.defaultService === setting_schema_1.EMAIL_TRANSPORTER.NODEMAILER) {
             const nodemailerConfig = this.settings.NODEMAILER;
             this.transporter = nodemailer_1.default.createTransport({
                 host: nodemailerConfig.host,
@@ -32,7 +33,7 @@ class EmailService {
                 },
             });
         }
-        else if (this.settings?.RESEND && this.defaultService === setting_schema_1.EMAIL_TRANSPORTER.RESEND) {
+        else if (((_b = this.settings) === null || _b === void 0 ? void 0 : _b.RESEND) && this.defaultService === setting_schema_1.EMAIL_TRANSPORTER.RESEND) {
             const resendConfig = this.settings.RESEND;
             const resend = new resend_1.Resend(resendConfig.token);
             this.transporter = {

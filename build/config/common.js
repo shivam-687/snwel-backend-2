@@ -31,14 +31,14 @@ catch (error) {
 }
 exports.paginateOptions = {
     customLabels: {
-        totalDocs: 'total', // Rename totalDocs to totalItems
-        docs: 'docs', // Rename docs to applications
-        limit: 'pageSize', // Rename limit to pageSize
-        totalPages: 'totalPages', // Keep the same or rename as needed
-        page: 'currentPage', // Rename page to currentPage
-        nextPage: 'nextPage', // Rename nextPage to next
-        prevPage: 'prevPage', // Rename prevPage to previous
-        hasPrevPage: 'hasPrevious', // Rename hasPrevPage to hasPrevious
-        hasNextPage: 'hasNext', // Rename hasNextPage to hasNext
+        totalDocs: 'total',
+        docs: 'docs',
+        limit: 'pageSize',
+        totalPages: 'totalPages',
+        page: 'currentPage',
+        nextPage: 'nextPage',
+        prevPage: 'prevPage',
+        hasPrevPage: 'hasPrevious',
+        hasNextPage: 'hasNext',
     }
 };

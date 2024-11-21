@@ -5,13 +5,11 @@ const courseService_1 = require("../service/courseService");
 const appResponse_1 = require("../utils/helpers/appResponse");
 const catchAsync_1 = require("../utils/helpers/catchAsync");
 const helpers_1 = require("../utils/helpers");
-// Function to get all courses
 const getAllCoursesController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const courses = await (0, courseService_1.getAllCourses)((0, helpers_1.extractListOptions)(req));
     return (0, appResponse_1.successResponse)(courses, res, { message: "Course Fetched successfully!" });
 });
 exports.getAllCoursesController = getAllCoursesController;
-// Function to create a new course
 const createCourseController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const courseData = req.body;
     const alreadyExists = await (0, courseService_1.getCourseBySlug)(courseData.slug);
@@ -22,7 +20,6 @@ const createCourseController = (0, catchAsync_1.catchAsync)(async (req, res) => 
     (0, appResponse_1.successResponse)(newCourse, res);
 });
 exports.createCourseController = createCourseController;
-// Function to get course by id
 const getCourseByIdController = (0, catchAsync_1.catchAsync)(async (req, res) => {
     const { courseId } = req.params;
     if (!courseId) {

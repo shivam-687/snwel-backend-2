@@ -30,23 +30,25 @@ exports.UserModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const UserSchema = new mongoose_1.Schema({
-    name: String,
-    email: String,
-    password: String,
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     profilePic: String,
     phone: String,
-    location: { type: {
-            addr: String,
-            state: String,
-            city: String,
-            country: String
-        } },
-    roles: { type: [String], default: ['USER'] },
-});
+    location: {
+        addr: String,
+        state: String,
+        city: String,
+        country: String
+    },
+    roles: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Role' }],
+    isActive: { type: Boolean, default: true },
+    lastLogin: Date
+}, { timestamps: true });
 UserSchema.pre('save', async function (next) {
-    const user = this;
-    const hash = await bcrypt_1.default.hash(this.password, 10);
-    this.password = hash;
+    if (this.isModified('password')) {
+        this.password = await bcrypt_1.default.hash(this.password, 10);
+    }
     next();
 });
 UserSchema.methods.isValidPassword = async function (password) {

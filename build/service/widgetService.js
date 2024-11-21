@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getWidgetTypes = exports.deleteWidgetById = exports.updateWidgetById = exports.getWidgetById = exports.getAllWidgets = exports.createWidget = void 0;
-// services/widgetService.ts
 const Widgets_1 = __importDefault(require("../models/Widgets"));
 const helpers_1 = require("../utils/helpers");
 const mongoose_1 = __importDefault(require("mongoose"));

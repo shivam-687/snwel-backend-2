@@ -5,10 +5,9 @@ const courseCategoryService_1 = require("../services/courseCategoryService");
 Object.defineProperty(exports, "attachParentCategory", { enumerable: true, get: function () { return courseCategoryService_1.attachParentCategory; } });
 const appResponse_1 = require("../../../utils/helpers/appResponse");
 const logger_1 = require("../../../utils/logger");
-// Controller function to get all course categories
 const getAllCategories = async (req, res) => {
     try {
-        const courseCategories = await (0, courseCategoryService_1.getAllCourseCategories)({ ...req.query });
+        const courseCategories = await (0, courseCategoryService_1.getAllCourseCategories)(Object.assign({}, req.query));
         (0, appResponse_1.successResponse)(courseCategories, res);
     }
     catch (error) {
@@ -16,7 +15,6 @@ const getAllCategories = async (req, res) => {
     }
 };
 exports.getAllCategories = getAllCategories;
-// Controller function to create a course category
 const createCategory = async (req, res) => {
     try {
         const newCategory = await (0, courseCategoryService_1.createCourseCategory)(req.body);
@@ -27,7 +25,6 @@ const createCategory = async (req, res) => {
     }
 };
 exports.createCategory = createCategory;
-// Controller function to get a course category by ID
 const getCategoryById = async (req, res) => {
     try {
         const categoryId = req.params.id;
@@ -43,7 +40,6 @@ const getCategoryById = async (req, res) => {
     }
 };
 exports.getCategoryById = getCategoryById;
-// Controller function to update a course category by ID
 const updateCategoryById = async (req, res) => {
     try {
         const categoryId = req.params.id;
@@ -59,7 +55,6 @@ const updateCategoryById = async (req, res) => {
     }
 };
 exports.updateCategoryById = updateCategoryById;
-// Controller function to delete a course category by ID
 const deleteCategoryById = async (req, res) => {
     try {
         const categoryId = req.params.id;

@@ -76,12 +76,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
-    "build": "rimraf ./build && tsc && tsc-alias",
+    "build": "rimraf ./build && tsc --skipLibCheck && tsc-alias",
     "start": "npm run build --force && node build/index.js",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add build",
     "generate": "drizzle-kit generate:pg",
-    "db:push": "node -r esbuild-register src/db/migrate.ts"
+    "db:push": "node -r esbuild-register src/db/migrate.ts",
+    "seed:admin": "ts-node src/seeders/superAdmin.ts"
   },
   "lint-staged": {
     "*": "npm run build"

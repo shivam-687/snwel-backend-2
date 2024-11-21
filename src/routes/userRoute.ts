@@ -1,5 +1,4 @@
 import express from 'express';
-import AuthRouter from './authRoute';
 import { getMeController, getUserController, getUserListController, updateUserController } from '@/controllers/userController';
 import passport from 'passport';
 

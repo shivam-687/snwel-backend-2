@@ -1,5 +1,4 @@
 "use strict";
-// src/services/jobApplicationService.ts
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,32 +9,27 @@ const helpers_1 = require("../utils/helpers");
 const mongoose_1 = require("mongoose");
 const json2csv_1 = require("json2csv");
 const notificationService_1 = require("./notificationService");
-// Function to create a new job application
 async function createJobApplication(data) {
     try {
         const jobApplication = await JobApplicationModel_1.default.create(data);
         try {
-            // Ensure populate is awaited
             await jobApplication.populate("jobId");
-            // Sending job application confirmation
             await (0, notificationService_1.sendJobApplyConfirmation)(jobApplication, {
                 email: jobApplication.email,
                 phone: jobApplication.phone
             });
         }
         catch (error) {
-            console.error("Failed to send mail to", jobApplication.email, error); // Log error details
+            console.error("Failed to send mail to", jobApplication.email, error);
         }
         return jobApplication.toObject();
     }
     catch (error) {
-        // Better error handling with logging the full error
         console.error(`Failed to create job application: ${error.message}`, error);
         throw new Error(`Failed to create job application: ${error.message}`);
     }
 }
 exports.createJobApplication = createJobApplication;
-// Function to get a job application by ID
 async function getJobApplicationById(jobApplicationId) {
     try {
         const query = mongoose_1.Types.ObjectId.isValid(jobApplicationId)
@@ -49,7 +43,6 @@ async function getJobApplicationById(jobApplicationId) {
     }
 }
 exports.getJobApplicationById = getJobApplicationById;
-// Function to update a job application by ID
 async function updateJobApplicationById(jobApplicationId, updateData) {
     try {
         const jobApplication = await JobApplicationModel_1.default.findByIdAndUpdate(jobApplicationId, updateData, { new: true });
@@ -60,7 +53,6 @@ async function updateJobApplicationById(jobApplicationId, updateData) {
     }
 }
 exports.updateJobApplicationById = updateJobApplicationById;
-// Function to delete a job application by ID
 async function deleteJobApplicationById(jobApplicationId) {
     try {
         await JobApplicationModel_1.default.findByIdAndDelete(jobApplicationId);
@@ -70,7 +62,6 @@ async function deleteJobApplicationById(jobApplicationId) {
     }
 }
 exports.deleteJobApplicationById = deleteJobApplicationById;
-// Function to get all job applications with pagination
 const getAllJobApplications = async (options) => {
     try {
         const { limit = 10, page = 1, search, filter, sort, startDate, endDate } = options;
@@ -110,11 +101,9 @@ exports.getAllJobApplications = getAllJobApplications;
 const exportJobApplications = async (options) => {
     try {
         const jobApplications = await (0, exports.getAllJobApplications)(options);
-        const jobAppsData = jobApplications.docs; // Extract the documents from the paginated result
-        // Convert the data to CSV format
+        const jobAppsData = jobApplications.docs;
         const parser = new json2csv_1.Parser();
         const csv = parser.parse(jobAppsData);
-        // You can return the CSV string or save it to a file depending on your needs
         return csv;
     }
     catch (error) {

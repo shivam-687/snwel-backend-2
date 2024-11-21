@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOtpController = exports.generateOtpController = void 0;
 const otpService_1 = require("../service/otpService");
 const appResponse_1 = require("../utils/helpers/appResponse");
-// Controller to handle OTP generation
 const generateOtpController = async (req, res) => {
     try {
         const { email, phone, action } = req.body;
@@ -15,10 +14,9 @@ const generateOtpController = async (req, res) => {
     }
 };
 exports.generateOtpController = generateOtpController;
-// Controller to handle OTP verification
 const verifyOtpController = async (req, res) => {
     try {
-        const token = req.headers['x-otp-token']; // Assuming token is sent in headers
+        const token = req.headers['x-otp-token'];
         const { otp } = req.body;
         const result = await (0, otpService_1.verifyOtp)(token, otp);
         return (0, appResponse_1.successResponse)(result, res);

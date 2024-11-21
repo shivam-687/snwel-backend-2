@@ -1,9 +1,7 @@
 "use strict";
-// src/entity-schema/enquiry.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateEnquirySchema = exports.createEnquirySchema = void 0;
 const zod_1 = require("zod");
-// Schema for creating a new enquiry
 exports.createEnquirySchema = zod_1.z.object({
     name: zod_1.z.string().min(1, "Name is required"),
     businessEmail: zod_1.z.string().email("Invalid email address"),
@@ -14,7 +12,6 @@ exports.createEnquirySchema = zod_1.z.object({
     consentGiven: zod_1.z.boolean().refine((value) => value === true, "Consent must be given"),
     otpValidated: zod_1.z.boolean().refine((value) => value === true, "OTP must be validated"),
 });
-// Schema for updating an existing enquiry
 exports.updateEnquirySchema = zod_1.z.object({
     name: zod_1.z.string().min(1).optional(),
     businessEmail: zod_1.z.string().email().optional(),

@@ -1,5 +1,4 @@
 "use strict";
-// config/seedConfig.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allSettings = exports.integrationSetting = exports.generalSetting = exports.emailSetting = void 0;
 const setting_schema_1 = require("../entity-schema/setting-schema");
@@ -50,5 +49,4 @@ exports.integrationSetting = {
     },
     isChangable: true,
 };
-// Export an array of all settings for easier iteration
 exports.allSettings = [exports.emailSetting, exports.generalSetting, exports.integrationSetting];

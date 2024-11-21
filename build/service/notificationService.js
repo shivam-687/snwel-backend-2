@@ -23,90 +23,52 @@ var AppIds;
     AppIds["SNWEL_SMTP"] = "snwel";
 })(AppIds || (AppIds = {}));
 class NotificationService {
-    // Private constructor to prevent direct instantiation
     constructor() {
         this.ingerations = [];
     }
-    // Get the singleton instance
     static async getInstance() {
         if (!NotificationService.instance) {
             const instance = new NotificationService();
-            await instance.loadSettings(); // Load settings when instance is first created
+            await instance.loadSettings();
             NotificationService.instance = instance;
             console.log("Load setting successfully");
         }
         return NotificationService.instance;
     }
-    // Load settings from the database (this would typically call your database or config service)
     async loadSettings() {
-        // Simulate loading settings from the database
         await this.loadIntegrations();
         this.emailSetting = await this.loadEmailSettingsFromDB();
         this.integrationSetting = await this.loadIntegrationSettingsFromDB();
         this.generalSetting = await this.loadGeneralSettingsFromDB();
     }
-    // Load email settings from DB (replace this with actual DB call)
     async loadEmailSettingsFromDB() {
         const emailSetting = await Setting_1.SettingModel.findOne({ code: setting_schema_1.SETTINGS.EMAIL });
         return emailSetting;
     }
-    // Load integration (WhatsApp) settings from DB (replace this with actual DB call)
     async loadIntegrationSettingsFromDB() {
         const emailSetting = await Setting_1.SettingModel.findOne({ code: setting_schema_1.SETTINGS.INTEGRATION });
         return emailSetting;
     }
     async loadGeneralSettingsFromDB() {
         const emailSetting = await Setting_1.SettingModel.findOne({ code: setting_schema_1.SETTINGS.GENERAL });
-        return emailSetting?.data;
+        return emailSetting === null || emailSetting === void 0 ? void 0 : emailSetting.data;
     }
     async loadIntegrations() {
         const res = await IntegrationModel_1.default.find({}).lean();
         this.ingerations = res;
         console.log("Integration: ", this.ingerations);
     }
-    // Refresh settings manually
     async refreshSettings() {
         await this.loadSettings();
         console.log('Settings refreshed');
     }
-    // Send Email Notification
     async sendEmail(to, subject, message) {
+        var _a;
         try {
             const smtp = this.ingerations.find(it => it.serviceName === AppIds.SMTP);
             if (!smtp || !smtp.enabled)
                 return;
-            const smtpConfig = email_apps_schema_1.SMTPSchema.parse(smtp?.config);
-            console.log("Start sending mail to", to);
-            const transporter = nodemailer_1.default.createTransport({
-                host: smtpConfig.host,
-                port: parseInt(smtpConfig.port),
-                secure: false,
-                auth: {
-                    user: smtpConfig.auth.username,
-                    pass: smtpConfig.auth.password
-                },
-                tls: {
-                    rejectUnauthorized: false, // Add this only for testing environments; avoid using it in production
-                }
-            });
-            await transporter.sendMail({
-                from: this.generalSetting?.senderEmail || `"No Reply" <${smtpConfig.auth.username}>`,
-                to,
-                subject,
-                html: `<b>${message}</b>`
-            });
-        }
-        catch (error) {
-            console.error("sendEmail", error);
-            throw error;
-        }
-    }
-    async sendSnwelEmail(to, subject, message) {
-        try {
-            const smtp = this.ingerations.find(it => it.serviceName === AppIds.SNWEL_SMTP);
-            if (!smtp || !smtp.enabled)
-                return;
-            const smtpConfig = email_apps_schema_1.SMTPSchema.parse(smtp?.config);
+            const smtpConfig = email_apps_schema_1.SMTPSchema.parse(smtp === null || smtp === void 0 ? void 0 : smtp.config);
             console.log("Start sending mail to", to);
             const transporter = nodemailer_1.default.createTransport({
                 host: smtpConfig.host,
@@ -121,7 +83,39 @@ class NotificationService {
                 }
             });
             await transporter.sendMail({
-                from: smtpConfig.sender || this.generalSetting?.senderEmail || `"No Reply" <${smtpConfig.auth.username}>`,
+                from: ((_a = this.generalSetting) === null || _a === void 0 ? void 0 : _a.senderEmail) || `"No Reply" <${smtpConfig.auth.username}>`,
+                to,
+                subject,
+                html: `<b>${message}</b>`
+            });
+        }
+        catch (error) {
+            console.error("sendEmail", error);
+            throw error;
+        }
+    }
+    async sendSnwelEmail(to, subject, message) {
+        var _a;
+        try {
+            const smtp = this.ingerations.find(it => it.serviceName === AppIds.SNWEL_SMTP);
+            if (!smtp || !smtp.enabled)
+                return;
+            const smtpConfig = email_apps_schema_1.SMTPSchema.parse(smtp === null || smtp === void 0 ? void 0 : smtp.config);
+            console.log("Start sending mail to", to);
+            const transporter = nodemailer_1.default.createTransport({
+                host: smtpConfig.host,
+                port: parseInt(smtpConfig.port),
+                secure: false,
+                auth: {
+                    user: smtpConfig.auth.username,
+                    pass: smtpConfig.auth.password
+                },
+                tls: {
+                    rejectUnauthorized: false,
+                }
+            });
+            await transporter.sendMail({
+                from: smtpConfig.sender || ((_a = this.generalSetting) === null || _a === void 0 ? void 0 : _a.senderEmail) || `"No Reply" <${smtpConfig.auth.username}>`,
                 to,
                 subject,
                 html: `<b>${message}</b>`
@@ -136,7 +130,7 @@ class NotificationService {
         const whatsapp = this.ingerations.find(it => it.serviceName === AppIds.WHATSAPP);
         if (!whatsapp || !whatsapp.enabled)
             return console.log("Whatsapp otp is not enabled");
-        const whatsappConfig = whatsapp_schema_1.WhatsappConfig.safeParse(whatsapp?.config);
+        const whatsappConfig = whatsapp_schema_1.WhatsappConfig.safeParse(whatsapp === null || whatsapp === void 0 ? void 0 : whatsapp.config);
         if (!whatsappConfig.success) {
             throw new Error("WhatsApp integration settings not configured");
         }

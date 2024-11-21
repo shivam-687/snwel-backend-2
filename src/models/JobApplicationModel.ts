@@ -34,6 +34,11 @@ const jobApplicationSchema = new Schema<IJobApplication>({
 
 jobApplicationSchema.plugin(mongoosePaginate);
 
+jobApplicationSchema.index({ jobId: 1 });
+jobApplicationSchema.index({ email: 1 });
+jobApplicationSchema.index({ status: 1 });
+jobApplicationSchema.index({ appliedDate: -1 });
+
 const JobApplication = model<IJobApplication, mongoose.PaginateModel<IJobApplication>>('JobApplication', jobApplicationSchema);
 
 export default JobApplication;

@@ -12,7 +12,7 @@ const createJobVacancyController = (0, catchAsync_1.catchAsync)(async (req, res)
 });
 exports.createJobVacancyController = createJobVacancyController;
 const getAllJobVacanciesController = (0, catchAsync_1.catchAsync)(async (req, res) => {
-    const options = { ...req.query };
+    const options = Object.assign({}, req.query);
     const jobVacancies = await (0, jobVacancyService_1.getAllJobVacancies)((0, helpers_1.extractListOptions)(req));
     (0, appResponse_1.successResponse)(jobVacancies, res, { message: 'Job vacancies fetched successfully!' });
 });

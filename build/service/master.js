@@ -1,4 +1,15 @@
 "use strict";
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -27,11 +38,11 @@ const getAllMasterItems = async (options) => {
             query.$or = [{ name: searchRegex }, { code: searchRegex }];
         }
         if (filter) {
-            const { ids, ...rest } = filter;
+            const { ids } = filter, rest = __rest(filter, ["ids"]);
             if (Array.isArray(ids) && ids.length > 0) {
                 query['_id'] = { $in: ids.map((id) => new mongodb_1.ObjectId(id)) };
             }
-            query = { ...query, ...rest };
+            query = Object.assign(Object.assign({}, query), rest);
         }
         const skip = (page - 1) * limit;
         const masterItems = await MasterModel_1.default.find(query)
@@ -67,12 +78,10 @@ const updateMasterItemByCode = async (code, updateData) => {
 exports.updateMasterItemByCode = updateMasterItemByCode;
 const getMasterItem = async (identifier) => {
     try {
-        // Check if the identifier is a valid ObjectId
         if (mongoose_1.default.Types.ObjectId.isValid(identifier)) {
             return await MasterModel_1.default.findById(identifier);
         }
         else {
-            // Otherwise, assume it's a code and find by code
             return await MasterModel_1.default.findOne({ code: identifier });
         }
     }

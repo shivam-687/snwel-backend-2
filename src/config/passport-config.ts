@@ -3,7 +3,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 const localStrategy = require('passport-local').Strategy;
 import { UserModel } from '@/models/User'; // Assuming you have your User model in a file named user.model.ts
 import { CommonConfig } from './common';
-import { getUserByEmail, getUserById, registerUser, verifyLogin } from '@/service/userService';
+import { verifyLogin } from '@/service/userService';
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -34,10 +34,12 @@ passport.use(
 );
 
 passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
-  // console.log("jwtPayload", jwtPayload)
   try {
-    const user = await getUserById(jwtPayload.user._id)
+    const user = await UserModel.findById(jwtPayload.user._id)
+      .populate('roles', 'name permissions');
+    
     if (user) {
+      console.log("User", {roles: user.roles})
       return done(null, user);
     } else {
       return done(null, false);

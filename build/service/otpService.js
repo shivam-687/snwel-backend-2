@@ -32,13 +32,9 @@ const sendOtp = async (otp, phoneNumber, email) => {
 exports.sendOtp = sendOtp;
 async function generateOtp(data, action) {
     const predefinedActions = 'snwel-com';
-    // Generate a 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    // Generate a strong token using crypto
     const token = crypto_1.default.randomBytes(32).toString('hex');
-    // Set expiration time (e.g., 5 minutes)
     const expirationTime = new Date(Date.now() + 5 * 60 * 1000);
-    // Save OTP to database
     const otpDocument = new OtpModel_1.OTPModel({
         otp,
         expirationTime,
@@ -49,29 +45,25 @@ async function generateOtp(data, action) {
     await otpDocument.save();
     console.log({ action });
     if (action && action === "snwel-com") {
-        await (0, notificationService_1.sendSnwelOTPNotification)(otp, data?.email || '');
+        await (0, notificationService_1.sendSnwelOTPNotification)(otp, (data === null || data === void 0 ? void 0 : data.email) || '');
     }
     else {
-        await (0, exports.sendOtp)(otp, data?.phone, data?.email);
+        await (0, exports.sendOtp)(otp, data === null || data === void 0 ? void 0 : data.phone, data === null || data === void 0 ? void 0 : data.email);
     }
     return { token, id: otpDocument._id };
 }
 exports.generateOtp = generateOtp;
 async function verifyOtp(token, otp) {
-    // Find the OTP document by token
     const otpDocument = await OtpModel_1.OTPModel.findOne({ token });
     if (!otpDocument) {
         throw new Error('Invalid token.');
     }
-    // Check if the OTP is expired
     if (otpDocument.expirationTime < new Date()) {
         throw new Error('OTP has expired.');
     }
-    // Check if the OTP matches
     if (otpDocument.otp !== otp && Number(otp) !== constants_1.Constants.OTP.MASTER_OTP) {
         throw new Error('Incorrect OTP.');
     }
-    // Mark as verified
     otpDocument.verified = true;
     await otpDocument.save();
     return { success: true, message: 'OTP verified successfully.', otp: otpDocument };
