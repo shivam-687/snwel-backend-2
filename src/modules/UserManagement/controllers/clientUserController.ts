@@ -5,7 +5,7 @@ import { errorResponseFromError, successResponse } from '@/utils/helpers/appResp
 
 export class ClientUserController {
   static getProfile = catchAsync(async (req: Request, res: Response) => {
-    const userId = req?.user?._id; // Assuming user is attached to request by auth middleware
+        const userId = (req.user as any)?._id; // Assuming user is attached to request by auth middleware
     if (!userId) {
       throw new Error('User ID is required');
     }
@@ -19,7 +19,7 @@ export class ClientUserController {
   });
 
   static updateProfile = catchAsync(async (req: Request, res: Response) => {
-    const userId = req?.user?._id; // Assuming user is attached to request by auth middleware
+        const userId = (req.user as any)?._id; // Assuming user is attached to request by auth middleware
     const updateData = req.body;
     
     if (!userId) {
@@ -35,7 +35,7 @@ export class ClientUserController {
   });
 
   static changePassword = catchAsync(async (req: Request, res: Response) => {
-    const userId = req?.user?._id; // Assuming user is attached to request by auth middleware
+        const userId = (req.user as any)?._id; // Assuming user is attached to request by auth middleware
     const { oldPassword, newPassword } = req.body;
     
     if (!userId) {
@@ -47,7 +47,7 @@ export class ClientUserController {
   });
 
   static deleteAccount = catchAsync(async (req: Request, res: Response) => {
-    const userId = req?.user?._id; // Assuming user is attached to request by auth middleware
+        const userId = (req.user as any)?._id; // Assuming user is attached to request by auth middleware
     const { password } = req.body;
     
     if (!userId) {
