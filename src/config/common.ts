@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const CommonConfigSchema = z.object({
-    DATABASE_URL: z.string(),
+    DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
     PORT: z.number(),
     JWT_SECRET: z.string(),
     DATA_LIMIT: z.number(),
@@ -22,7 +22,7 @@ export const CommonConfig: CommonConfigType = {
 
 
 try {
-     CommonConfigSchema.parseAsync(CommonConfig);
+     CommonConfigSchema.parse(CommonConfig);
     console.log("Configs validated");
 } catch (error) {
     console.error("Config validation error", error);
