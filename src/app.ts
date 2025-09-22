@@ -7,6 +7,7 @@ import connectDB from './db/dbClient';
 import cors from 'cors';
 import helmet from 'helmet';
 import { initializeUserManagement } from './modules/UserManagement';
+import { NotificationService } from './service/notificationService';
 
 const app = express();
 
@@ -18,6 +19,9 @@ const initializeApp = async () => {
     
     // Initialize User Management module
     await initializeUserManagement();
+
+    // Load notification settings after DB connection
+    await NotificationService.getInstance();
     
     console.log('Application initialized successfully');
   } catch (error) {

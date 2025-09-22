@@ -161,11 +161,6 @@ export class NotificationService {
 }
 
 
-(async () => {
-    await NotificationService.getInstance();
-})();
-
-
 
 export const sendOTPNotification = async (otp: string, to: string) => {
     const template = await otpEmailTemplate(otp);
