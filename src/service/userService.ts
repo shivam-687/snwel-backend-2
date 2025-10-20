@@ -55,12 +55,27 @@ export async function registerUser(userData: RegistrationInput) {
         name: { $in: roles } 
       }).distinct('_id');
     } else {
-      // Default to USER role if no roles provided
       const defaultRole = await RoleModel.findOne({ 
         name: Constants.ROLES.USER 
       });
       if (defaultRole) {
         roleIds = [defaultRole._id];
+      } else {
+        const createdDefaultRole = await RoleModel.findOneAndUpdate(
+          { name: Constants.ROLES.USER },
+          { name: Constants.ROLES.USER, description: 'Default application user', permissions: [], isSystem: true, isActive: true },
+          { upsert: true, new: true }
+        );
+        if (createdDefaultRole) {
+          roleIds = [createdDefaultRole._id as any];
+        }
+      }
+    }
+
+    if (roleIds.length === 0) {
+      const fallbackRole = await RoleModel.findOne({ name: { $in: [Constants.ROLES.USER, 'USER', 'user'] } });
+      if (fallbackRole) {
+        roleIds = [fallbackRole._id];
       }
     }
 

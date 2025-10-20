@@ -24,6 +24,7 @@ import { BlogRouter } from '@/components/blog/admin-routes';
 import { BlogCategoryRouter } from '@/components/blog-category/blog-category-routes';
 import { AdminUserRouter, ClientUserRouter } from '@/modules/UserManagement';
 import { RoleRouter } from '@/modules/UserManagement/routes/roleRoutes';
+import { AdminCourseRouter } from './adminCourseRoutes';
 
 const router = express.Router();
 
@@ -31,6 +32,7 @@ router.get('/', helloController)
 router.use('/auth', AuthRouter);
 router.use('/user', UserRouter);
 router.use('/course', CourseRouter);
+router.use('/admin/course', AdminCourseRouter);
 router.use('/course-category', CourseCategoryRouter);
 router.use('/file', FileRouter);
 router.use('/webinar', WebinarRouter)
