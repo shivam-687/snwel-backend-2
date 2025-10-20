@@ -53,9 +53,35 @@ export const initializeUserManagement = async () => {
       { upsert: true }
     );
 
+    // Ensure default User role exists (used for anonymous enrollments and general users)
+    await RoleModel.findOneAndUpdate(
+      { name: 'User' },
+      {
+        name: 'User',
+        description: 'Default application user',
+        permissions: [],
+        isSystem: true,
+        isActive: true
+      },
+      { upsert: true }
+    );
+
+    // Optionally ensure Admin role exists (no elevated permissions by default; customize as needed)
+    await RoleModel.findOneAndUpdate(
+      { name: 'Admin' },
+      {
+        name: 'Admin',
+        description: 'Administrator role',
+        permissions: [],
+        isSystem: true,
+        isActive: true
+      },
+      { upsert: true }
+    );
+
     console.log('User Management module initialized successfully');
   } catch (error) {
     console.error('Failed to initialize User Management module:', error);
     throw error;
   }
-}; 
+};
