@@ -36,10 +36,13 @@ passport.use(
 passport.use(new JwtStrategy(jwtOptions, async (jwtPayload, done) => {
   try {
     const user = await UserModel.findById(jwtPayload.user._id)
-      .populate('roles', 'name permissions');
+      .populate({
+        path: 'roles',
+        select: 'name permissions',
+        populate: { path: 'permissions', select: 'code name' }
+      });
     
     if (user) {
-      console.log("User", {roles: user.roles})
       return done(null, user);
     } else {
       return done(null, false);

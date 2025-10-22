@@ -18,6 +18,11 @@ const PermissionSchema = new Schema<IPermission>({
   module: { type: String, required: true }
 }, { timestamps: true });
 
+// Indexes for optimized queries
+PermissionSchema.index({ code: 1 }, { unique: true }); // Unique permission code lookup
+PermissionSchema.index({ module: 1 }); // Group by module
+PermissionSchema.index({ module: 1, code: 1 }); // Module-specific permission lookup
+
 PermissionSchema.plugin(mongoosePaginate);
 
 export const PermissionModel = mongoose.model<IPermission, mongoose.PaginateModel<IPermission>>('Permission', PermissionSchema); 

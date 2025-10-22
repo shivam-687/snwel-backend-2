@@ -142,6 +142,7 @@ export class NotificationService {
     }
 
     async sendWhatsApp(number: string, message: string): Promise<void> {
+
         const whatsapp = this.ingerations.find(it => it.serviceName === AppIds.WHATSAPP);
         if(!whatsapp || !whatsapp.enabled) return console.log("Whatsapp otp is not enabled");
         const whatsappConfig = WhatsappConfig.safeParse(whatsapp?.config);
@@ -152,7 +153,7 @@ export class NotificationService {
         const url = `${whatsappConfig.data.url}?api_key=${whatsappConfig.data.apiKey}&sender=${whatsappConfig.data.phoneNumber}&number=${number}&message=${message}`;
         try {
             const response = await axios.get(url);
-            console.log(`WhatsApp message sent: ${response.data}`);
+            console.log(`WhatsApp message sent: ${JSON.stringify(response.data)}`);
         } catch (error) {
             console.error('Error sending WhatsApp message:', error);
             throw new Error("Failed to send WhatsApp message");

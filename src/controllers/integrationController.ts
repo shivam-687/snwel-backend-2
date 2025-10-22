@@ -10,10 +10,13 @@ import {
 } from '@/service/IntegrationService';
 import { successResponse, errorResponse } from '@/utils/helpers/appResponse';
 import { catchAsync } from '@/utils/helpers/catchAsync';
+import { NotificationService } from '@/service/notificationService';
 
 const createIntegrationController = catchAsync(async (req: Request, res: Response): Promise<void> => {
   const integrationData = req.body;
   const newIntegration = await createIntegration(integrationData);
+  const ns = await NotificationService.getInstance();
+  await ns.refreshSettings();
   successResponse(newIntegration, res, { message: 'Integration created successfully!' });
 });
 
@@ -39,12 +42,16 @@ const updateIntegrationByIdController = catchAsync(async (req: Request, res: Res
   if (!updatedIntegration) {
     return errorResponse('Integration not found', res);
   }
+  const ns = await NotificationService.getInstance();
+  await ns.refreshSettings();
   successResponse(updatedIntegration, res, { message: 'Integration updated successfully!' });
 });
 
 const deleteIntegrationByIdController = catchAsync(async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   await deleteIntegrationById(id);
+  const ns = await NotificationService.getInstance();
+  await ns.refreshSettings();
   successResponse(null, res, { message: 'Integration deleted successfully!' });
 });
 

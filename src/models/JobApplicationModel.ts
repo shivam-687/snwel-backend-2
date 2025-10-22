@@ -34,10 +34,12 @@ const jobApplicationSchema = new Schema<IJobApplication>({
 
 jobApplicationSchema.plugin(mongoosePaginate);
 
-jobApplicationSchema.index({ jobId: 1 });
-jobApplicationSchema.index({ email: 1 });
-jobApplicationSchema.index({ status: 1 });
-jobApplicationSchema.index({ appliedDate: -1 });
+// Indexes for optimized queries
+jobApplicationSchema.index({ jobId: 1, appliedDate: -1 }); // Applications by job with date sorting
+jobApplicationSchema.index({ status: 1, appliedDate: -1 }); // Filter by status with date
+jobApplicationSchema.index({ email: 1 }); // Email lookup
+jobApplicationSchema.index({ appliedDate: -1 }); // Recent applications
+jobApplicationSchema.index({ createdAt: -1 }); // Listing with creation date
 
 const JobApplication = model<IJobApplication, mongoose.PaginateModel<IJobApplication>>('JobApplication', jobApplicationSchema);
 

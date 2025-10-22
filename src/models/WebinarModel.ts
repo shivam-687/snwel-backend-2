@@ -41,9 +41,13 @@ const WebinarSchema = new Schema<Webinar>({
     videoUrl: {type: String, default: null}
 }, {timestamps: true});
 
-WebinarSchema.index({ slug: 1 }, { unique: true });
-WebinarSchema.index({ startDate: 1 });
-WebinarSchema.index({ isActive: 1 });
-WebinarSchema.index({ hosts: 1 });
+// Indexes for optimized queries
+WebinarSchema.index({ slug: 1 }, { unique: true }); // Unique lookup by slug
+WebinarSchema.index({ isActive: 1, startDate: 1 }); // Active upcoming webinars
+WebinarSchema.index({ startDate: -1 }); // Sort by start date
+WebinarSchema.index({ createdAt: -1 }); // Recent webinars
+WebinarSchema.index({ hosts: 1 }); // Filter by hosts
+
+WebinarSchema.plugin(mongoosePaginate);
 
 export const WebinarModel = mongoose.model<Webinar, mongoose.PaginateModel<Webinar>>('Webinar', WebinarSchema);

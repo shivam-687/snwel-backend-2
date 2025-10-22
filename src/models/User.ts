@@ -55,6 +55,10 @@ UserSchema.methods.isValidPassword = async function (password: string) {
   return compare;
 }
 
-
+// Indexes for optimized queries
+UserSchema.index({ email: 1 }, { unique: true }); // Login, unique user lookup
+UserSchema.index({ isActive: 1, createdAt: -1 }); // Active users stats
+UserSchema.index({ roles: 1 }); // Role-based filtering
+UserSchema.index({ createdAt: -1 }); // New users, user listing
 
 export const UserModel = mongoose.model<User>('User', UserSchema);

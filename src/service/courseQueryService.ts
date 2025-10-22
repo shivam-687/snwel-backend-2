@@ -8,8 +8,8 @@ import CourseEnrollmentModel, { CourseEnrollment } from '@/models/CourseEnrollme
 import { Constants } from '@/config/constants';
 import { logger } from '@/utils/logger';
 import { User, UserModel } from '@/models/User';
-import { otpEmailTemplate } from '@/email-templates/templateFactory';
-import { NotificationService, sendCourseEnquiryNotification } from './notificationService';
+import { sendCourseEnquiryNotification } from './notificationService';
+import { sendOtp } from './otpService';
 import { Course } from '@/models/CourseModel';
 
 // Function to create a new course
@@ -24,11 +24,9 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
         }
         const user = await UserModel.findById(queryData.userId);
         const otpObject = generateOTPObject({})
-        const emailTemplate = await otpEmailTemplate(otpObject.otp);
-        const nfs = await NotificationService.getInstance()
         if (exists) {
             const updated = await exists.updateOne({ otp: otpObject });
-            await nfs.sendEmail(user?.email||"", emailTemplate.subject, emailTemplate.template)
+            await sendOtp(otpObject.otp, (user as any)?.phone, (user as any)?.email)
             return {
                 isVerified: false,
                 token: generateJwtToken({
@@ -40,7 +38,7 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
         } else {
             let newCourseQuery = new CourseEnrollmentModel({ ...queryData, otp: otpObject });
             await newCourseQuery.save()
-            await nfs.sendEmail(user?.email||"", emailTemplate.subject, emailTemplate.template)
+            await sendOtp(otpObject.otp, (user as any)?.phone, (user as any)?.email)
             return {
                 isVerified: false,
                 token: generateJwtToken({
@@ -167,6 +165,7 @@ const updateById = async (id: string, updateData: Partial<CourseEnrollment>): Pr
 // Function to delete a course by ID
 const deleteById = async (id: string): Promise<void> => {
     try {
+        console.log("Deleting course query with ID:", id);
         await CourseEnrollmentModel.findByIdAndDelete(id).exec();
     } catch (error: any) {
         throw new Error(`Error: deleting course query: ${error.message}`);
@@ -239,11 +238,12 @@ async function resendOtp(token: string) {
         // Generate a new OTP and expiration time
         const newOtp = generateOTPObject({})
 
-        // Update the OTP in the document
         enrollment.otp = newOtp;
         await enrollment.save();
 
-        // Generate a new JWT token
+        const user = await UserModel.findById(enrollment.userId as any);
+        await sendOtp(newOtp.otp, (user as any)?.phone, (user as any)?.email);
+
         const newToken = generateJwtToken({
             enrollmentId: enrollment._id.toString(),
             courseId: enrollment.courseId,

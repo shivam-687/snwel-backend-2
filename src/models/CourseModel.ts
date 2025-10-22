@@ -128,10 +128,17 @@ CourseSchema.pre<Course>('save', async function (next) {
 });
 CourseSchema.plugin(mongoosePaginate);
 
-CourseSchema.index({ slug: 1 }, { unique: true });
-CourseSchema.index({ title: 'text' });
-CourseSchema.index({ categories: 1 });
-CourseSchema.index({ status: 1 });
-CourseSchema.index({ isPopular: 1 });
+// Indexes for optimized queries
+CourseSchema.index({ slug: 1 }, { unique: true }); // Unique lookup by slug
+CourseSchema.index({ title: 'text' }); // Text search
+CourseSchema.index({ status: 1 }); // Filter by status
+CourseSchema.index({ status: 1, createdAt: -1 }); // Status with creation date
+CourseSchema.index({ categories: 1, status: 1 }); // Category filtering with status
+CourseSchema.index({ isPopular: 1, status: 1 }); // Popular courses filtering
+CourseSchema.index({ isPremium: 1, status: 1 }); // Premium courses filtering
+CourseSchema.index({ rating: -1 }); // Top rated courses sorting
+CourseSchema.index({ createdAt: -1 }); // Activity feed, recent courses
+CourseSchema.index({ 'qualifications': 1 }); // Filter by qualifications
+CourseSchema.index({ 'trainingModes': 1 }); // Filter by training modes
 
 export const CourseModel = mongoose.model<Course,  mongoose.PaginateModel<Course>>('Course', CourseSchema);

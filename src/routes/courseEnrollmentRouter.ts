@@ -6,18 +6,19 @@ import { createByAnonymous, createController, deleteController, getAllController
 import { validateSchema } from '@/middleware/validateSchema';
 import { createCourseEnrollment, createEnrollmentAnonymously } from '@/entity-schema/course-enrollment';
 import { checkAlreadyApplied } from '@/middleware/checkAlreadyApplied';
+import { checkPermission } from '@/middleware/permissionMiddleware';
 
 const router = express.Router();
 
 
-router.get('/', passport.authenticate('jwt', {session: false}), getAllController);
+router.get('/', passport.authenticate('jwt', {session: false}), checkPermission('ENROLLMENT_VIEW'), getAllController);
 router.post('/', validateSchema(createCourseEnrollment), checkAlreadyApplied(), createController);
 router.post('/anon', validateSchema(createEnrollmentAnonymously), createByAnonymous);
 router.post('/verify-otp', verifyOtpController);
 router.post('/resend-otp', resendOtpController);
-router.get('/:id', passport.authenticate('jwt', {session: false}), getByIdController);
-router.put('/:id',passport.authenticate('jwt', {session: false}), updateController);
-router.delete('/:id', passport.authenticate('jwt', {session: false}), deleteController);
+router.get('/:id', passport.authenticate('jwt', {session: false}), checkPermission('ENROLLMENT_VIEW'), getByIdController);
+router.put('/:id',passport.authenticate('jwt', {session: false}), checkPermission('ENROLLMENT_MANAGE'), updateController);
+router.delete('/:id', passport.authenticate('jwt', {session: false}), checkPermission('ENROLLMENT_MANAGE'), deleteController);
 
 
 export { router as courseEnrollmentRouter };

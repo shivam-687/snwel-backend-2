@@ -25,6 +25,8 @@ import { BlogCategoryRouter } from '@/components/blog-category/blog-category-rou
 import { AdminUserRouter, ClientUserRouter } from '@/modules/UserManagement';
 import { RoleRouter } from '@/modules/UserManagement/routes/roleRoutes';
 import { AdminCourseRouter } from './adminCourseRoutes';
+import { AdminDashboardRouter } from './admin/dashboardRoutes';
+import { AdminPermissionsRouter } from './admin/permissionsRoutes';
 
 const router = express.Router();
 
@@ -55,5 +57,7 @@ router.use(BlogCategoryRouter)
 router.use('/admin/users', AdminUserRouter);
 router.use('/users', ClientUserRouter);
 router.use('/roles', RoleRouter);
+router.use('/admin/dashboard', AdminDashboardRouter);
+router.use('/admin/permissions', AdminPermissionsRouter);
 
 export { router as indexRoute };

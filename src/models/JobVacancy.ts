@@ -94,9 +94,17 @@ jobVacancySchema.pre<JobVacancy>('save', async function (next) {
 
   jobVacancySchema.plugin(mongoosePaginate);
 
-jobVacancySchema.index({ title: 'text', companyName: 'text' });
-jobVacancySchema.index({ 'location.city': 1, 'location.country': 1, 'location.state': 1 });
-jobVacancySchema.index({ slug: 1 }, { unique: true });
+// Indexes for optimized queries
+jobVacancySchema.index({ slug: 1 }, { unique: true }); // Unique lookup by slug
+jobVacancySchema.index({ title: 'text', companyName: 'text' }); // Text search
+jobVacancySchema.index({ status: 1 }); // Filter by status (open/closed/filled)
+jobVacancySchema.index({ isActive: 1, postedDate: -1 }); // Active jobs sorting
+jobVacancySchema.index({ 'location.city': 1 }); // Location search
+jobVacancySchema.index({ 'location.state': 1 }); // Location search
+jobVacancySchema.index({ 'location.country': 1 }); // Location search
+jobVacancySchema.index({ categories: 1 }); // Category filtering
+jobVacancySchema.index({ applicationDeadline: 1 }); // Sort by deadline
+jobVacancySchema.index({ isFeatured: 1, postedDate: -1 }); // Featured jobs
 
 const JobVacancyModel = mongoose.model<JobVacancyDocument, mongoose.PaginateModel<JobVacancy>>('JobVacancy', jobVacancySchema);
 
