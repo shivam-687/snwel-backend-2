@@ -58,6 +58,7 @@ const getAllCourses = async (options: ListOptions, adminMode=false): Promise<Pag
         }
       
         const skip = (page - 1) * limit;
+        console.log({query, skip, limit})
         const users = await CourseModel
         .find(query)
         .skip(skip)
@@ -68,6 +69,7 @@ const getAllCourses = async (options: ListOptions, adminMode=false): Promise<Pag
         .populate('trainingModes', '_id name code')
         .populate('curriculum.curriculumType', 'name');
         const count = await CourseModel.countDocuments(query);
+        console.log({users, count})
         return convertToPagination(users, count, paginationData.limit, paginationData.offset);
     } catch (error: any) {
         throw new Error(`Error: retrieving courses: ${error.message}`);

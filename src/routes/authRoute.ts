@@ -6,6 +6,7 @@ import { errorResponse } from '@/utils/helpers/appResponse';
 import { validateSchema } from '@/middleware/validateSchema';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken'
+import { authenticateJWT } from '@/middleware/auth.middleware';
 
 const AuthRouter = express.Router();
 
@@ -47,3 +48,23 @@ AuthRouter.post(
 
 
 export default AuthRouter;
+
+// Authenticated current user info (roles and permissions)
+AuthRouter.get('/me', authenticateJWT as any, (req, res) => {
+  const u: any = req.user;
+  const roles = (u?.roles || []).map((r: any) => ({
+    _id: r?._id,
+    name: r?.name
+  }));
+  const permissionCodes = Array.from(new Set(
+    (u?.roles || []).flatMap((r: any) => (r?.permissions || []).map((p: any) => p?.code)).filter(Boolean)
+  ));
+  return res.json({
+    id: u?._id,
+    email: u?.email,
+    name: u?.name,
+    roles,
+    permissions: permissionCodes,
+    picture: u?.profilePic
+  });
+});

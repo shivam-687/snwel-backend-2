@@ -45,6 +45,15 @@ const CourseEnrollmentSchema = new Schema<CourseEnrollment>({
     widget: {type: Schema.Types.ObjectId, ref: 'Widget', default: null}
 }, { timestamps: true }); // This option enables Mongoose to add createdAt and updatedAt timestamps automatically
 
+// Indexes for optimized queries
+CourseEnrollmentSchema.index({ status: 1, createdAt: -1 }); // Dashboard stats, enrollment filtering
+CourseEnrollmentSchema.index({ status: 1, updatedAt: -1 }); // Revenue queries with updatedAt
+CourseEnrollmentSchema.index({ courseId: 1, createdAt: -1 }); // Top performing courses
+CourseEnrollmentSchema.index({ userId: 1, createdAt: -1 }); // User enrollments
+CourseEnrollmentSchema.index({ paymentStatus: 1, createdAt: -1 }); // Revenue calculations
+CourseEnrollmentSchema.index({ paymentStatus: 1, updatedAt: -1 }); // Yearly sales data
+CourseEnrollmentSchema.index({ createdAt: -1 }); // Recent enrollments sorting
+
 CourseEnrollmentSchema.plugin(mongoosePaginate);
 const CourseEnrollmentModel = mongoose.model<CourseEnrollment,  mongoose.PaginateModel<CourseEnrollment>>('CourseEnrollment', CourseEnrollmentSchema);
 

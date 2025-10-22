@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { RoleController } from '../controllers/roleController';
-import { checkPermission } from '../middleware/checkPermission';
+import { checkPermission } from '@/middleware/permissionMiddleware';
 import passport from 'passport';
 
 const router = Router();
@@ -39,4 +39,11 @@ router.delete(
   RoleController.deleteRole
 );
 
-export { router as RoleRouter }; 
+// Assign permissions to a role
+router.patch(
+  '/:id/permissions',
+  checkPermission('ROLE_UPDATE'),
+  RoleController.assignPermissions
+);
+
+export { router as RoleRouter };

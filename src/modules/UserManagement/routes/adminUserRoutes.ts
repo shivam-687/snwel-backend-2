@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { AdminUserController } from '../controllers/adminUserController';
-import { checkPermission } from '../middleware/checkPermission';
+import { checkPermission } from '@/middleware/permissionMiddleware';
 import { validateSchema } from '@/middleware/validateSchema';
 // import { createUserSchema, updateUserSchema } from '../entity-schema/userSchema';
 import passport from 'passport';
+import { getUserStatistics } from '@/controllers/admin/statisticsController';
 
 const router = Router();
 
@@ -11,6 +12,12 @@ const router = Router();
 router.use(passport.authenticate('jwt', { session: false }));
 
 // User Management Routes
+router.get(
+  '/statistics',
+  checkPermission('USER_VIEW'),
+  getUserStatistics
+);
+
 router.post(
   '/',
   checkPermission('USER_CREATE'),

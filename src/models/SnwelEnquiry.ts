@@ -33,6 +33,12 @@ const enquirySchema = new Schema<ISnwelEnquiry>({
   otpValidated: { type: Boolean, required: true, default: false },
 }, { timestamps: true });
 
+// Indexes for optimized queries
+enquirySchema.index({ createdAt: -1 }); // Listing and sorting enquiries
+enquirySchema.index({ enquiryType: 1, createdAt: -1 }); // Filter by type with date
+enquirySchema.index({ businessEmail: 1 }); // Email lookup
+enquirySchema.index({ otpValidated: 1 }); // Filter by validation status
+
 enquirySchema.plugin(mongoosePaginate);
 
 const SnwelEnquiry = model<ISnwelEnquiry, mongoose.PaginateModel<ISnwelEnquiry>>('SnwelEnquiry', enquirySchema);

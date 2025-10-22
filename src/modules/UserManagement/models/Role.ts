@@ -21,6 +21,11 @@ const RoleSchema = new Schema<IRole>({
   isSystem: { type: Boolean, default: false }
 }, { timestamps: true });
 
+// Indexes for optimized queries
+RoleSchema.index({ name: 1 }, { unique: true }); // Unique role name lookup
+RoleSchema.index({ isActive: 1 }); // Filter active roles
+RoleSchema.index({ isSystem: 1 }); // Filter system roles
+
 RoleSchema.plugin(mongoosePaginate);
 
 export const RoleModel = mongoose.model<IRole, mongoose.PaginateModel<IRole>>('Role', RoleSchema); 

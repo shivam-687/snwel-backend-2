@@ -52,7 +52,12 @@ CourseCategorySchema.pre<CourseCategory>('save', async function (next) {
     } catch (error: any) {
         next(error)
     }
-
-
 });
+
+// Indexes for optimized queries
+CourseCategorySchema.index({ slug: 1 }, { unique: true }); // Unique slug lookup
+CourseCategorySchema.index({ isActive: 1 }); // Filter active categories
+CourseCategorySchema.index({ parentCategory: 1 }); // Hierarchical category queries
+CourseCategorySchema.index({ isPremium: 1 }); // Filter premium categories
+
 export const CourseCategoryModel = mongoose.model<CourseCategory>('CourseCategory', CourseCategorySchema);
