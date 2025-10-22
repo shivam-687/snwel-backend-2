@@ -107,7 +107,7 @@ const resendOtpController = catchAsync(async (req, res): Promise<any> => {
     }
 
     const result = await resendOtp(token);
-    if (result.success) {
+    if (result.token) {
         successResponse({ token: result.token }, res, { message: 'OTP resent successfully' });
     } else {
         res.status(400).json({ message: result.message });
