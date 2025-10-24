@@ -5,6 +5,7 @@ import { WhatsappConfig } from "@/entity-schema/whatsapp-schema";
 import { Course } from "@/models/CourseModel";
 import IntegrationModel, { IIntegration } from "@/models/IntegrationModel";
 import { IJobApplication } from "@/models/JobApplicationModel";
+import JobVacancyModel from "@/models/JobVacancy";
 import { SettingModel } from "@/models/Setting";
 import axios from "axios";
 import nodemailer from 'nodemailer'
@@ -76,6 +77,13 @@ export class NotificationService {
     public async refreshSettings(): Promise<void> {
         await this.loadSettings();
         console.log('Settings refreshed');
+    }
+
+    public getSupportInfo() {
+        const siteName = this.generalSetting?.siteName;
+        const email = this.generalSetting?.contacts?.email;
+        const phone = this.generalSetting?.contacts?.phone;
+        return { siteName, email, phone };
     }
 
     // Send Email Notification
@@ -150,7 +158,8 @@ export class NotificationService {
             throw new Error("WhatsApp integration settings not configured");
         }
        
-        const url = `${whatsappConfig.data.url}?api_key=${whatsappConfig.data.apiKey}&sender=${whatsappConfig.data.phoneNumber}&number=${number}&message=${message}`;
+        const encodedMessage = encodeURIComponent(message);
+        const url = `${whatsappConfig.data.url}?api_key=${whatsappConfig.data.apiKey}&sender=${whatsappConfig.data.phoneNumber}&number=${number}&message=${encodedMessage}`;
         try {
             const response = await axios.get(url);
             console.log(`WhatsApp message sent: ${JSON.stringify(response.data)}`);
@@ -183,12 +192,37 @@ export const sendOTPWhatsapp = async (otp: string, number: string) => {
 
 export const sendCourseEnquiryNotification = async (course: Course, to: {email?: string, phone?: string, userName?: string}) => {
     const ns = await NotificationService.getInstance();
+    const template = await courseEnquiryTemplate(course, to.userName||"");
     if(to.email){
-        const template = await courseEnquiryTemplate(course, to.userName||"");
         await ns.sendEmail(
             to.email,
             template.subject,
             template.template
+        )
+    }
+    if(to.phone){
+        const support = ns.getSupportInfo();
+        const parts = [
+            `Dear ${to.userName || 'Learner'}, thank you for your interest in "${(course as any)?.title || 'the course'}". Your enrollment is almost complete. Our team will contact you shortly.`,
+        ];
+        if ((course as any)?.courseDuration || (course as any)?.price) {
+            const duration = (course as any)?.courseDuration ? `Duration: ${(course as any).courseDuration}` : '';
+            const price = (course as any)?.price ? `Price: ${(course as any).price} ${(course as any)?.currency || ''}` : '';
+            const details = [duration, price].filter(Boolean).join(' | ');
+            if (details) parts.push(details);
+        }
+        if (support.email || support.phone) {
+            const contact = [support.email, support.phone].filter(Boolean).join(' | ');
+            parts.push(`Support: ${contact}`);
+        }
+        if (support.siteName) {
+            parts.push(`- ${support.siteName}`);
+        }
+        const whatsappMessage = parts.join('\n');
+        console.log("Send whatsapp to", to.phone, whatsappMessage)
+        await ns.sendWhatsApp(
+            to.phone,
+            whatsappMessage
         )
     }
 }
@@ -200,6 +234,33 @@ export const sendJobApplyConfirmation = async (jobApp: IJobApplication, to: {ema
             to.email,
             template.subject,
             template.template
+        )
+    }
+    if(to.phone){
+        const support = ns.getSupportInfo();
+        const job = await JobVacancyModel.findById(jobApp.jobId).lean();
+        const applicant = jobApp.applicantName || 'Applicant';
+        const jobTitle = (job as any)?.title || 'the position';
+        const company = (job as any)?.companyName || support.siteName || 'our company';
+        const email = support.email || 'hello@snwelacademy.in';
+
+        const parts = [
+            `*Application Received*`,
+            `Dear ${applicant},`,
+            `Thank you for submitting your application for the ${jobTitle} position at ${company}. We appreciate your interest in joining our team!`,
+            `Our hiring team is currently reviewing your application and qualifications. If your profile matches our requirements, we will be in touch to schedule the next steps in the hiring process, such as an interview.`,
+            `Please note, due to the high volume of applications, it may take some time to process all submissions. Rest assured, we will keep you updated on the status of your application.`,
+            `If you have any questions in the meantime, feel free to reach out to us at ${email} or visit our careers page for more information.`,
+            `Thank you once again for considering ${company} as your next career move. We look forward to reviewing your application.`,
+            `Best regards,`,
+            `${support.siteName || 'snwel Academy'}`,
+            `${support.phone || 'N/A'}`,
+            `${company}`
+        ];
+        const whatsappMessage = parts.join('\n');
+        await ns.sendWhatsApp(
+            to.phone,
+            whatsappMessage
         )
     }
 }

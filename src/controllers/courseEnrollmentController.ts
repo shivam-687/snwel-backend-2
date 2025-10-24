@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { courseEnrollmentResponse, courseErrorResponse, successResponse } from '@/utils/helpers/appResponse';
+import { courseEnrollmentResponse, courseErrorResponse, errorResponse, successResponse } from '@/utils/helpers/appResponse';
 import { catchAsync } from '@/utils/helpers/catchAsync';
 import { checkApplied, create, deleteById, getAll, getById, resendOtp, updateById, verifyOtpAndUpdate } from '@/service/courseQueryService';
 import { CreateCourseQuery, CreateEnrollmentAnonymously } from '@/entity-schema/course-enrollment';
@@ -107,10 +107,15 @@ const resendOtpController = catchAsync(async (req, res): Promise<any> => {
     }
 
     const result = await resendOtp(token);
-    if (result.token) {
-        successResponse({ token: result.token }, res, { message: 'OTP resent successfully' });
+    console.log("Resend otp result", result)
+    if (result && (result as any).token) {
+        successResponse({ token: (result as any).token }, res, { message: 'OTP resent successfully' });
+    } else if ((result as any)?.invalidToken) {
+        console.log("Invalid token")
+        return errorResponse({}, res, { message: 'Invalid token', status: 400 });
     } else {
-        res.status(400).json({ message: result.message });
+        console.log("Failed to resend OTP")
+        return errorResponse({}, res, { message: (result as any)?.message || 'Failed to resend OTP', status: 400 });
     }
 });
 

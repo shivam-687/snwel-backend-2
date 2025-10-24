@@ -31,7 +31,7 @@ const getAllMasterItems = async (options: ListOptions): Promise<PaginatedList<IM
     }
 
     const skip = (page - 1) * limit;
-
+    console.log({query})
     const masterItems = await MasterModel.find(query)
       .skip(skip)
       .limit(limit)
