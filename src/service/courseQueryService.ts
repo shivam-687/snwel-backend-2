@@ -205,7 +205,11 @@ async function verifyOtpAndUpdate(token: string, otp: string) {
         enrollment.otp.verified = true;
         await enrollment.save();
         const user = enrollment.userId as unknown as User
-        await sendCourseEnquiryNotification(enrollment.courseId as unknown as Course, {email: user?.email, phone: user?.phone, userName: user?.name})
+        try {
+            await sendCourseEnquiryNotification(enrollment.courseId as unknown as Course, {email: user?.email, phone: user?.phone, userName: user?.name})
+        } catch (error) {
+            logger.error('Error sending course enquiry notification', error)
+        }
         return {
             isVerified: true,
             enrollmentId: enrollment._id

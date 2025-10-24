@@ -151,20 +151,17 @@ export function generateJwtToken(payload: any){
 
   
 export const extractListOptions = (req: Request): ListOptions => {
-    const { limit, page, search, ...rest } = req.query;
-
+    const { limit, page, search, filter, ...rest } = req.query;
+console.log({REQQUERY: req.query})
     // Parse limit and page to numbers if they exist, otherwise set defaults
     const parsedLimit = limit ? parseInt(limit as string, 10) : 10;
     const parsedPage = page ? parseInt(page as string, 10) : 1;
-
-    // Construct the filter object from remaining query parameters
-    const filter = { ...rest };
 
     return {
         limit: parsedLimit,
         page: parsedPage,
         search: search as string,
-        filter
+        filter: filter || { ...rest }
     };
 };
 

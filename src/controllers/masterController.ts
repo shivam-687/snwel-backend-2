@@ -19,8 +19,9 @@ const createMasterItemController = catchAsync(async (req: Request, res: Response
 
 const getAllMasterItemsController = catchAsync(async (req: Request, res: Response): Promise<void> => {
   const options = { ...req.query };
-  // console.log(options)
+  console.log({options})
   const masterItems = await getAllMasterItems(extractListOptions(req));
+  console.log({masterItems: JSON.stringify(masterItems)})
   successResponse(masterItems, res, { message: 'Master items fetched successfully!' });
 });
 
