@@ -25,18 +25,40 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
         const user = await UserModel.findById(queryData.userId);
         const otpObject = generateOTPObject({})
         if (exists) {
-            const updated = await exists.updateOne({ otp: otpObject });
+            const sessionExpiresAt = new Date(Date.now() + Constants.OTP.SESSION_TTL_MINUTES * 60 * 1000);
+            await exists.updateOne({ 
+                otp: otpObject,
+                extra: {
+                    ...(exists.extra || {}),
+                    otpSession: {
+                        resendCount: 0,
+                        lastSentAt: new Date(),
+                        sessionExpiresAt,
+                    }
+                }
+            });
             await sendOtp(otpObject.otp, (user as any)?.phone, (user as any)?.email)
             return {
                 isVerified: false,
                 token: generateJwtToken({
                     courseId: queryData.courseId,
                     userId: queryData.userId,
-                    enrollmentId: updated._id
+                    enrollmentId: exists._id
                 })
             }
         } else {
-            let newCourseQuery = new CourseEnrollmentModel({ ...queryData, otp: otpObject });
+            const sessionExpiresAt = new Date(Date.now() + Constants.OTP.SESSION_TTL_MINUTES * 60 * 1000);
+            let newCourseQuery = new CourseEnrollmentModel({ 
+                ...queryData, 
+                otp: otpObject,
+                extra: {
+                    otpSession: {
+                        resendCount: 0,
+                        lastSentAt: new Date(),
+                        sessionExpiresAt,
+                    }
+                }
+            });
             await newCourseQuery.save()
             await sendOtp(otpObject.otp, (user as any)?.phone, (user as any)?.email)
             return {
@@ -193,12 +215,35 @@ async function verifyOtpAndUpdate(token: string, otp: string) {
 
         const now = new Date();
 
-        if ((enrollment.otp.otp !== otp && Number(otp) !== Constants.OTP.MASTER_OTP) || now > enrollment.otp.expirationTime) {
+        if (now > (enrollment.otp.expirationTime as Date)) {
+            const session = (enrollment.extra as any)?.otpSession || {};
+            const sessionExpiresAt: Date | undefined = session.sessionExpiresAt ? new Date(session.sessionExpiresAt) : undefined;
+            const lastSentAt: Date | undefined = session.lastSentAt ? new Date(session.lastSentAt) : undefined;
+            const resendCount: number = typeof session.resendCount === 'number' ? session.resendCount : 0;
+            const withinSession = sessionExpiresAt ? now < sessionExpiresAt : true;
+            const cooldown = Constants.OTP.RESEND_COOLDOWN_SEC;
+            const sinceLast = lastSentAt ? Math.floor((now.getTime() - lastSentAt.getTime()) / 1000) : cooldown;
+            const retryAfter = Math.max(0, cooldown - sinceLast);
+            const resendAllowed = withinSession && resendCount < Constants.OTP.MAX_RESENDS;
             return {
                 isVerified: false,
                 enrollmentId: null,
-                invalidOtp: true
-            }; // OTP is incorrect or expired
+                invalidOtp: true,
+                otpExpired: true,
+                verificationId: enrollment._id.toString(),
+                resend_allowed: resendAllowed,
+                retry_after: retryAfter,
+                session_expires_at: sessionExpiresAt ? sessionExpiresAt.toISOString() : undefined,
+            } as any; // OTP expired
+        }
+
+        if (enrollment.otp.otp !== otp && Number(otp) !== Constants.OTP.MASTER_OTP) {
+            return {
+                isVerified: false,
+                enrollmentId: null,
+                invalidOtp: true,
+                otpExpired: false
+            };
         }
 
         // Update the verified field to true
@@ -221,13 +266,28 @@ async function verifyOtpAndUpdate(token: string, otp: string) {
     }
 }
 
-async function resendOtp(token: string) {
+async function resendOtp(params: { token?: string; verificationId?: string }) {
     try {
-        // Verify the JWT token
-        const decoded = jwt.verify(token, Constants.TOKEN_SECRET) as any;
-
-        // Extract enrollmentId from the decoded token
-        const { enrollmentId, courseId, userId } = decoded;
+        const now = new Date();
+        let enrollmentId: string | undefined = undefined;
+        if (params?.verificationId) {
+            enrollmentId = params.verificationId;
+        } else if (params?.token) {
+            try {
+                const decoded = jwt.verify(params.token, Constants.TOKEN_SECRET) as any;
+                enrollmentId = decoded.enrollmentId;
+            } catch (err) {
+                // Token invalid or expired
+                return {
+                    invalidToken: true
+                } as any;
+            }
+        }
+        if (!enrollmentId) {
+            return {
+                invalidToken: true
+            } as any;
+        }
 
         // Find the document by enrollmentId
         const enrollment = await CourseEnrollmentModel.findById(enrollmentId);
@@ -239,10 +299,54 @@ async function resendOtp(token: string) {
             };
         }
 
+        const session = (enrollment.extra as any)?.otpSession || {};
+        const sessionExpiresAt: Date = session.sessionExpiresAt ? new Date(session.sessionExpiresAt) : new Date(Date.now() + Constants.OTP.SESSION_TTL_MINUTES * 60 * 1000);
+        const lastSentAt: Date | undefined = session.lastSentAt ? new Date(session.lastSentAt) : undefined;
+        const resendCount: number = typeof session.resendCount === 'number' ? session.resendCount : 0;
+
+        const withinSession = now < sessionExpiresAt;
+        const cooldown = Constants.OTP.RESEND_COOLDOWN_SEC;
+        const sinceLast = lastSentAt ? Math.floor((now.getTime() - lastSentAt.getTime()) / 1000) : cooldown;
+        const retryAfter = Math.max(0, cooldown - sinceLast);
+        const canResend = withinSession && resendCount < Constants.OTP.MAX_RESENDS && retryAfter === 0;
+
+        if (!withinSession) {
+            return {
+                resend_allowed: false,
+                reason: 'SESSION_EXPIRED',
+                retry_after: 0,
+                session_expires_at: sessionExpiresAt.toISOString(),
+            } as any;
+        }
+        if (resendCount >= Constants.OTP.MAX_RESENDS) {
+            return {
+                resend_allowed: false,
+                reason: 'RESEND_LIMIT_REACHED',
+                retry_after: retryAfter,
+                session_expires_at: sessionExpiresAt.toISOString(),
+            } as any;
+        }
+        if (retryAfter > 0) {
+            return {
+                resend_allowed: false,
+                reason: 'COOLDOWN',
+                retry_after: retryAfter,
+                session_expires_at: sessionExpiresAt.toISOString(),
+            } as any;
+        }
+
         // Generate a new OTP and expiration time
         const newOtp = generateOTPObject({})
 
         enrollment.otp = newOtp;
+        (enrollment as any).extra = {
+            ...(enrollment.extra || {}),
+            otpSession: {
+                resendCount: resendCount + 1,
+                lastSentAt: now,
+                sessionExpiresAt,
+            }
+        };
         await enrollment.save();
 
         const user = await UserModel.findById(enrollment.userId as any);
@@ -255,8 +359,12 @@ async function resendOtp(token: string) {
         })
 
         return {
-            token: newToken
-        };
+            token: newToken,
+            otp_expires_at: newOtp.expirationTime?.toISOString?.() || undefined,
+            session_expires_at: sessionExpiresAt.toISOString(),
+            resend_allowed: true,
+            retry_after: Constants.OTP.RESEND_COOLDOWN_SEC,
+        } as any;
     } catch (error) {
         console.error(error);
         return { success: false, message: 'An error occurred' };

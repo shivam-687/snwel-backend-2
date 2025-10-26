@@ -112,7 +112,7 @@ export function generateOTP(length: number = 6): string {
 }
 
 export function generateOTPObject({length=6}: {length?: number}){
-    const expiry = dayjs(Date.now()).add(1, 'year').toDate();
+    const expiry = dayjs(Date.now()).add(5, 'minute').toDate();
     return {
         otp: generateOTP(length),
         expirationTime: expiry,

@@ -27,6 +27,7 @@ import { RoleRouter } from '@/modules/UserManagement/routes/roleRoutes';
 import { AdminCourseRouter } from './adminCourseRoutes';
 import { AdminDashboardRouter } from './admin/dashboardRoutes';
 import { AdminPermissionsRouter } from './admin/permissionsRoutes';
+import { AdminPermissionsAllRouter } from './admin/permissionsAllRoutes';
 
 const router = express.Router();
 
@@ -59,5 +60,6 @@ router.use('/users', ClientUserRouter);
 router.use('/roles', RoleRouter);
 router.use('/admin/dashboard', AdminDashboardRouter);
 router.use('/admin/permissions', AdminPermissionsRouter);
+router.use('/admin/permissions-all', AdminPermissionsAllRouter);
 
 export { router as indexRoute };

@@ -8,25 +8,18 @@ import {
     hardDeleteAllSoftDeletedBlogCategoriesController,
 } from './blog-category-controller';
 import passport from '@/config/passport-config';
+import { checkPermission } from '@/middleware/permissionMiddleware';
 
 const router = Router();
 
-// Route to create a new blog category
-router.post('/categories', passport.authenticate('jwt', { session: false }), createBlogCategoryController);
-
-// Route to get a blog category by ID or slug
+// Public routes
+router.get('/categories', getAllBlogCategoriesController);
 router.get('/categories/:id', getBlogCategoryByIdController);
 
-// Route to update a blog category by ID
-router.put('/categories/:id', passport.authenticate('jwt', { session: false }), updateBlogCategoryByIdController);
-
-// Route to soft delete a blog category by ID
-router.delete('/categories/:id', passport.authenticate('jwt', { session: false }), deleteBlogCategoryByIdController);
-
-// Route to get all blog categories with optional filters
-router.get('/categories', getAllBlogCategoriesController);
-
-// Route to hard delete all soft-deleted blog categories
-router.delete('/categories/hard-delete', passport.authenticate('jwt', { session: false }), hardDeleteAllSoftDeletedBlogCategoriesController);
+// Admin routes (require authentication and permissions)
+router.post('/categories', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_CATEGORY_CREATE'), createBlogCategoryController);
+router.put('/categories/:id', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_CATEGORY_UPDATE'), updateBlogCategoryByIdController);
+router.delete('/categories/:id', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_CATEGORY_DELETE'), deleteBlogCategoryByIdController);
+router.delete('/categories/hard-delete', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_CATEGORY_DELETE'), hardDeleteAllSoftDeletedBlogCategoriesController);
 
 export { router as BlogCategoryRouter };

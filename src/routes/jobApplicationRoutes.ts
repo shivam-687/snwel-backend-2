@@ -14,8 +14,11 @@ import { checkPermission } from '@/middleware/permissionMiddleware';
 
 const router = Router();
 
+// Public route - anyone can submit a job application
 router.post('/', validateSchema(createJobApplicationSchema), createJobApplicationController);
-router.get('/export', exportJobApplicationsController);
+
+// Admin routes (require authentication and permissions)
+router.get('/export', passport.authenticate('jwt', {session: false}), checkPermission('JOB_APP_EXPORT'), exportJobApplicationsController);
 router.get('/', passport.authenticate('jwt', {session: false}), checkPermission('JOB_APP_VIEW'), getAllJobApplicationsController);
 router.get('/:id', passport.authenticate('jwt', {session: false}), checkPermission('JOB_APP_VIEW'), getJobApplicationByIdController);
 router.put('/:id', passport.authenticate('jwt', {session: false}), checkPermission('JOB_APP_UPDATE'), validateSchema(updateJobApplicationSchema), updateJobApplicationByIdController);

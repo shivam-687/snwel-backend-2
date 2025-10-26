@@ -6,17 +6,21 @@ import {
     getWidgetByIdController,
     updateWidgetByIdController,
     deleteWidgetByIdController,
-    getWidgetTypesController, // Add this line
+    getWidgetTypesController, 
   } from '@/controllers/widgetController';
-  
-  const router = Router();
-  
-  router.post('/', createWidgetController);
-  router.get('/', getAllWidgetsController);
-  router.get('/types', getWidgetTypesController); // Add this line
-  router.get('/:id', getWidgetByIdController);
-  router.put('/:id', updateWidgetByIdController);
-  router.delete('/:id', deleteWidgetByIdController);
-  
-  export {router as WidgetRouter};
-  
+import passport from 'passport';
+import { checkPermission } from '@/middleware/permissionMiddleware';
+
+const router = Router();
+
+// Public routes
+router.get('/', getAllWidgetsController);
+router.get('/types', getWidgetTypesController);
+router.get('/:id', getWidgetByIdController);
+
+// Admin routes (require authentication and permissions)
+router.post('/', passport.authenticate('jwt', { session: false }), checkPermission('WIDGET_CREATE'), createWidgetController);
+router.put('/:id', passport.authenticate('jwt', { session: false }), checkPermission('WIDGET_UPDATE'), updateWidgetByIdController);
+router.delete('/:id', passport.authenticate('jwt', { session: false }), checkPermission('WIDGET_DELETE'), deleteWidgetByIdController);
+
+export {router as WidgetRouter};
