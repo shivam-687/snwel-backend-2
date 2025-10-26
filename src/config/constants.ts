@@ -25,7 +25,10 @@ export const Constants = {
             whatsapp: true,
             email: true
         },
-        MASTER_OTP: 796239
+        MASTER_OTP: 796239,
+        RESEND_COOLDOWN_SEC: 30,
+        MAX_RESENDS: 5,
+        SESSION_TTL_MINUTES: 20
     },
     TOKEN_SECRET: 'snwellacademy',
     FROM_EMAIL: "snwellacademy@gmail.com",

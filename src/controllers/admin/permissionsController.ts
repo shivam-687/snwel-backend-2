@@ -52,3 +52,19 @@ export const listAllPermissions = catchAsync(async (req: Request, res: Response)
     { message: 'Permissions fetched successfully' }
   );
 });
+
+/**
+ * GET /api/admin/permissions-all
+ * Returns flat list of permissions in raw shape required by frontend
+ */
+export const listAllPermissionsFlat = catchAsync(async (req: Request, res: Response) => {
+  const permissions = await PermissionModel.find()
+    .select('code name description module -_id')
+    .sort({ module: 1, code: 1 })
+    .lean();
+
+  res.status(200).json({
+    success: true,
+    data: permissions,
+  });
+});

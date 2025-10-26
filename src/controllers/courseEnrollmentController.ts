@@ -100,23 +100,20 @@ const verifyOtpController = catchAsync(async (req, res): Promise<any> => {
 
 
 const resendOtpController = catchAsync(async (req, res): Promise<any> => {
-    const { token } = req.body;
+    const { token, verificationId } = req.body;
 
-    if (!token) {
-        return res.status(400).json({ message: 'Token is required' });
+    if (!token && !verificationId) {
+        return errorResponse({}, res, { status: 400, message: 'token or verificationId is required' });
     }
 
-    const result = await resendOtp(token);
-    console.log("Resend otp result", result)
+    const result = await resendOtp({ token, verificationId });
     if (result && (result as any).token) {
-        successResponse({ token: (result as any).token }, res, { message: 'OTP resent successfully' });
-    } else if ((result as any)?.invalidToken) {
-        console.log("Invalid token")
-        return errorResponse({}, res, { message: 'Invalid token', status: 400 });
-    } else {
-        console.log("Failed to resend OTP")
-        return errorResponse({}, res, { message: (result as any)?.message || 'Failed to resend OTP', status: 400 });
+        return successResponse(result, res, { message: 'OTP resent successfully' });
     }
+    if ((result as any)?.invalidToken) {
+        return errorResponse({}, res, { message: 'Invalid token', status: 400 });
+    }
+    return successResponse(result, res);
 });
 
 
