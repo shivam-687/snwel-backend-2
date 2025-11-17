@@ -1,7 +1,14 @@
 import { z } from "zod";
 
+const enrollmentApplicantSchema = z.object({
+    name: z.string().optional(),
+    email: z.string().email(),
+    phone: z.string().optional(),
+    location: z.any().optional(),
+});
+
 export const createCourseEnrollment = z.object({
-    userId: z.string(),
+    userId: z.string().optional(),
     courseId: z.string(),
     status: z.enum(['ACTIVE', 'PENDING', 'DECLINED']).default('PENDING').optional(),
     paymentStatus: z.enum(['PAID', 'PENDING', 'FAILED']).default('PENDING').optional(),
@@ -13,12 +20,12 @@ export const createCourseEnrollment = z.object({
     qualification: z.string(),
     mode: z.string(),
     occupation: z.string(),
-    widget: z.string().optional()
+    widget: z.string().optional(),
+    applicant: enrollmentApplicantSchema.optional(),
 })
 export const updateCourseEnrollment = z.object({
     _id: z.string()
 }).merge(createCourseEnrollment);
-
 
 export const createEnrollmentAnonymously = z.object({
     name: z.string().min(2, { message: "Username must be at least 2 characters." }),

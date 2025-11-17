@@ -3,10 +3,6 @@ import { courseEnrollmentResponse, courseErrorResponse, errorResponse, successRe
 import { catchAsync } from '@/utils/helpers/catchAsync';
 import { checkApplied, create, deleteById, getAll, getById, resendOtp, updateById, verifyOtpAndUpdate } from '@/service/courseQueryService';
 import { CreateCourseQuery, CreateEnrollmentAnonymously } from '@/entity-schema/course-enrollment';
-import { getUserByEmail, registerUser } from '@/service/userService';
-import { ObjectId } from 'mongodb';
-import { generateRandomPassword } from '@/utils/helpers';
-import { Constants } from '@/config/constants';
 
 // Function to get all courses
 const getAllController = catchAsync(async (req: Request, res: Response): Promise<void> => {
@@ -23,39 +19,20 @@ const createController = catchAsync(async (req: Request, res: Response): Promise
 
 const createByAnonymous = catchAsync(async (req: Request, res: Response): Promise<void> => {
     const courseData: CreateEnrollmentAnonymously = req.body;
-    const userExists = await getUserByEmail(courseData.email);
-    
-    if (userExists) {
-        const createdCourse = await create({
-            userId: userExists._id,
-            courseId: courseData.courseId,
-            extra: courseData.extra,
-            qualification: courseData.qualification,
-            mode: courseData.mode,
-            occupation: courseData.occupation,
-            widget: courseData.widget
-        });
-        return successResponse(createdCourse, res);
-    }
-
-    const newUser = await registerUser({
-        email: courseData.email,
-        name: courseData.name,
-        password: generateRandomPassword(),
-        phone: courseData.phone,
-        roles: [Constants.ROLES.USER],
-        location: courseData.location
-    });
-
     const newEnroll = await create({
         courseId: courseData.courseId,
-        userId: newUser?._id,
         extra: courseData.extra,
         qualification: courseData.qualification,
         mode: courseData.mode,
         occupation: courseData.occupation,
-        widget: courseData.widget
-    });
+        widget: courseData.widget,
+        applicant: {
+            name: courseData.name,
+            email: courseData.email,
+            phone: courseData.phone,
+            location: courseData.location,
+        }
+    } as any);
     successResponse(newEnroll, res);
 })
 
