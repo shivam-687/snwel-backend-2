@@ -107,7 +107,7 @@ export class NotificationService {
             });
 
             await transporter.sendMail({
-                from: this.generalSetting?.senderEmail || `"No Reply" <${smtpConfig.auth.username}>`,
+                from: smtpConfig.sender || this.generalSetting?.senderEmail || `"No Reply" <${smtpConfig.auth.username}>`,
                 to,
                 subject,
                 html: `<b>${message}</b>`

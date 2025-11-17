@@ -4,7 +4,7 @@ import { convertSortOrder, convertToPagination, generateJwtToken, generateOTPObj
 import { ObjectId } from 'mongodb';
 import { ListOptions, PaginatedList } from '@/types/custom'
 import { CreateCourseQuery } from '@/entity-schema/course-enrollment';
-import CourseEnrollmentModel, { CourseEnrollment } from '@/models/CourseEnrollment';
+import CourseEnrollmentModel, { CourseEnrollment, EnrollmentPerson } from '@/models/CourseEnrollment';
 import { Constants } from '@/config/constants';
 import { logger } from '@/utils/logger';
 import { User, UserModel } from '@/models/User';
@@ -12,22 +12,69 @@ import { sendCourseEnquiryNotification } from './notificationService';
 import { sendOtp } from './otpService';
 import { Course } from '@/models/CourseModel';
 
-// Function to create a new course
+const buildApplicantFromUser = (user?: User | null): EnrollmentPerson | undefined => {
+    if (!user || !user.email) return undefined;
+    return {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        location: user.location
+    };
+};
+
+const isSameApplicant = (existing?: EnrollmentPerson | null, incoming?: EnrollmentPerson): boolean => {
+    if (!existing || !incoming) return false;
+    if (!existing.email || !incoming.email) return false;
+    if (existing.email !== incoming.email) return false;
+    const existingPhone = (existing.phone || '').trim();
+    const incomingPhone = (incoming.phone || '').trim();
+    if (!existingPhone && !incomingPhone) return true;
+    return existingPhone === incomingPhone;
+};
+
+// Helper to derive applicant from request (preferred) or legacy userId
+const resolveApplicant = async (queryData: CreateCourseQuery): Promise<EnrollmentPerson> => {
+    let applicant = queryData.applicant as EnrollmentPerson | undefined;
+
+    // Legacy fallback: build from userId if applicant not provided
+    if (!applicant && (queryData as any).userId) {
+        const user = await UserModel.findById((queryData as any).userId);
+        applicant = buildApplicantFromUser(user);
+    }
+
+    if (!applicant || !applicant.email) {
+        throw new Error('Error: 400: Applicant email is required for enrollment');
+    }
+
+    // Normalize phone
+    applicant.phone = applicant.phone?.trim() || undefined;
+    return applicant;
+};
+
+// Function to create a new course enrollment
 const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, isVerified: boolean, enrollmentId?: string }> => {
     try {
-        const exists = await CourseEnrollmentModel.findOne({ userId: queryData.userId, courseId: queryData.courseId });
-        if (exists && exists.otp?.verified) {
-            return {
-                isVerified: true,
-                enrollmentId: exists._id
-            }
+        const applicant = await resolveApplicant(queryData);
+
+        // Find existing enrollment for same course + applicant (email + phone rules)
+        const candidates = await CourseEnrollmentModel.find({
+            courseId: queryData.courseId,
+            'applicant.email': applicant.email,
+        });
+        const exists = candidates.find((enrollment: any) =>
+            isSameApplicant(enrollment.applicant as EnrollmentPerson, applicant)
+        ) as CourseEnrollment | undefined;
+
+        if (exists && exists.otp?.verified && isSameApplicant((exists as any).applicant, applicant)) {
+            throw new Error('Error: 400: Course Enrollment already found.');
         }
-        const user = await UserModel.findById(queryData.userId);
+
         const otpObject = generateOTPObject({})
+        const sessionExpiresAt = new Date(Date.now() + Constants.OTP.SESSION_TTL_MINUTES * 60 * 1000);
         if (exists) {
-            const sessionExpiresAt = new Date(Date.now() + Constants.OTP.SESSION_TTL_MINUTES * 60 * 1000);
             await exists.updateOne({ 
                 otp: otpObject,
+                applicant,
                 extra: {
                     ...(exists.extra || {}),
                     otpSession: {
@@ -37,19 +84,21 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
                     }
                 }
             });
-            await sendOtp(otpObject.otp, (user as any)?.phone, (user as any)?.email)
+            await sendOtp(otpObject.otp, applicant?.phone, applicant?.email)
             return {
                 isVerified: false,
                 token: generateJwtToken({
                     courseId: queryData.courseId,
-                    userId: queryData.userId,
+                    // userId is kept only for legacy consumers of the token payload
+                    userId: (queryData as any).userId,
                     enrollmentId: exists._id
                 })
             }
         } else {
-            const sessionExpiresAt = new Date(Date.now() + Constants.OTP.SESSION_TTL_MINUTES * 60 * 1000);
+            const { userId, ...rest } = queryData as any;
             let newCourseQuery = new CourseEnrollmentModel({ 
-                ...queryData, 
+                ...rest,
+                applicant,
                 otp: otpObject,
                 extra: {
                     otpSession: {
@@ -60,12 +109,12 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
                 }
             });
             await newCourseQuery.save()
-            await sendOtp(otpObject.otp, (user as any)?.phone, (user as any)?.email)
+            await sendOtp(otpObject.otp, applicant?.phone, applicant?.email)
             return {
                 isVerified: false,
                 token: generateJwtToken({
                     courseId: queryData.courseId,
-                    userId: queryData.userId,
+                    userId,
                     enrollmentId: newCourseQuery._id
                 })
             }
@@ -74,11 +123,26 @@ const create = async (queryData: CreateCourseQuery): Promise<{ token?: string, i
         throw new Error(`Error: creating course query: ${error.message}`);
     }
 };
+
 const createByClient = async (queryData: CreateCourseQuery): Promise<CourseEnrollment> => {
     try {
-        const exists = await CourseEnrollmentModel.findOne({ userId: queryData.userId, courseId: queryData.courseId });
-        if (exists) throw new Error("Course Enrollment already found.");
-        const newCourseQuery = new CourseEnrollmentModel(queryData);
+        const applicant = await resolveApplicant(queryData);
+
+        const candidates = await CourseEnrollmentModel.find({
+            courseId: queryData.courseId,
+            'applicant.email': applicant.email,
+        });
+        const exists = candidates.find((enrollment: any) =>
+            isSameApplicant(enrollment.applicant as EnrollmentPerson, applicant)
+        ) as CourseEnrollment | undefined;
+
+        if (exists) throw new Error('Error: 400: Course Enrollment already found.');
+
+        const { userId, ...rest } = queryData as any;
+        const newCourseQuery = new CourseEnrollmentModel({
+            ...rest,
+            applicant,
+        });
         return await newCourseQuery.save();
     } catch (error: any) {
         throw new Error(`Error: creating course query: ${error.message}`);
