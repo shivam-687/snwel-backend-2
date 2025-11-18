@@ -27,6 +27,10 @@ const getAllJobVacancies = async (options: ListOptions): Promise<PaginatedList<J
       query.$or = [{ "location.city": searchRegex }, { "location.country": searchRegex }, {"location.state": searchRegex}];
     }
 
+    if (filter && filter['type']) {
+      query.employmentType = filter['type'];
+    }
+
     const skip = (page - 1) * limit;
 
     const jobVacancies = await JobVacancyModel.find(query)
