@@ -19,6 +19,7 @@ export interface IBlog extends SoftDeleteDocument {
   category: ObjectId,
   published: boolean;
   publishedAt?: Date;
+  isFeatured: boolean; // New field
   views: number;
   createdAt: Date;
   updatedAt: Date;
@@ -34,13 +35,21 @@ const blogSchema = new Schema<IBlog>({
   tags: { type: [String], default: [] },
   published: { type: Boolean, default: false },
   publishedAt: { type: Date },
+  isFeatured: { type: Boolean, default: false }, // New field
   views: { type: Number, default: 0 },
-  category: {type: Schema.ObjectId, default: null, ref: 'BlogCategory'}
+  category: { type: Schema.ObjectId, default: null, ref: 'BlogCategory' }
 }, { timestamps: true });
+
+// Indexes for performance
+blogSchema.index({ published: 1, createdAt: -1 }); // For default listing
+blogSchema.index({ isFeatured: 1, published: 1 }); // For featured blogs
+blogSchema.index({ tags: 1, published: 1 }); // For similar blogs by tags
+blogSchema.index({ category: 1, published: 1 }); // For similar blogs by category
+blogSchema.index({ slug: 1 }); // For lookup by slug
 
 blogSchema.plugin(mongoosePaginate);
 blogSchema.plugin(mongooseDelete, { deletedAt: true, overrideMethods: 'all' });
 
-const Blog = model<IBlog, mongoose.PaginateModel<IBlog>&SoftDeleteModel<IBlog>>('Blog', blogSchema);
+const Blog = model<IBlog, mongoose.PaginateModel<IBlog> & SoftDeleteModel<IBlog>>('Blog', blogSchema);
 
 export default Blog;

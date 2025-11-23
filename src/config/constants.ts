@@ -16,6 +16,10 @@ export const Constants = {
         ROLE_VIEW: 'ROLE_VIEW',
         ROLE_UPDATE: 'ROLE_UPDATE',
         ROLE_DELETE: 'ROLE_DELETE',
+        PAGE_CREATE: 'PAGE_CREATE',
+        PAGE_VIEW: 'PAGE_VIEW',
+        PAGE_UPDATE: 'PAGE_UPDATE',
+        PAGE_DELETE: 'PAGE_DELETE',
         
         // Other permissions...
     },

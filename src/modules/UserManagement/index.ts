@@ -109,11 +109,21 @@ export const initializeUserManagement = async () => {
       { name: 'View Blog Categories', description: 'Can view blog categories', code: 'BLOG_CATEGORY_VIEW', module: 'BLOG_CATEGORY' },
       { name: 'Update Blog Category', description: 'Can update blog categories', code: 'BLOG_CATEGORY_UPDATE', module: 'BLOG_CATEGORY' },
       { name: 'Delete Blog Category', description: 'Can delete blog categories', code: 'BLOG_CATEGORY_DELETE', module: 'BLOG_CATEGORY' },
+      // Testimonial
+      { name: 'Create Testimonial', description: 'Can create testimonials', code: 'TESTIMONIAL_CREATE', module: 'TESTIMONIAL' },
+      { name: 'View Testimonials', description: 'Can view testimonials', code: 'TESTIMONIAL_VIEW', module: 'TESTIMONIAL' },
+      { name: 'Update Testimonial', description: 'Can update testimonials', code: 'TESTIMONIAL_UPDATE', module: 'TESTIMONIAL' },
+      { name: 'Delete Testimonial', description: 'Can delete testimonials', code: 'TESTIMONIAL_DELETE', module: 'TESTIMONIAL' },
       // Widgets
       { name: 'Create Widget', description: 'Can create widgets', code: 'WIDGET_CREATE', module: 'WIDGET' },
       { name: 'View Widgets', description: 'Can view widgets', code: 'WIDGET_VIEW', module: 'WIDGET' },
       { name: 'Update Widget', description: 'Can update widgets', code: 'WIDGET_UPDATE', module: 'WIDGET' },
       { name: 'Delete Widget', description: 'Can delete widgets', code: 'WIDGET_DELETE', module: 'WIDGET' },
+      // Pages
+      { name: 'Create Page', description: 'Can create pages', code: 'PAGE_CREATE', module: 'PAGE' },
+      { name: 'View Pages', description: 'Can view pages', code: 'PAGE_VIEW', module: 'PAGE' },
+      { name: 'Update Page', description: 'Can update pages', code: 'PAGE_UPDATE', module: 'PAGE' },
+      { name: 'Delete Page', description: 'Can delete pages', code: 'PAGE_DELETE', module: 'PAGE' },
       // Analytics
       { name: 'View Analytics', description: 'Can view analytics', code: 'ANALYTICS_VIEW', module: 'ANALYTICS' },
     ];
