@@ -21,7 +21,10 @@ import { GalleryRouter } from './gallerRoutes';
 import { IntegrationRouter } from './integration.routes';
 import { SnwelEnquiryRouter } from './snwelEnquiry';
 import { BlogRouter } from '@/components/blog/admin-routes';
+import { ClientBlogRouter } from '@/components/blog/client-routes';
 import { BlogCategoryRouter } from '@/components/blog-category/blog-category-routes';
+import { TestimonialRouter } from '@/components/testimonial/admin-routes';
+import { ClientTestimonialRouter } from '@/components/testimonial/client-routes';
 import { AdminUserRouter, ClientUserRouter } from '@/modules/UserManagement';
 import { RoleRouter } from '@/modules/UserManagement/routes/roleRoutes';
 import { AdminCourseRouter } from './adminCourseRoutes';
@@ -54,7 +57,10 @@ router.use("/gallery", GalleryRouter);
 router.use("/integrations", IntegrationRouter);
 router.use("/snwel-enquiry", SnwelEnquiryRouter);
 router.use(BlogRouter)
+router.use(ClientBlogRouter)
 router.use(BlogCategoryRouter)
+router.use(TestimonialRouter)
+router.use(ClientTestimonialRouter)
 router.use('/admin/users', AdminUserRouter);
 router.use('/users', ClientUserRouter);
 router.use('/roles', RoleRouter);

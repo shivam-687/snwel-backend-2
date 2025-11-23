@@ -15,29 +15,28 @@ import { getBlogStatistics } from '@/controllers/admin/statisticsController';
 const router = Router();
 
 // Route to get blog statistics (must be before /blogs/:id)
-router.get('/blogs/statistics', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_VIEW'), getBlogStatistics);
+router.get('/blogs/statistics', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_VIEW'), getBlogStatistics);
 
 // Route to create a new blog
-router.post('/blogs', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_CREATE'), createBlogController);
+router.post('/blogs', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_CREATE'), createBlogController);
 
 // Route to get all blogs with optional filters (admin)
-router.get('/blogs', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_VIEW'), getAllBlogsController);
+router.get('/blogs', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_VIEW'), getAllBlogsController);
 
 // Route to get a blog by ID
-router.get('/blogs/:id', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_VIEW'), getBlogByIdController);
+router.get('/blogs/:id', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_VIEW'), getBlogByIdController);
 
 // Route to update a blog by ID
-router.put('/blogs/:id', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_UPDATE'), updateBlogByIdController);
+router.put('/blogs/:id', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_UPDATE'), updateBlogByIdController);
 
 // Route to soft delete a blog by ID
-router.delete('/blogs/:id', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_DELETE'), deleteBlogByIdController);
+router.delete('/blogs/:id', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_DELETE'), deleteBlogByIdController);
 
 // Route to hard delete all soft-deleted blogs
-router.delete('/blogs/hard-delete', passport.authenticate('jwt', {session: false}), checkPermission('BLOG_DELETE'), hardDeleteAllSoftDeletedBlogsController);
+router.delete('/blogs/hard-delete', passport.authenticate('jwt', { session: false }), checkPermission('BLOG_DELETE'), hardDeleteAllSoftDeletedBlogsController);
 
 
 
-router.get("/guest/blogs", getBlogsController);
-router.get("/guest/blogs/:id", getBlogByIdController);
 
-export {router as BlogRouter};
+
+export { router as BlogRouter };
